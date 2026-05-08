@@ -243,6 +243,7 @@ def build_brief(
         score >= ANALYSIS_MIN_SCORE
         and direction is not None
         and levels is not None
+        and symbol not in UNVALIDATED_SYMBOLS  # paper-only — no live alert
     )
 
     confidence = _confidence_bucket(score)

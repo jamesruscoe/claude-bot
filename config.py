@@ -51,8 +51,15 @@ YAHOO_TICKERS: dict[str, str] = {
 INTRADAY_LOOKBACK_DAYS = 730
 
 # Symbols on the live watchlist that have NOT yet passed a backtest. Their
-# briefs get a paper-only warning until they do.
-UNVALIDATED_SYMBOLS: set[str] = {"APLD"}
+# briefs get a paper-only warning AND `take_trade` is forced to False, so no
+# live alert fires — they're still scanned for data collection only.
+#
+# - APLD: only 6 backtest signals, statistically inconclusive. Holds here
+#   until ≥20 signals accumulated.
+# - TSLA: 10-day win rate dropped to 45.5% on 11 signals (below the 50%
+#   breakeven required for 1:2 R:R) on the 2026-05-08 backtest. Demoted
+#   to paper-only pending another data refresh.
+UNVALIDATED_SYMBOLS: set[str] = {"APLD", "TSLA"}
 
 # Per-symbol Order Block impulse-threshold overrides. The default in
 # smc_detector.OB_IMPULSE_THRESHOLD (3%) is calibrated for large caps like
@@ -65,12 +72,11 @@ OB_IMPULSE_OVERRIDES: dict[str, float] = {
 # Per-symbol historical win rate at the 10-day TP1-vs-SL horizon. Updated
 # after each backtest run. Used by the daily briefing to display a coarse
 # probability estimate per signal.
+# Active live-trading symbols only. TSLA + APLD are scanned but unvalidated
+# (see UNVALIDATED_SYMBOLS) and therefore intentionally absent here.
 HISTORICAL_WIN_RATES_10D: dict[str, float] = {
-    "USOIL": 0.667,
     "NVDA":  0.750,
-    "TSLA":  0.455,
-    # APLD intentionally omitted — only 6 backtest signals, not statistically
-    # meaningful. Will be added once we have ≥20 signals to anchor against.
+    "USOIL": 0.667,
 }
 
 # Assets that are sensitive to ongoing geopolitical conflict — always warn.
