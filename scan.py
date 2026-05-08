@@ -44,12 +44,14 @@ from config import (
     BACKTEST_RESULTS_FILE,
     BACKTEST_WARMUP_BARS,
     LOG_FILE,
+    OB_IMPULSE_OVERRIDES,
     SCAN_MIN_SCORE,
     SCAN_RESULTS_FILE,
     SIGNAL_DEDUP_BARS,
     WATCHLIST,
     assert_configured,
 )
+from smc_detector import OB_IMPULSE_THRESHOLD
 from market_data import Bar
 
 logging.basicConfig(
@@ -82,7 +84,8 @@ async def scan_symbol(client: httpx.AsyncClient, symbol: str) -> dict[str, Any]:
             "warnings": [], "take_trade": False,
         }
 
-    score, direction, signals = smc_detector.score_setups(bars)
+    threshold = OB_IMPULSE_OVERRIDES.get(symbol, OB_IMPULSE_THRESHOLD)
+    score, direction, signals = smc_detector.score_setups(bars, impulse_threshold=threshold)
     bias = smc_detector.simple_bias(bars)
     atr14 = smc_detector.atr(bars)
 
@@ -255,9 +258,10 @@ def _backtest_one(symbol: str, bars: list[Bar]) -> dict[str, Any]:
     suppressed_dupes = 0
     recent_fires: list[dict[str, Any]] = []
 
+    threshold = OB_IMPULSE_OVERRIDES.get(symbol, OB_IMPULSE_THRESHOLD)
     for i in range(BACKTEST_WARMUP_BARS, last_index + 1):
         history = bars[:i + 1]
-        score, direction, signals = smc_detector.score_setups(history)
+        score, direction, signals = smc_detector.score_setups(history, impulse_threshold=threshold)
         bias = smc_detector.simple_bias(history)
         atr14 = smc_detector.atr(history)
 

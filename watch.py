@@ -37,11 +37,13 @@ import smc_detector
 from config import (
     ANALYSIS_MIN_SCORE,
     LOG_FILE,
+    OB_IMPULSE_OVERRIDES,
     SIGNAL_DEDUP_BARS,
     WATCH_INTERVAL_SECONDS,
     WATCHLIST,
     assert_configured,
 )
+from smc_detector import OB_IMPULSE_THRESHOLD
 
 logging.basicConfig(
     level=logging.INFO,
@@ -69,7 +71,8 @@ async def one_iteration(
             "warnings": [], "take_trade": False,
         }, 0, -1)
 
-    score, direction, signals = smc_detector.score_setups(bars)
+    threshold = OB_IMPULSE_OVERRIDES.get(symbol, OB_IMPULSE_THRESHOLD)
+    score, direction, signals = smc_detector.score_setups(bars, impulse_threshold=threshold)
     bias = smc_detector.simple_bias(bars)
     atr14 = smc_detector.atr(bars)
 

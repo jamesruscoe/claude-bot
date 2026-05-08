@@ -111,9 +111,10 @@ def _bars_window(timespan: str, multiplier: int, count: int) -> tuple[str, str]:
     """Compute a generous from/to window. We over-fetch and let the API cap to `limit`."""
     now = datetime.now(timezone.utc)
     if timespan == "day":
-        # ~2 years of calendar days covers up to ~500 trading bars, plenty
-        # of history for backtest warm-up + signal evaluation.
-        start = now - timedelta(days=730)
+        # Polygon Stocks Basic (free) docs claim 5 years of EOD history. Ask
+        # for 8 years so we get whatever the API is willing to return — the
+        # API silently truncates to its tier-cap.
+        start = now - timedelta(days=8 * 365)
     else:
         # Intraday is not supported on free tier — kept for completeness but
         # callers shouldn't hit this path.
@@ -145,7 +146,9 @@ async def fetch_candles(
     params = {
         "adjusted": "true",
         "sort": "asc",
-        "limit": str(max(bar_count * 2, 500)),
+        # Polygon's per-request hard cap is 50000 — well above any window
+        # the free tier will actually serve, so we just ask for everything.
+        "limit": "50000",
         "apiKey": MASSIVE_API_KEY,
     }
 

@@ -28,33 +28,49 @@ WATCHLIST: dict[str, str] = {
     "USOIL": "USO",
     "NVDA":  "NVDA",
     "TSLA":  "TSLA",
+    "APLD":  "APLD",
 }
 
 # Yahoo Finance tickers (yfinance) for intraday data. Massive's free tier doesn't
 # return usable 1H/4H/15M aggregates, but yfinance does — we fetch 1H from
 # Yahoo and synthesise 4H locally so the detector can also analyse intraday
 # structure. CL=F is the front-month NYMEX crude futures contract, which
-# tracks USOIL / WTI tightly (closer than the USO ETF proxy).
+# tracks USOIL / WTI tightly (closer than the USO ETF proxy). APLD trades
+# directly on Nasdaq so no proxy is needed.
 YAHOO_TICKERS: dict[str, str] = {
     "USOIL": "CL=F",
     "NVDA":  "NVDA",
     "TSLA":  "TSLA",
+    "APLD":  "APLD",
 }
 
-# Lookback window for 1H bars from Yahoo. 30 days × ~7 RTH bars/day on equities
-# ≈ 210 bars; CL=F is near-24h so 30d ≈ 600+ bars. Plenty for the SMC detector.
-INTRADAY_LOOKBACK_DAYS = 30
+# Lookback window for 1H bars from Yahoo. 730 days is yfinance's hard cap on
+# the 1H interval — request the maximum so the intraday detector has the
+# longest possible runway. Equities (RTH-only) yield ~5000 bars at this
+# window; CL=F (near-24h) yields ~16000.
+INTRADAY_LOOKBACK_DAYS = 730
 
-# No unvalidated symbols in the live watchlist any more.
-UNVALIDATED_SYMBOLS: set[str] = set()
+# Symbols on the live watchlist that have NOT yet passed a backtest. Their
+# briefs get a paper-only warning until they do.
+UNVALIDATED_SYMBOLS: set[str] = {"APLD"}
+
+# Per-symbol Order Block impulse-threshold overrides. The default in
+# smc_detector.OB_IMPULSE_THRESHOLD (3%) is calibrated for large caps like
+# NVDA/TSLA; smaller caps (APLD) move in smaller increments so a 3% bar over
+# 1-3 days is rarer — the lower threshold gives the detector more candidates.
+OB_IMPULSE_OVERRIDES: dict[str, float] = {
+    "APLD": 0.02,
+}
 
 # Per-symbol historical win rate at the 10-day TP1-vs-SL horizon. Updated
 # after each backtest run. Used by the daily briefing to display a coarse
 # probability estimate per signal.
 HISTORICAL_WIN_RATES_10D: dict[str, float] = {
-    "USOIL": 1.000,
-    "NVDA":  0.667,
-    "TSLA":  0.625,
+    "USOIL": 0.667,
+    "NVDA":  0.750,
+    "TSLA":  0.455,
+    # APLD intentionally omitted — only 6 backtest signals, not statistically
+    # meaningful. Will be added once we have ≥20 signals to anchor against.
 }
 
 # Assets that are sensitive to ongoing geopolitical conflict — always warn.
@@ -65,6 +81,7 @@ TRADING_WINDOWS: dict[str, str] = {
     "USOIL": "13:30-15:30 GMT (US session + EIA Wednesdays)",
     "NVDA":  "13:30-16:00 GMT (US open + first 2.5h)",
     "TSLA":  "13:30-16:00 GMT (US open + first 2.5h)",
+    "APLD":  "13:30-16:00 GMT (US open + first 2.5h)",
 }
 
 # --- API base ---
@@ -109,14 +126,20 @@ DASHBOARD_URL = f"http://{DASHBOARD_HOST}:{DASHBOARD_PORT}"
 HTF_BIAS_BARS = 60  # last 60 days of daily candles
 
 # --- Backtest config ---
-BACKTEST_WARMUP_BARS = 60  # need this much history before generating signals
+# 120 daily bars (~6 months trading) of warmup gives the SMA-50 regime
+# filter, the 60-bar HTF bias, and the OB/BOS detectors enough history
+# before the walk-forward starts firing signals.
+BACKTEST_WARMUP_BARS = 120
 BACKTEST_HORIZONS = (5, 10)  # forward-look windows in trading days
 
 # --- Timeframe configs (multiplier, timespan, lookback_bars) ---
 # Daily ONLY. Massive free tier doesn't return usable intraday data
-# (1H comes back empty/sparse, 4H is always resultsCount=0).
+# (1H comes back empty/sparse, 4H is always resultsCount=0). `bars` is the
+# *retain* count — we over-fetch from the API and trim to the most recent
+# `bars` here. 2000 covers ~8 years of trading days, well beyond what the
+# Polygon free tier returns in practice.
 TIMEFRAMES = {
-    "D": {"multiplier": 1, "timespan": "day", "bars": 250},
+    "D": {"multiplier": 1, "timespan": "day", "bars": 2000},
 }
 
 

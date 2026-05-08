@@ -142,10 +142,14 @@ def _build_reasoning(symbol: str, score: int, direction: str | None,
                      signals: dict[str, Any], levels: dict[str, Any] | None,
                      news_sentiment: dict[str, Any] | None = None,
                      macro_warning: str | None = None,
-                     staleness_reasons: list[str] | None = None) -> str:
+                     staleness_reasons: list[str] | None = None,
+                     regime_block: str | None = None) -> str:
     parts: list[str] = []
     ob = signals.get("ob_retest")
     bos = signals.get("bos_retest")
+
+    if regime_block:
+        parts.append(f"{symbol}: {regime_block}.")
 
     if staleness_reasons:
         parts.append(
@@ -172,7 +176,7 @@ def _build_reasoning(symbol: str, score: int, direction: str | None,
         parts.append(
             f"{bos['direction']} BOS retest only at {bos['level']}; no aligned OB retest yet."
         )
-    elif not staleness_reasons:
+    elif not staleness_reasons and not regime_block:
         parts.append(f"{symbol}: no qualifying setup right now.")
 
     if levels and direction:
@@ -231,6 +235,7 @@ def build_brief(
     headlines = enrichment.get("headlines", [])
     news_warnings = list(news_warnings or [])
     staleness_reasons = list(staleness_reasons or [])
+    regime_block = (signals or {}).get("regime_blocked")
 
     levels = compute_levels(direction, signals, atr14=atr14) if direction else None
 
@@ -247,7 +252,11 @@ def build_brief(
     win_rate = HISTORICAL_WIN_RATES_10D.get(symbol)
 
     warnings = _warnings(symbol, direction, enrichment)
-    # Stale-price reasons go first — they explain why score collapsed.
+    # Front-load reasons that explain a collapsed/zero score: regime block
+    # first (final gate inside the detector), then staleness (live-price
+    # invalidation), then everything else.
+    if regime_block:
+        warnings.insert(0, regime_block)
     warnings = staleness_reasons + warnings
     warnings.extend(news_warnings)
     if macro_warning:
@@ -292,6 +301,7 @@ def build_brief(
         symbol, score, direction, signals, levels,
         news_sentiment=news_sentiment, macro_warning=macro_warning,
         staleness_reasons=staleness_reasons,
+        regime_block=regime_block,
     )
     return brief
 

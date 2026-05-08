@@ -881,10 +881,14 @@
       const sig = brief.signals || {};
       const ob = sig.ob_retest;
       const bos = sig.bos_retest;
+      const regimeBlock = sig.regime_blocked;
       const warns = brief.warnings || [];
       const stale = warns.some(w => /left behind|stale/i.test(w || ''));
-      const conflictNews = warns.find(w => /News sentiment.*conflicts/i.test(w || ''));
+      const conflictNews = warns.find(w => /news conflicts|News sentiment.*conflicts/i.test(w || ''));
 
+      if (regimeBlock) {
+        return `Setup detected but blocked by the 50MA regime filter — ${regimeBlock}. Counter-trend trades are suppressed here. Wait for price to cross back through the 50MA before this setup is allowed to fire.`;
+      }
       if (stale) {
         return 'Setup was invalidated because intraday price has run more than 2% beyond the OB/BOS zone. Wait for price to return into the zone — or for a fresh setup to form.';
       }

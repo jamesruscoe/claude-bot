@@ -48,7 +48,11 @@ class OBRetest:
     impulse_pct: float
 
 
-def detect_ob_retest(bars: list[Bar]) -> OBRetest | None:
+def detect_ob_retest(
+    bars: list[Bar],
+    *,
+    impulse_threshold: float = OB_IMPULSE_THRESHOLD,
+) -> OBRetest | None:
     n = len(bars)
     if n < 6:
         return None
@@ -68,10 +72,10 @@ def detect_ob_retest(bars: list[Bar]) -> OBRetest | None:
             if o0 <= 0:
                 continue
             move = (cN - o0) / o0
-            if move >= OB_IMPULSE_THRESHOLD:
+            if move >= impulse_threshold:
                 found = ("long", start_idx, end_idx, move)
                 break
-            if move <= -OB_IMPULSE_THRESHOLD:
+            if move <= -impulse_threshold:
                 found = ("short", start_idx, end_idx, abs(move))
                 break
         if found:
@@ -215,6 +219,45 @@ def detect_bos_retest(bars: list[Bar]) -> BOSRetest | None:
     return None
 
 
+# ---------- 50MA regime filter ----------
+
+REGIME_MA_PERIOD = 50
+
+
+def sma(bars: list[Bar], period: int = REGIME_MA_PERIOD) -> float | None:
+    """Simple moving average of the last `period` closes. None if too few bars."""
+    if len(bars) < period:
+        return None
+    return sum(b.c for b in bars[-period:]) / period
+
+
+def regime_filter(bars: list[Bar], direction: str | None) -> str | None:
+    """Block setups that go against the 50MA regime. Returns the block reason
+    string, or None if the setup is clear to fire.
+
+    Long setups blocked when current close is below the 50MA.
+    Short setups blocked when current close is above the 50MA.
+    Insufficient history → no block (don't penalise the early walk-forward
+    window before the MA has converged)."""
+    if direction is None:
+        return None
+    ma = sma(bars, REGIME_MA_PERIOD)
+    if ma is None:
+        return None
+    current = bars[-1].c
+    if direction == "long" and current < ma:
+        return (
+            f"against regime — 50MA filter blocked this setup "
+            f"(price {current:.2f} < 50MA {ma:.2f})"
+        )
+    if direction == "short" and current > ma:
+        return (
+            f"against regime — 50MA filter blocked this setup "
+            f"(price {current:.2f} > 50MA {ma:.2f})"
+        )
+    return None
+
+
 # ---------- ATR (Wilder, 14-period default) — used for ATR-aware SL placement ----------
 
 def atr(bars: list[Bar], period: int = 14) -> float | None:
@@ -289,14 +332,21 @@ def simple_bias(bars: list[Bar], window: int = 60) -> str:
 
 # ---------- Scoring ----------
 
-def score_setups(bars: list[Bar]) -> tuple[int, str | None, dict[str, Any]]:
+def score_setups(
+    bars: list[Bar],
+    *,
+    impulse_threshold: float = OB_IMPULSE_THRESHOLD,
+) -> tuple[int, str | None, dict[str, Any]]:
     """Return (score, direction, signals_dict).
 
     50  — exactly one setup fires
     100 — both setups fire AND agree on direction
-    0   — none, or both fire but disagree
+    0   — none, both fire but disagree, or 50MA regime filter blocked it
+
+    `impulse_threshold` overrides the default OB impulse percentage — used
+    for smaller-cap symbols whose typical bar range is below 3%.
     """
-    ob = detect_ob_retest(bars)
+    ob = detect_ob_retest(bars, impulse_threshold=impulse_threshold)
     bos = detect_bos_retest(bars)
 
     signals: dict[str, Any] = {"ob_retest": None, "bos_retest": None}
@@ -318,15 +368,26 @@ def score_setups(bars: list[Bar]) -> tuple[int, str | None, dict[str, Any]]:
             "broken_at": bos.broken_at,
         }
 
+    # Determine candidate score + direction first so we can filter by regime.
     if ob and bos:
         if ob.direction == bos.direction:
-            return 100, ob.direction, signals
-        return 0, None, signals  # conflicting setups
-    if ob:
-        return 50, ob.direction, signals
-    if bos:
-        return 50, bos.direction, signals
-    return 0, None, signals
+            score, direction = 100, ob.direction
+        else:
+            return 0, None, signals  # conflicting setups
+    elif ob:
+        score, direction = 50, ob.direction
+    elif bos:
+        score, direction = 50, bos.direction
+    else:
+        return 0, None, signals
+
+    # 50MA regime filter — last gate before returning a fireable signal.
+    block = regime_filter(bars, direction)
+    if block:
+        signals["regime_blocked"] = block
+        return 0, None, signals
+
+    return score, direction, signals
 
 
 # ---------- Live-price staleness invalidation ----------
@@ -336,7 +397,11 @@ STALE_THRESHOLD_PCT = 0.02  # 2% — see invalidate_by_price docstring
 
 def score_from_signals(signals: dict[str, Any]) -> tuple[int, str | None]:
     """Re-derive (score, direction) from a possibly-modified signals dict.
-    Mirrors the scoring logic at the bottom of `score_setups`."""
+    Mirrors the scoring logic at the bottom of `score_setups`. Honours the
+    `regime_blocked` flag — once the 50MA filter has rejected a setup,
+    re-deriving from surviving signals must not resurrect it."""
+    if signals.get("regime_blocked"):
+        return 0, None
     ob = signals.get("ob_retest")
     bos = signals.get("bos_retest")
     if ob and bos:
@@ -405,6 +470,9 @@ def invalidate_by_price(
 
 # ---------- News sentiment confluence ----------
 
+NEWS_VETO_CAP = 40  # hard ceiling when news disagrees with technical direction
+
+
 def apply_news_sentiment(
     score: int,
     direction: str | None,
@@ -413,7 +481,10 @@ def apply_news_sentiment(
     """Adjust the technical confluence score by news sentiment alignment.
 
     +15 when news sentiment matches the technical direction.
-    -10 plus a warning when they conflict.
+    Hard veto when they conflict — score is capped at NEWS_VETO_CAP (40)
+    regardless of how strong the technical confluence is, and a warning is
+    emitted. This is intentionally aggressive: trading against fresh
+    headlines has historically been the largest source of avoidable losers.
     No change if news is neutral, missing, or there's no technical direction.
 
     Returns (adjusted_score, list_of_warnings).
@@ -427,8 +498,9 @@ def apply_news_sentiment(
         return score + 15, []
     if (sentiment == "bullish" and direction == "short") or \
        (sentiment == "bearish" and direction == "long"):
-        return score - 10, [
-            f"News sentiment ({sentiment}) conflicts with technical direction ({direction})."
+        capped = min(score, NEWS_VETO_CAP)
+        return capped, [
+            f"news conflicts with technical direction ({sentiment} news vs {direction} setup)"
         ]
     return score, []
 
