@@ -61,6 +61,11 @@
       padding: 2px 9px; border-radius: 999px;
       font-size: 11px; font-family: ui-monospace, monospace;
     }
+    .watching-pill.amber {
+      background: rgba(210,153,34,0.14);
+      color: var(--amber);
+      border-color: rgba(210,153,34,0.45);
+    }
 
     main {
       display: grid; gap: 20px; padding: 20px 24px;
@@ -141,9 +146,13 @@
     .badge.medium { background: rgba(210,153,34,0.12); border-color: rgba(210,153,34,0.4); color: var(--amber); }
     .badge.low { background: rgba(110,118,129,0.18); border-color: rgba(110,118,129,0.5); color: var(--muted); }
     .badge.warn { background: rgba(210,153,34,0.12); border-color: rgba(210,153,34,0.4); color: var(--amber); }
+    .badge.danger { background: rgba(248,81,73,0.14); border-color: rgba(248,81,73,0.5); color: var(--red); }
     .badge.win { background: rgba(63,185,80,0.18); border-color: rgba(63,185,80,0.5); color: var(--green); }
     .badge.loss { background: rgba(248,81,73,0.18); border-color: rgba(248,81,73,0.5); color: var(--red); }
     .badge.stopped { background: rgba(110,118,129,0.18); border-color: rgba(110,118,129,0.5); color: var(--muted); }
+    .badge.bullish { background: rgba(63,185,80,0.12); border-color: rgba(63,185,80,0.4); color: var(--green); }
+    .badge.bearish { background: rgba(248,81,73,0.14); border-color: rgba(248,81,73,0.5); color: var(--red); }
+    .badge.neutral { background: rgba(110,118,129,0.18); border-color: rgba(110,118,129,0.5); color: var(--muted); }
 
     .reasoning {
       margin: 12px 0 4px; padding: 10px 12px;
@@ -183,6 +192,11 @@
     }
     .scan-table tr:last-child td { border-bottom: none; }
     .scan-table tr.watch td { background: rgba(63,185,80,0.06); }
+    .scan-table tr.partial td { background: rgba(210,153,34,0.05); }
+    .scan-table tr.clickable { cursor: pointer; transition: background 0.12s; }
+    .scan-table tr.clickable:hover td { background: #1f2731; }
+    .scan-table tr.selected td { background: rgba(88,166,255,0.10) !important; }
+    .scan-table tr.selected:first-child td { border-top: 1px solid rgba(88,166,255,0.4); }
     .scan-table .score-cell {
       font-family: ui-monospace, monospace;
       font-weight: 600;
@@ -190,10 +204,100 @@
     .scan-table .score-high { color: var(--green); }
     .scan-table .score-med  { color: var(--amber); }
     .scan-table .score-low  { color: var(--muted); }
+    .scan-table .notes-cell {
+      color: var(--muted);
+      max-width: 320px;
+      overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    }
+    .scan-table .sparkline {
+      display: inline-block; width: 60px; height: 18px;
+      vertical-align: middle;
+    }
+    .scan-table .sparkline-empty {
+      color: var(--grey); font-size: 11px;
+    }
 
     .scan-summary-bar {
       display: flex; gap: 16px; align-items: center;
       margin-bottom: 8px; color: var(--muted); font-size: 12px;
+    }
+
+    /* Detail panel — appears below scan table on row click */
+    .detail-panel {
+      margin-top: 14px;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-left: 4px solid var(--accent);
+      border-radius: 8px;
+      padding: 16px 18px;
+      animation: slidein 0.25s ease-out;
+    }
+    .detail-panel.take { border-left-color: var(--green); }
+    .detail-panel.partial { border-left-color: var(--amber); }
+    .detail-panel.empty { border-left-color: var(--grey); }
+    .detail-panel.invalidated { border-left-color: var(--red); }
+
+    .detail-head {
+      display: flex; justify-content: space-between; align-items: baseline;
+      margin-bottom: 10px; gap: 12px; flex-wrap: wrap;
+    }
+    .detail-head .close {
+      flex: 0 0 auto;
+      background: transparent; border: none; color: var(--muted);
+      font-size: 18px; line-height: 1; cursor: pointer; padding: 0 4px;
+    }
+    .detail-head .close:hover { color: var(--text); }
+    .detail-section {
+      margin-top: 14px; padding-top: 12px;
+      border-top: 1px solid var(--border);
+    }
+    .detail-section:first-of-type { border-top: none; padding-top: 0; }
+    .detail-section h3 {
+      margin: 0 0 8px 0;
+      font-size: 11px; font-weight: 600;
+      text-transform: uppercase; letter-spacing: 0.06em;
+      color: var(--muted);
+    }
+    .detail-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 8px;
+    }
+    .detail-grid .stat .value { font-size: 13px; }
+
+    .news-list { display: flex; flex-direction: column; gap: 6px; }
+    .news-item {
+      display: flex; gap: 8px; align-items: flex-start;
+      padding: 6px 8px;
+      background: var(--panel-2); border-radius: 5px;
+      font-size: 12px; line-height: 1.45;
+    }
+    .news-item .arrow { width: 14px; flex: 0 0 auto; text-align: center; font-weight: 600; }
+    .news-item.bullish .arrow { color: var(--green); }
+    .news-item.bearish .arrow { color: var(--red); }
+    .news-item.neutral .arrow { color: var(--muted); }
+    .news-item .body { flex: 1; min-width: 0; }
+    .news-item .pub { color: var(--muted); font-size: 11px; margin-left: 6px; }
+
+    .why-no-trade {
+      margin: 10px 0 0;
+      padding: 10px 12px;
+      background: rgba(210,153,34,0.07);
+      border: 1px solid rgba(210,153,34,0.25);
+      border-radius: 6px;
+      font-size: 12.5px; line-height: 1.55;
+    }
+    .why-no-trade strong { color: var(--amber); }
+
+    .signal-detail {
+      padding: 10px 12px;
+      background: var(--panel-2);
+      border-radius: 6px;
+      font-size: 12.5px; line-height: 1.55;
+    }
+    .signal-detail + .signal-detail { margin-top: 8px; }
+    .signal-detail .label {
+      color: var(--muted); font-size: 11px;
+      text-transform: uppercase; letter-spacing: 0.05em;
     }
 
     .history-item {
@@ -237,6 +341,7 @@
       <h2>Daily Scan</h2>
       <div class="scan-summary-bar" id="scan-summary-bar">No scan yet — run <span class="mono">&nbsp;py scan.py</span></div>
       <div id="scan-table-wrap"></div>
+      <div id="detail-panel-wrap"></div>
     </section>
   </main>
 
@@ -250,6 +355,17 @@
     const watchingList = document.getElementById('watching-list');
     const scanSummaryBar = document.getElementById('scan-summary-bar');
     const scanTableWrap = document.getElementById('scan-table-wrap');
+    const detailPanelWrap = document.getElementById('detail-panel-wrap');
+
+    // Thresholds — keep in sync with config.py.
+    const TAKE_TRADE_MIN = 75;   // ANALYSIS_MIN_SCORE
+    const PARTIAL_MIN = 50;      // SCAN_MIN_SCORE
+    const SPARKLINE_LIMIT = 10;
+    const SPARKLINE_MAX = 115;   // accommodates 100 base + 15 news bonus
+
+    let lastScanResults = [];
+    let activeWatching = {};       // symbols watch.py is heartbeating on
+    let selectedSymbol = null;     // currently expanded detail panel
 
     function fmt(n) {
       if (n === null || n === undefined || n === '') return '—';
@@ -271,6 +387,62 @@
       return String(s ?? '').replace(/[&<>"']/g, c => ({
         '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
       }[c]));
+    }
+    function escapeAttr(s) {
+      // Same as escapeHtml — included as a separate name so intent is clear
+      // when used inside attribute values (e.g. title="…").
+      return escapeHtml(s);
+    }
+
+    // ---------- Score history (localStorage-backed) ----------
+    const SCORE_HISTORY_KEY = 'tradingbot.scoreHistory.v1';
+
+    function loadScoreHistory() {
+      try {
+        return JSON.parse(localStorage.getItem(SCORE_HISTORY_KEY) || '{}');
+      } catch (e) { return {}; }
+    }
+    function saveScoreHistory(h) {
+      try { localStorage.setItem(SCORE_HISTORY_KEY, JSON.stringify(h)); }
+      catch (e) { /* quota or disabled — ignore */ }
+    }
+    function pushScoreHistory(symbol, score, ts) {
+      const h = loadScoreHistory();
+      const arr = h[symbol] || [];
+      // Idempotent on the same scan timestamp (handles dashboard refresh).
+      if (arr.length && arr[arr.length - 1].ts === ts) return arr;
+      arr.push({ ts: ts || new Date().toISOString(), score: Number(score) || 0 });
+      while (arr.length > SPARKLINE_LIMIT) arr.shift();
+      h[symbol] = arr;
+      saveScoreHistory(h);
+      return arr;
+    }
+    function getScoreHistory(symbol) {
+      return loadScoreHistory()[symbol] || [];
+    }
+
+    function renderSparkline(symbol) {
+      const hist = getScoreHistory(symbol);
+      if (hist.length < 2) {
+        return '<span class="sparkline-empty">building…</span>';
+      }
+      const W = 60, H = 18, PAD = 1;
+      const usable = SPARKLINE_MAX;
+      const xs = hist.map((_, i) => (i / (hist.length - 1)) * (W - 2 * PAD) + PAD);
+      const ys = hist.map(p => H - PAD - (Math.max(0, Math.min(usable, p.score)) / usable) * (H - 2 * PAD));
+      const points = xs.map((x, i) => `${x.toFixed(1)},${ys[i].toFixed(1)}`).join(' ');
+      const last = hist[hist.length - 1].score;
+      const prev = hist[hist.length - 2].score;
+      const trendColor = last > prev ? 'var(--green)' : (last < prev ? 'var(--red)' : 'var(--muted)');
+      const lastX = xs[xs.length - 1].toFixed(1);
+      const lastY = ys[ys.length - 1].toFixed(1);
+      // Title attr summarises the series for hover inspection.
+      const summary = hist.map(p => p.score).join(' → ');
+      return `<svg class="sparkline" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none">
+        <title>${escapeAttr('scores: ' + summary)}</title>
+        <polyline fill="none" stroke="${trendColor}" stroke-width="1.5" stroke-linejoin="round" points="${points}"/>
+        <circle cx="${lastX}" cy="${lastY}" r="2" fill="${trendColor}"/>
+      </svg>`;
     }
 
     // ---------- Live alert cards ----------
@@ -422,68 +594,347 @@
 
     // ---------- Daily scan column ----------
     function scoreClass(score) {
-      if (score >= 60) return 'score-high';
-      if (score >= 50) return 'score-med';
+      if (score >= TAKE_TRADE_MIN) return 'score-high';
+      if (score >= PARTIAL_MIN)    return 'score-med';
       return 'score-low';
+    }
+
+    function rowClass(brief) {
+      const score = brief.confluence_score ?? 0;
+      if (brief.take_trade)            return 'watch';
+      if (score >= PARTIAL_MIN && score < TAKE_TRADE_MIN) return 'partial';
+      return '';
     }
 
     function renderScan(payload) {
       const ts = payload.timestamp;
       const results = payload.results || [];
+      lastScanResults = results;
       lastScanEl.textContent = 'last scan: ' + (ts ? fmtTime(ts) : 'never');
+
+      // Persist score history per symbol — drives the sparklines.
+      results.forEach(r => pushScoreHistory(r.symbol, r.confluence_score ?? 0, ts));
 
       if (results.length === 0) {
         scanSummaryBar.innerHTML = 'No scan yet — run <span class="mono">&nbsp;py scan.py</span>';
         scanTableWrap.innerHTML = '<div class="empty">No symbols scanned.</div>';
+        detailPanelWrap.innerHTML = '';
+        renderWatchingHeader();
         return;
       }
 
       const sorted = [...results].sort((a, b) => (b.confluence_score ?? 0) - (a.confluence_score ?? 0));
-      const watch = sorted.filter(r => (r.confluence_score ?? 0) >= 60);
-      const note  = sorted.filter(r => (r.confluence_score ?? 0) >= 50 && (r.confluence_score ?? 0) < 60);
+      const fired   = sorted.filter(r => r.take_trade);
+      const partial = sorted.filter(r => !r.take_trade && (r.confluence_score ?? 0) >= PARTIAL_MIN);
 
       scanSummaryBar.innerHTML = `
-        <span><strong style="color:var(--green)">${watch.length}</strong> to watch (≥60)</span>
-        <span><strong style="color:var(--amber)">${note.length}</strong> notable (50-59)</span>
+        <span><strong style="color:var(--green)">${fired.length}</strong> firing (≥${TAKE_TRADE_MIN})</span>
+        <span><strong style="color:var(--amber)">${partial.length}</strong> partial (${PARTIAL_MIN}–${TAKE_TRADE_MIN - 1})</span>
         <span>${results.length} total</span>
       `;
 
       const rows = sorted.map(r => {
         const score = r.confluence_score ?? 0;
-        const isWatch = score >= 60;
         const dir = (r.direction || '—').toUpperCase();
         const dirCls = r.direction === 'long' ? 'dir-long' : (r.direction === 'short' ? 'dir-short' : 'dir-skip');
-        const reason = (r.reasoning || '').replace(/\s+/g, ' ').slice(0, 80);
+        const reasonFull = (r.reasoning || '').replace(/\s+/g, ' ').trim();
+        const reasonShort = reasonFull.slice(0, 80);
+        const isSelected = r.symbol === selectedSymbol;
+        const classes = [
+          'clickable',
+          rowClass(r),
+          isSelected ? 'selected' : '',
+        ].filter(Boolean).join(' ');
         return `
-          <tr class="${isWatch ? 'watch' : ''}">
+          <tr class="${classes}" data-symbol="${escapeAttr(r.symbol)}">
             <td><strong>${escapeHtml(r.symbol)}</strong></td>
             <td class="score-cell ${scoreClass(score)}">${score}</td>
             <td class="${dirCls}">${escapeHtml(dir)}</td>
             <td>${escapeHtml(r.htf_bias || '?')}</td>
-            <td style="color:var(--muted)">${escapeHtml(reason)}${reason.length >= 80 ? '…' : ''}</td>
+            <td>${renderSparkline(r.symbol)}</td>
+            <td class="notes-cell" title="${escapeAttr(reasonFull)}">${escapeHtml(reasonShort)}${reasonFull.length > 80 ? '…' : ''}</td>
           </tr>`;
       }).join('');
 
       scanTableWrap.innerHTML = `
         <table class="scan-table">
           <thead>
-            <tr><th>Symbol</th><th>Score</th><th>Dir</th><th>HTF</th><th>Notes</th></tr>
+            <tr><th>Symbol</th><th>Score</th><th>Dir</th><th>HTF</th><th>Trend</th><th>Notes</th></tr>
           </thead>
           <tbody>${rows}</tbody>
         </table>
       `;
+
+      // Wire row clicks. Re-binding on every scan is fine — the table is rebuilt.
+      scanTableWrap.querySelectorAll('tr.clickable').forEach(tr => {
+        tr.addEventListener('click', () => selectSymbol(tr.dataset.symbol));
+      });
+
+      // Refresh expanded detail panel if a symbol is selected.
+      if (selectedSymbol) renderDetailPanel(selectedSymbol);
+      renderWatchingHeader();
     }
 
-    function renderWatching(state) {
-      const watching = state?.watching || {};
-      const symbols = Object.keys(watching);
-      if (symbols.length === 0) {
+    function selectSymbol(symbol) {
+      if (selectedSymbol === symbol) {
+        selectedSymbol = null;
+        detailPanelWrap.innerHTML = '';
+      } else {
+        selectedSymbol = symbol;
+        renderDetailPanel(symbol);
+      }
+      // Re-apply selected styling without rebuilding the whole table.
+      scanTableWrap.querySelectorAll('tr.clickable').forEach(tr => {
+        tr.classList.toggle('selected', tr.dataset.symbol === selectedSymbol);
+      });
+    }
+
+    function renderDetailPanel(symbol) {
+      const brief = lastScanResults.find(r => r.symbol === symbol);
+      if (!brief) { detailPanelWrap.innerHTML = ''; return; }
+
+      const score = brief.confluence_score ?? 0;
+      const dir = (brief.direction || '—').toUpperCase();
+      const dirCls = brief.direction === 'long' ? 'dir-long' : (brief.direction === 'short' ? 'dir-short' : 'dir-skip');
+      const winRate = brief.historical_win_rate_10d != null
+        ? (brief.historical_win_rate_10d * 100).toFixed(0) + '%'
+        : '—';
+
+      const stale = (brief.warnings || []).some(w =>
+        /left behind|stale/i.test(w || '')
+      );
+      let panelClass = 'empty';
+      if (brief.take_trade) panelClass = 'take';
+      else if (stale) panelClass = 'invalidated';
+      else if (score >= PARTIAL_MIN) panelClass = 'partial';
+
+      // ---- Sections ----
+      const summarySection = `
+        <div class="detail-section">
+          <h3>Summary</h3>
+          <div class="detail-grid">
+            <div class="stat"><div class="label">Current price</div><div class="value mono">${escapeHtml(fmt(brief.current_price))}</div></div>
+            <div class="stat"><div class="label">ATR(14)</div><div class="value mono">${escapeHtml(fmt(brief.atr14))}</div></div>
+            <div class="stat"><div class="label">HTF bias</div><div class="value">${escapeHtml(brief.htf_bias || '?')}</div></div>
+            <div class="stat"><div class="label">Score</div><div class="value mono">${score}/100</div></div>
+            <div class="stat"><div class="label">Direction</div><div class="value ${dirCls}">${escapeHtml(dir)}</div></div>
+            <div class="stat"><div class="label">Hist. win rate (10d)</div><div class="value mono">${escapeHtml(winRate)}</div></div>
+          </div>
+        </div>`;
+
+      const intraday = brief.intraday || {};
+      const h4 = intraday.h4, h1 = intraday.h1;
+      const intradayBadge = (block, tf) => {
+        if (!block) return `<span class="badge low">${tf}: no data</span>`;
+        const s = block.score ?? 0;
+        const d = (block.direction || '—').toUpperCase();
+        const cls = s >= TAKE_TRADE_MIN ? 'high' : (s >= PARTIAL_MIN ? 'medium' : 'low');
+        return `<span class="badge ${cls}">${tf}: ${s}/${escapeHtml(d)}</span>`;
+      };
+      const intradaySection = `
+        <div class="detail-section">
+          <h3>Intraday confluence</h3>
+          <div class="meta">
+            ${intradayBadge(h4, '4H')}
+            ${intradayBadge(h1, '1H')}
+            <span class="badge mono">${intraday.h1_bars || 0} 1H bars</span>
+          </div>
+        </div>`;
+
+      // News
+      const newsSentiment = brief.news_sentiment || 'neutral';
+      const newsScore = brief.news_score ?? 0;
+      const newsCount = brief.news_headline_count ?? 0;
+      const newsHeadlines = brief.news_top_headlines || [];
+      const sentBadgeCls = newsSentiment;
+      const headlineRows = newsHeadlines.length === 0
+        ? '<div style="color:var(--muted);font-size:12px">No headlines fetched.</div>'
+        : newsHeadlines.map(h => {
+            const s = h.score || 0;
+            const cls = s > 0 ? 'bullish' : s < 0 ? 'bearish' : 'neutral';
+            const arrow = s > 0 ? '↑' : s < 0 ? '↓' : '·';
+            const pub = h.publisher ? `<span class="pub">[${escapeHtml(h.publisher)}]</span>` : '';
+            return `<div class="news-item ${cls}">
+              <div class="arrow">${arrow}</div>
+              <div class="body">${escapeHtml(h.title || '')}${pub}</div>
+            </div>`;
+          }).join('');
+      const newsSection = `
+        <div class="detail-section">
+          <h3>News sentiment</h3>
+          <div class="meta">
+            <span class="badge ${sentBadgeCls}">${escapeHtml(newsSentiment.toUpperCase())}</span>
+            <span class="badge mono">net ${newsScore >= 0 ? '+' : ''}${newsScore}</span>
+            <span class="badge mono">${newsCount} headlines</span>
+          </div>
+          <div class="news-list">${headlineRows}</div>
+        </div>`;
+
+      // Levels (only if take_trade)
+      let levelsSection = '';
+      if (brief.take_trade) {
+        levelsSection = `
+          <div class="detail-section">
+            <h3>Trade levels</h3>
+            <div class="detail-grid">
+              <div class="stat"><div class="label">Entry zone</div><div class="value mono">${escapeHtml(fmt(brief.entry_zone_low))} – ${escapeHtml(fmt(brief.entry_zone_high))}</div></div>
+              <div class="stat"><div class="label">Entry (mid)</div><div class="value mono">${escapeHtml(fmt(brief.entry))}</div></div>
+              <div class="stat"><div class="label">Stop loss</div><div class="value mono">${escapeHtml(fmt(brief.stop_loss))}</div></div>
+              <div class="stat"><div class="label">TP1</div><div class="value mono">${escapeHtml(fmt(brief.take_profit_1))}</div></div>
+              <div class="stat"><div class="label">TP2</div><div class="value mono">${escapeHtml(fmt(brief.take_profit_2))}</div></div>
+              <div class="stat"><div class="label">R:R</div><div class="value mono">${escapeHtml(brief.rr_ratio || '—')}</div></div>
+            </div>
+            <div class="meta" style="margin-top:10px">
+              <span class="badge">⏱ ${escapeHtml(brief.best_window || '—')}</span>
+              <span class="badge ${(brief.confidence || 'medium')}">confidence: ${escapeHtml(brief.confidence || 'medium')}</span>
+            </div>
+          </div>`;
+      }
+
+      // Detected signals
+      const sigs = brief.signals || {};
+      const sigBlocks = [];
+      if (sigs.ob_retest) {
+        const ob = sigs.ob_retest;
+        sigBlocks.push(`
+          <div class="signal-detail">
+            <div class="label">Order Block Retest — ${escapeHtml((ob.direction || '').toUpperCase())}</div>
+            <div>Origin zone: <span class="mono">${escapeHtml(fmt(ob.ob_low))} – ${escapeHtml(fmt(ob.ob_high))}</span></div>
+            <div>Impulse: <span class="mono">${(ob.impulse_pct * 100).toFixed(2)}%</span> over bars ${ob.impulse_start}–${ob.impulse_end}.</div>
+            <div style="color:var(--muted);font-size:12px;margin-top:4px">Last opposite-coloured candle before the impulse marks the OB. Fires on first retrace into that zone with no prior invalidation.</div>
+          </div>`);
+      }
+      if (sigs.bos_retest) {
+        const bos = sigs.bos_retest;
+        sigBlocks.push(`
+          <div class="signal-detail">
+            <div class="label">Break of Structure Retest — ${escapeHtml((bos.direction || '').toUpperCase())}</div>
+            <div>Broken level: <span class="mono">${escapeHtml(fmt(bos.level))}</span> (swing at bar ${bos.swing_index}, broken at bar ${bos.broken_at}).</div>
+            <div style="color:var(--muted);font-size:12px;margin-top:4px">Price closed past a prior swing extreme; signal fires on the first retest of that broken level.</div>
+          </div>`);
+      }
+      const signalsSection = sigBlocks.length === 0
+        ? `<div class="detail-section">
+            <h3>Signals detected</h3>
+            <div style="color:var(--muted);font-size:12.5px">No active OB or BOS retest right now.</div>
+           </div>`
+        : `<div class="detail-section"><h3>Signals detected</h3>${sigBlocks.join('')}</div>`;
+
+      // Why no trade — only render when there's no firing trade
+      let whySection = '';
+      if (!brief.take_trade) {
+        const why = whyNoTrade(brief);
+        whySection = `
+          <div class="detail-section">
+            <h3>Why no trade?</h3>
+            <div class="why-no-trade"><strong>What's missing:</strong> ${escapeHtml(why)}</div>
+          </div>`;
+      }
+
+      // Macro / warnings
+      const warns = (brief.warnings || []);
+      let warnsSection = '';
+      if (warns.length) {
+        const warnPills = warns.map(w => `<span class="badge warn">⚠ ${escapeHtml(w)}</span>`).join(' ');
+        warnsSection = `
+          <div class="detail-section">
+            <h3>Warnings</h3>
+            <div class="meta">${warnPills}</div>
+          </div>`;
+      }
+
+      // Reasoning (full, untruncated)
+      const reasoningSection = `
+        <div class="detail-section">
+          <h3>Full reasoning</h3>
+          <div class="reasoning">${escapeHtml(brief.reasoning || 'No reasoning provided.')}</div>
+        </div>`;
+
+      detailPanelWrap.innerHTML = `
+        <div class="detail-panel ${panelClass}">
+          <div class="detail-head">
+            <div>
+              <span class="symbol">${escapeHtml(brief.symbol)} <span class="${dirCls}">— ${escapeHtml(dir)}</span></span>
+              <span class="timestamp mono" style="margin-left:10px">${escapeHtml(fmtTime(brief.generated_at))}</span>
+            </div>
+            <button class="close" data-close-detail title="Close">×</button>
+          </div>
+          ${summarySection}
+          ${levelsSection}
+          ${intradaySection}
+          ${newsSection}
+          ${signalsSection}
+          ${whySection}
+          ${warnsSection}
+          ${reasoningSection}
+        </div>`;
+
+      detailPanelWrap.querySelector('[data-close-detail]')?.addEventListener('click', () => {
+        selectedSymbol = null;
+        detailPanelWrap.innerHTML = '';
+        scanTableWrap.querySelectorAll('tr.clickable').forEach(tr => tr.classList.remove('selected'));
+      });
+    }
+
+    function whyNoTrade(brief) {
+      const score = brief.confluence_score ?? 0;
+      const sig = brief.signals || {};
+      const ob = sig.ob_retest;
+      const bos = sig.bos_retest;
+      const warns = brief.warnings || [];
+      const stale = warns.some(w => /left behind|stale/i.test(w || ''));
+      const conflictNews = warns.find(w => /News sentiment.*conflicts/i.test(w || ''));
+
+      if (stale) {
+        return 'Setup was invalidated because intraday price has run more than 2% beyond the OB/BOS zone. Wait for price to return into the zone — or for a fresh setup to form.';
+      }
+      if (ob && bos && ob.direction !== bos.direction) {
+        return `Conflicting signals — the OB retest is ${ob.direction.toUpperCase()} but the BOS retest is ${bos.direction.toUpperCase()}. Need them to agree on direction (or for one to invalidate cleanly).`;
+      }
+      if (ob && !bos) {
+        const swingWord = ob.direction === 'long' ? 'a recent swing high' : 'a recent swing low';
+        const closeDir = ob.direction === 'long' ? 'above' : 'below';
+        let txt = `OB retest active at ${fmt(ob.ob_low)}–${fmt(ob.ob_high)} (${(ob.impulse_pct * 100).toFixed(1)}% impulse). Waiting for BOS confirmation — need a daily close ${closeDir} ${swingWord}.`;
+        if (conflictNews) txt += ' News sentiment is also pulling against the technical direction.';
+        return txt;
+      }
+      if (bos && !ob) {
+        let txt = `BOS retest active at ${fmt(bos.level)}. Waiting for an OB retest in the same direction — need price to retrace into a 3%+ impulse origin.`;
+        if (conflictNews) txt += ' News sentiment is also pulling against the technical direction.';
+        return txt;
+      }
+      // No active signals
+      if (score === 0) {
+        return 'No qualifying setup detected. Watching for either a 3%+ impulse forming a new order block, or a daily close past a recent swing extreme to mark a Break of Structure.';
+      }
+      return 'Score is below the take-trade threshold but no specific blocker identified. Re-check after the next daily close.';
+    }
+
+    // ---------- Header watching list ----------
+    function renderWatchingHeader() {
+      const active = Object.keys(activeWatching);
+      // Symbols currently in a partial-setup state — surfaced from the most
+      // recent scan. Excludes anything already shown as actively watched.
+      const partials = (lastScanResults || [])
+        .filter(r => {
+          const s = r.confluence_score ?? 0;
+          return !r.take_trade && s >= PARTIAL_MIN && s < TAKE_TRADE_MIN;
+        })
+        .map(r => r.symbol)
+        .filter(s => !active.includes(s));
+
+      if (active.length === 0 && partials.length === 0) {
         watchingList.innerHTML = '<em style="color:var(--muted)">none</em>';
         return;
       }
-      watchingList.innerHTML = symbols.map(s =>
-        `<span class="watching-pill">${escapeHtml(s)}</span>`
+
+      const greenPills = active.map(s =>
+        `<span class="watching-pill" title="watch.py running">${escapeHtml(s)}</span>`
       ).join('');
+      const amberPills = partials.map(s =>
+        `<span class="watching-pill amber" title="Partial setup forming (score ${PARTIAL_MIN}–${TAKE_TRADE_MIN - 1})">${escapeHtml(s)} ⚠</span>`
+      ).join('');
+      watchingList.innerHTML = greenPills + amberPills;
     }
 
     // ---------- SSE wiring ----------
@@ -501,7 +952,9 @@
         renderScan(JSON.parse(ev.data));
       });
       es.addEventListener('watching_changed', (ev) => {
-        renderWatching(JSON.parse(ev.data));
+        const state = JSON.parse(ev.data);
+        activeWatching = state?.watching || {};
+        renderWatchingHeader();
       });
       es.addEventListener('error_event', (ev) => {
         if (ev.data) { try { renderAlert(JSON.parse(ev.data)); } catch (_) {} }
