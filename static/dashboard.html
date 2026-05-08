@@ -1,0 +1,521 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Trading Bot</title>
+  <style>
+    :root {
+      --bg: #0d1117;
+      --panel: #161b22;
+      --panel-2: #1c232c;
+      --border: #2a323d;
+      --text: #e6edf3;
+      --muted: #8b949e;
+      --accent: #58a6ff;
+      --green: #3fb950;
+      --red: #f85149;
+      --amber: #d29922;
+      --grey: #6e7681;
+    }
+    * { box-sizing: border-box; }
+    html, body {
+      margin: 0; padding: 0;
+      background: var(--bg); color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+      font-size: 14px; line-height: 1.5;
+    }
+    .mono { font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; }
+
+    header {
+      display: flex; align-items: center; gap: 16px;
+      padding: 14px 24px;
+      background: var(--panel);
+      border-bottom: 1px solid var(--border);
+      position: sticky; top: 0; z-index: 10;
+      flex-wrap: wrap;
+    }
+    header h1 {
+      margin: 0; font-size: 18px; font-weight: 600;
+      letter-spacing: -0.01em;
+    }
+    .status {
+      display: flex; align-items: center; gap: 8px;
+      color: var(--muted); font-size: 12px;
+    }
+    .dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: var(--grey); transition: background 0.2s;
+    }
+    .dot.live { background: var(--green); box-shadow: 0 0 8px var(--green); }
+    .dot.dead { background: var(--red); }
+    .meta-info {
+      display: flex; gap: 16px; align-items: center;
+      color: var(--muted); font-size: 12px;
+      margin-left: auto; flex-wrap: wrap;
+    }
+    .watching-list { display: flex; gap: 6px; flex-wrap: wrap; }
+    .watching-pill {
+      background: rgba(63,185,80,0.12); color: var(--green);
+      border: 1px solid rgba(63,185,80,0.4);
+      padding: 2px 9px; border-radius: 999px;
+      font-size: 11px; font-family: ui-monospace, monospace;
+    }
+
+    main {
+      display: grid; gap: 20px; padding: 20px 24px;
+      max-width: 1400px; margin: 0 auto;
+      grid-template-columns: 1.4fr 1fr;
+    }
+    @media (max-width: 900px) { main { grid-template-columns: 1fr; } }
+
+    section h2 {
+      margin: 0 0 12px 0;
+      font-size: 13px; font-weight: 600;
+      text-transform: uppercase; letter-spacing: 0.06em;
+      color: var(--muted);
+    }
+    .feed { display: flex; flex-direction: column; gap: 12px; }
+    .empty {
+      padding: 24px; text-align: center;
+      color: var(--muted);
+      background: var(--panel);
+      border: 1px dashed var(--border);
+      border-radius: 8px;
+    }
+
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-left: 4px solid var(--grey);
+      border-radius: 8px;
+      padding: 16px 18px;
+      animation: slidein 0.35s ease-out;
+    }
+    .card.take { border-left-color: var(--green); }
+    .card.skip { border-left-color: var(--grey); }
+    .card.error { border-left-color: var(--red); }
+    @keyframes slidein {
+      from { opacity: 0; transform: translateY(-8px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .card-head {
+      display: flex; align-items: baseline; justify-content: space-between;
+      margin-bottom: 12px; gap: 12px; flex-wrap: wrap;
+    }
+    .symbol {
+      font-size: 20px; font-weight: 600; letter-spacing: -0.01em;
+    }
+    .symbol .dir-long { color: var(--green); }
+    .symbol .dir-short { color: var(--red); }
+    .symbol .dir-skip { color: var(--muted); font-weight: 400; font-size: 14px; }
+    .timestamp { color: var(--muted); font-size: 11px; }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px; margin: 10px 0;
+    }
+    @media (max-width: 600px) { .grid { grid-template-columns: repeat(2, 1fr); } }
+    .stat {
+      background: var(--panel-2); border: 1px solid var(--border);
+      border-radius: 6px; padding: 8px 10px;
+    }
+    .stat .label {
+      font-size: 10px; text-transform: uppercase; letter-spacing: 0.06em;
+      color: var(--muted); margin-bottom: 2px;
+    }
+    .stat .value { font-size: 14px; }
+
+    .meta {
+      display: flex; flex-wrap: wrap; gap: 8px; margin: 10px 0;
+    }
+    .badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 3px 9px; border-radius: 999px; font-size: 11px;
+      background: var(--panel-2); border: 1px solid var(--border);
+      color: var(--text);
+    }
+    .badge.high { background: rgba(63,185,80,0.12); border-color: rgba(63,185,80,0.4); color: var(--green); }
+    .badge.medium { background: rgba(210,153,34,0.12); border-color: rgba(210,153,34,0.4); color: var(--amber); }
+    .badge.low { background: rgba(110,118,129,0.18); border-color: rgba(110,118,129,0.5); color: var(--muted); }
+    .badge.warn { background: rgba(210,153,34,0.12); border-color: rgba(210,153,34,0.4); color: var(--amber); }
+    .badge.win { background: rgba(63,185,80,0.18); border-color: rgba(63,185,80,0.5); color: var(--green); }
+    .badge.loss { background: rgba(248,81,73,0.18); border-color: rgba(248,81,73,0.5); color: var(--red); }
+    .badge.stopped { background: rgba(110,118,129,0.18); border-color: rgba(110,118,129,0.5); color: var(--muted); }
+
+    .reasoning {
+      margin: 12px 0 4px; padding: 10px 12px;
+      background: var(--panel-2); border-radius: 6px;
+      color: var(--text); font-size: 13px; line-height: 1.55;
+    }
+
+    .actions { display: flex; gap: 8px; margin-top: 12px; }
+    button {
+      flex: 1; padding: 8px 12px;
+      background: var(--panel-2); color: var(--text);
+      border: 1px solid var(--border); border-radius: 6px;
+      font-size: 13px; cursor: pointer; font-family: inherit;
+      transition: background 0.15s, border-color 0.15s;
+    }
+    button:hover { background: #232a35; border-color: #3a4452; }
+    button.win:hover { border-color: var(--green); color: var(--green); }
+    button.loss:hover { border-color: var(--red); color: var(--red); }
+    button.stopped:hover { border-color: var(--amber); color: var(--amber); }
+    button:disabled { opacity: 0.5; cursor: default; }
+
+    /* Daily scan summary table */
+    .scan-table {
+      width: 100%; border-collapse: collapse;
+      background: var(--panel); border: 1px solid var(--border);
+      border-radius: 8px; overflow: hidden;
+    }
+    .scan-table th, .scan-table td {
+      padding: 8px 12px; text-align: left;
+      border-bottom: 1px solid var(--border);
+      font-size: 12px;
+    }
+    .scan-table th {
+      background: var(--panel-2); color: var(--muted);
+      text-transform: uppercase; letter-spacing: 0.05em;
+      font-weight: 600; font-size: 11px;
+    }
+    .scan-table tr:last-child td { border-bottom: none; }
+    .scan-table tr.watch td { background: rgba(63,185,80,0.06); }
+    .scan-table .score-cell {
+      font-family: ui-monospace, monospace;
+      font-weight: 600;
+    }
+    .scan-table .score-high { color: var(--green); }
+    .scan-table .score-med  { color: var(--amber); }
+    .scan-table .score-low  { color: var(--muted); }
+
+    .scan-summary-bar {
+      display: flex; gap: 16px; align-items: center;
+      margin-bottom: 8px; color: var(--muted); font-size: 12px;
+    }
+
+    .history-item {
+      background: var(--panel); border: 1px solid var(--border);
+      border-radius: 6px; padding: 10px 12px;
+      margin-bottom: 8px; font-size: 12px;
+    }
+    .history-item .top {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 4px;
+    }
+    .history-item .sym { font-weight: 600; }
+    .history-item .when { color: var(--muted); font-size: 11px; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Trading Bot</h1>
+    <div class="status">
+      <span class="dot dead" id="status-dot"></span>
+      <span id="status-text">connecting…</span>
+    </div>
+    <div class="meta-info">
+      <span id="last-scan">last scan: never</span>
+      <span>watching: <span class="watching-list" id="watching-list"><em style="color:var(--muted)">none</em></span></span>
+    </div>
+  </header>
+
+  <main>
+    <section>
+      <h2>Live Alerts</h2>
+      <div class="feed" id="feed">
+        <div class="empty" id="feed-empty">Waiting for alerts… run <span class="mono">py watch.py --symbol &lt;SYMBOL&gt;</span> to start.</div>
+      </div>
+
+      <h2 style="margin-top: 24px">Recent Trades</h2>
+      <div id="history"><div class="empty">No trades yet.</div></div>
+    </section>
+
+    <section>
+      <h2>Daily Scan</h2>
+      <div class="scan-summary-bar" id="scan-summary-bar">No scan yet — run <span class="mono">&nbsp;py scan.py</span></div>
+      <div id="scan-table-wrap"></div>
+    </section>
+  </main>
+
+  <script>
+    const feed = document.getElementById('feed');
+    const feedEmpty = document.getElementById('feed-empty');
+    const history = document.getElementById('history');
+    const statusDot = document.getElementById('status-dot');
+    const statusText = document.getElementById('status-text');
+    const lastScanEl = document.getElementById('last-scan');
+    const watchingList = document.getElementById('watching-list');
+    const scanSummaryBar = document.getElementById('scan-summary-bar');
+    const scanTableWrap = document.getElementById('scan-table-wrap');
+
+    function fmt(n) {
+      if (n === null || n === undefined || n === '') return '—';
+      const num = Number(n);
+      if (!Number.isFinite(num)) return String(n);
+      return num.toLocaleString('en-US', { maximumFractionDigits: 5 });
+    }
+    function fmtTime(iso) {
+      if (!iso) return '';
+      const d = new Date(iso);
+      if (Number.isNaN(d.getTime())) return iso;
+      return d.toUTCString().replace('GMT', 'UTC');
+    }
+    function setStatus(live) {
+      statusDot.className = 'dot ' + (live ? 'live' : 'dead');
+      statusText.textContent = live ? 'live' : 'disconnected';
+    }
+    function escapeHtml(s) {
+      return String(s ?? '').replace(/[&<>"']/g, c => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+      }[c]));
+    }
+
+    // ---------- Live alert cards ----------
+    function renderAlert(trade) {
+      if (feedEmpty && feedEmpty.parentNode) feedEmpty.remove();
+
+      const card = document.createElement('div');
+      card.dataset.tradeId = trade.id || '';
+
+      if (trade.error) {
+        card.className = 'card error';
+        card.innerHTML = `
+          <div class="card-head">
+            <div class="symbol">${escapeHtml(trade.symbol || '?')} <span class="dir-skip">— Error</span></div>
+            <div class="timestamp mono">${escapeHtml(fmtTime(trade.timestamp))}</div>
+          </div>
+          <div class="reasoning">${escapeHtml(trade.error)}</div>
+        `;
+        feed.prepend(card);
+        return;
+      }
+
+      const conf = (trade.confidence || 'medium').toLowerCase();
+      const score = trade.confluence_score ?? '—';
+      const warns = (trade.warnings || []).map(w =>
+        `<span class="badge warn">⚠ ${escapeHtml(w)}</span>`
+      ).join('');
+      const patterns = (trade.patterns_detected || []).map(p =>
+        `<span class="badge">${escapeHtml(p)}</span>`
+      ).join('');
+
+      if (trade.take_trade) {
+        const dirClass = trade.direction === 'long' ? 'dir-long' : 'dir-short';
+        const dirLabel = (trade.direction || '').toUpperCase();
+        card.className = 'card take';
+        card.innerHTML = `
+          <div class="card-head">
+            <div class="symbol">${escapeHtml(trade.symbol)} <span class="${dirClass}">— ${escapeHtml(dirLabel)}</span></div>
+            <div class="timestamp mono">${escapeHtml(fmtTime(trade.timestamp))}</div>
+          </div>
+          <div class="grid">
+            <div class="stat"><div class="label">Entry</div><div class="value mono">${escapeHtml(fmt(trade.entry))}</div></div>
+            <div class="stat"><div class="label">Stop loss</div><div class="value mono">${escapeHtml(fmt(trade.stop_loss))}</div></div>
+            <div class="stat"><div class="label">TP1</div><div class="value mono">${escapeHtml(fmt(trade.take_profit_1))}</div></div>
+            <div class="stat"><div class="label">TP2</div><div class="value mono">${escapeHtml(fmt(trade.take_profit_2))}</div></div>
+          </div>
+          <div class="meta">
+            <span class="badge">⏱ ${escapeHtml(trade.best_window || '—')}</span>
+            <span class="badge mono">R:R ${escapeHtml(trade.rr_ratio || '—')}</span>
+            <span class="badge ${conf}">confidence: ${escapeHtml(conf)}</span>
+            <span class="badge mono">score ${escapeHtml(score)}/100</span>
+            <span class="badge">HTF ${escapeHtml(trade.htf_bias || '?')}</span>
+          </div>
+          ${patterns ? `<div class="meta">${patterns}</div>` : ''}
+          ${warns ? `<div class="meta">${warns}</div>` : ''}
+          <div class="reasoning">${escapeHtml(trade.reasoning || '')}</div>
+          <div class="actions" data-actions>
+            <button class="win" data-outcome="win">Outcome: Win</button>
+            <button class="loss" data-outcome="loss">Outcome: Loss</button>
+            <button class="stopped" data-outcome="stopped">Stopped</button>
+          </div>
+        `;
+        card.querySelectorAll('button[data-outcome]').forEach(btn => {
+          btn.addEventListener('click', () => logOutcome(trade.id, btn.dataset.outcome, card));
+        });
+      } else {
+        card.className = 'card skip';
+        card.innerHTML = `
+          <div class="card-head">
+            <div class="symbol">${escapeHtml(trade.symbol)} <span class="dir-skip">— No trade</span></div>
+            <div class="timestamp mono">${escapeHtml(fmtTime(trade.timestamp))}</div>
+          </div>
+          <div class="meta">
+            <span class="badge mono">score ${escapeHtml(score)}/100</span>
+            <span class="badge">HTF ${escapeHtml(trade.htf_bias || '?')}</span>
+          </div>
+          ${patterns ? `<div class="meta">${patterns}</div>` : ''}
+          ${warns ? `<div class="meta">${warns}</div>` : ''}
+          <div class="reasoning">${escapeHtml(trade.reasoning || 'No reasoning provided.')}</div>
+        `;
+      }
+
+      feed.prepend(card);
+      while (feed.children.length > 30) feed.lastElementChild.remove();
+    }
+
+    async function logOutcome(tradeId, outcome, card) {
+      const buttons = card.querySelectorAll('button[data-outcome]');
+      buttons.forEach(b => b.disabled = true);
+      try {
+        const resp = await fetch('/outcome', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ trade_id: tradeId, outcome })
+        });
+        if (!resp.ok) throw new Error('HTTP ' + resp.status);
+        const updated = await resp.json();
+        const actions = card.querySelector('[data-actions]');
+        if (actions) actions.innerHTML = `<span class="badge ${outcome}">Logged: ${outcome}</span>`;
+        applyOutcomeToHistory(updated);
+      } catch (e) {
+        buttons.forEach(b => b.disabled = false);
+        alert('Failed to log outcome: ' + e.message);
+      }
+    }
+
+    // ---------- Recent trades column ----------
+    function renderHistory(trades) {
+      if (!trades || trades.length === 0) {
+        history.innerHTML = '<div class="empty">No trades yet.</div>';
+        return;
+      }
+      history.innerHTML = trades.map(t => {
+        const outcome = t.outcome
+          ? `<span class="badge ${t.outcome}">${t.outcome}</span>`
+          : (t.take_trade ? '<span class="badge low">pending</span>' : '<span class="badge low">skipped</span>');
+        const dir = t.take_trade
+          ? `<span class="${t.direction === 'long' ? 'dir-long' : 'dir-short'}">${(t.direction || '').toUpperCase()}</span>`
+          : '<span class="dir-skip">no trade</span>';
+        return `
+          <div class="history-item" data-history-id="${escapeHtml(t.id)}">
+            <div class="top">
+              <span class="sym">${escapeHtml(t.symbol)} ${dir}</span>
+              ${outcome}
+            </div>
+            <div class="when mono">${escapeHtml(fmtTime(t.timestamp))}</div>
+          </div>`;
+      }).join('');
+    }
+
+    function applyOutcomeToHistory(trade) {
+      const el = history.querySelector(`[data-history-id="${trade.id}"]`);
+      if (!el) { loadHistory(); return; }
+      const top = el.querySelector('.top');
+      const oldBadge = top.querySelector('.badge');
+      if (oldBadge) oldBadge.remove();
+      const span = document.createElement('span');
+      span.className = `badge ${trade.outcome}`;
+      span.textContent = trade.outcome;
+      top.appendChild(span);
+    }
+
+    async function loadHistory() {
+      try {
+        const resp = await fetch('/trades');
+        renderHistory(await resp.json());
+      } catch (e) { console.error('history load failed:', e); }
+    }
+
+    // ---------- Daily scan column ----------
+    function scoreClass(score) {
+      if (score >= 60) return 'score-high';
+      if (score >= 50) return 'score-med';
+      return 'score-low';
+    }
+
+    function renderScan(payload) {
+      const ts = payload.timestamp;
+      const results = payload.results || [];
+      lastScanEl.textContent = 'last scan: ' + (ts ? fmtTime(ts) : 'never');
+
+      if (results.length === 0) {
+        scanSummaryBar.innerHTML = 'No scan yet — run <span class="mono">&nbsp;py scan.py</span>';
+        scanTableWrap.innerHTML = '<div class="empty">No symbols scanned.</div>';
+        return;
+      }
+
+      const sorted = [...results].sort((a, b) => (b.confluence_score ?? 0) - (a.confluence_score ?? 0));
+      const watch = sorted.filter(r => (r.confluence_score ?? 0) >= 60);
+      const note  = sorted.filter(r => (r.confluence_score ?? 0) >= 50 && (r.confluence_score ?? 0) < 60);
+
+      scanSummaryBar.innerHTML = `
+        <span><strong style="color:var(--green)">${watch.length}</strong> to watch (≥60)</span>
+        <span><strong style="color:var(--amber)">${note.length}</strong> notable (50-59)</span>
+        <span>${results.length} total</span>
+      `;
+
+      const rows = sorted.map(r => {
+        const score = r.confluence_score ?? 0;
+        const isWatch = score >= 60;
+        const dir = (r.direction || '—').toUpperCase();
+        const dirCls = r.direction === 'long' ? 'dir-long' : (r.direction === 'short' ? 'dir-short' : 'dir-skip');
+        const reason = (r.reasoning || '').replace(/\s+/g, ' ').slice(0, 80);
+        return `
+          <tr class="${isWatch ? 'watch' : ''}">
+            <td><strong>${escapeHtml(r.symbol)}</strong></td>
+            <td class="score-cell ${scoreClass(score)}">${score}</td>
+            <td class="${dirCls}">${escapeHtml(dir)}</td>
+            <td>${escapeHtml(r.htf_bias || '?')}</td>
+            <td style="color:var(--muted)">${escapeHtml(reason)}${reason.length >= 80 ? '…' : ''}</td>
+          </tr>`;
+      }).join('');
+
+      scanTableWrap.innerHTML = `
+        <table class="scan-table">
+          <thead>
+            <tr><th>Symbol</th><th>Score</th><th>Dir</th><th>HTF</th><th>Notes</th></tr>
+          </thead>
+          <tbody>${rows}</tbody>
+        </table>
+      `;
+    }
+
+    function renderWatching(state) {
+      const watching = state?.watching || {};
+      const symbols = Object.keys(watching);
+      if (symbols.length === 0) {
+        watchingList.innerHTML = '<em style="color:var(--muted)">none</em>';
+        return;
+      }
+      watchingList.innerHTML = symbols.map(s =>
+        `<span class="watching-pill">${escapeHtml(s)}</span>`
+      ).join('');
+    }
+
+    // ---------- SSE wiring ----------
+    function connect() {
+      const es = new EventSource('/events');
+      es.addEventListener('hello', () => { setStatus(true); });
+      es.addEventListener('alert', (ev) => {
+        renderAlert(JSON.parse(ev.data));
+        loadHistory();
+      });
+      es.addEventListener('outcome_updated', (ev) => {
+        applyOutcomeToHistory(JSON.parse(ev.data));
+      });
+      es.addEventListener('scan_complete', (ev) => {
+        renderScan(JSON.parse(ev.data));
+      });
+      es.addEventListener('watching_changed', (ev) => {
+        renderWatching(JSON.parse(ev.data));
+      });
+      es.addEventListener('error_event', (ev) => {
+        if (ev.data) { try { renderAlert(JSON.parse(ev.data)); } catch (_) {} }
+      });
+      es.addEventListener('ping', () => {});
+      es.onerror = () => {
+        setStatus(false);
+        es.close();
+        setTimeout(connect, 3000);
+      };
+    }
+
+    loadHistory();
+    connect();
+  </script>
+</body>
+</html>

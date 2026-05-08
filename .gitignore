@@ -1,0 +1,25 @@
+# Secrets
+.env
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+.venv/
+venv/
+env/
+
+# Runtime state (regenerated on each scan / backtest / watch)
+trades.json
+scan_results.json
+watching_state.json
+backtest_results.json
+trading_bot.log
+*.json.tmp
+
+# IDE
+.vscode/
+.idea/
+*.swp
+.DS_Store
