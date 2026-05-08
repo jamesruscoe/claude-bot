@@ -20,7 +20,10 @@ concurrency:
 jobs:
   scan:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    # 20 symbols × 2 Massive calls (daily + news) at 5/min = ~8 min for the
+    # API portion alone, plus yfinance overhead. 15 min gives comfortable
+    # headroom without leaving runs hanging on a runtime regression.
+    timeout-minutes: 15
 
     steps:
       - name: Checkout

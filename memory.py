@@ -94,3 +94,25 @@ def update_outcome(trade_id: str, outcome: str) -> dict[str, Any] | None:
 def total_count() -> int:
     with _lock:
         return len(_read_all())
+
+
+def compute_win_rate(symbol: str) -> tuple[float, int] | None:
+    """Rolling win rate for `symbol` from logged outcomes.
+
+    Returns (win_rate, n_resolved) where n_resolved counts trades whose
+    outcome is "win" or "loss" — "stopped" trades and unresolved (None)
+    trades are excluded so the rate reflects market verdict only.
+
+    Returns None if no resolved outcomes exist for the symbol.
+    """
+    with _lock:
+        trades = _read_all()
+    resolved = [
+        t for t in trades
+        if t.get("symbol") == symbol
+        and t.get("outcome") in ("win", "loss")
+    ]
+    if not resolved:
+        return None
+    wins = sum(1 for t in resolved if t["outcome"] == "win")
+    return (wins / len(resolved), len(resolved))

@@ -17,31 +17,62 @@ BACKTEST_RESULTS_FILE = ROOT_DIR / "backtest_results.json"
 LOG_FILE = ROOT_DIR / "trading_bot.log"
 STATIC_DIR = ROOT_DIR / "static"
 
-# --- Watchlist (final curation by backtest) ---
-# symbol → Massive/Polygon ticker. USOIL uses USO ETF as a proxy.
+# --- Scan universe (broad, dynamic) ---
+# 20 liquid US stocks + commodity/index proxies. Every scan covers all 20;
+# the daily briefing surfaces only the top 3 by confluence score. There is
+# no static curation any more — symbols that work will be revealed by the
+# rolling win rate computed from logged outcomes (memory.compute_win_rate).
 #
-# Only names with demonstrated edge on score-100 dual-confluence signals
-# (10-day TP1-vs-SL win rate). SPY/MSFT/QQQ/AAPL all removed for failing
-# the backtest. HISTORICAL_WIN_RATES_10D below is filled in from the most
-# recent backtest run after the ATR+dedup fixes.
+# symbol → Polygon/Massive ticker (used for daily candles + reference news).
+# Aliases: USOIL→USO, XAUUSD→GLD, NQ1→QQQ.
 WATCHLIST: dict[str, str] = {
-    "USOIL": "USO",
-    "NVDA":  "NVDA",
-    "TSLA":  "TSLA",
-    "APLD":  "APLD",
+    "NVDA":   "NVDA",
+    "AAPL":   "AAPL",
+    "TSLA":   "TSLA",
+    "MSFT":   "MSFT",
+    "META":   "META",
+    "AMZN":   "AMZN",
+    "AMD":    "AMD",
+    "GOOGL":  "GOOGL",
+    "NFLX":   "NFLX",
+    "CRM":    "CRM",
+    "UBER":   "UBER",
+    "COIN":   "COIN",
+    "PLTR":   "PLTR",
+    "APLD":   "APLD",
+    "ARM":    "ARM",
+    "SMCI":   "SMCI",
+    "MSTR":   "MSTR",
+    "USOIL":  "USO",
+    "XAUUSD": "GLD",
+    "NQ1":    "QQQ",
 }
 
-# Yahoo Finance tickers (yfinance) for intraday data. Massive's free tier doesn't
-# return usable 1H/4H/15M aggregates, but yfinance does — we fetch 1H from
-# Yahoo and synthesise 4H locally so the detector can also analyse intraday
-# structure. CL=F is the front-month NYMEX crude futures contract, which
-# tracks USOIL / WTI tightly (closer than the USO ETF proxy). APLD trades
-# directly on Nasdaq so no proxy is needed.
+# Yahoo Finance tickers (yfinance) for intraday data + news + live price.
+# Most symbols are direct equities so Yahoo and Polygon use the same ticker;
+# the three commodity/index aliases use a sympathetic proxy on each side
+# (CL=F for crude futures, GLD for gold ETF, QQQ for Nasdaq-100).
 YAHOO_TICKERS: dict[str, str] = {
-    "USOIL": "CL=F",
-    "NVDA":  "NVDA",
-    "TSLA":  "TSLA",
-    "APLD":  "APLD",
+    "NVDA":   "NVDA",
+    "AAPL":   "AAPL",
+    "TSLA":   "TSLA",
+    "MSFT":   "MSFT",
+    "META":   "META",
+    "AMZN":   "AMZN",
+    "AMD":    "AMD",
+    "GOOGL":  "GOOGL",
+    "NFLX":   "NFLX",
+    "CRM":    "CRM",
+    "UBER":   "UBER",
+    "COIN":   "COIN",
+    "PLTR":   "PLTR",
+    "APLD":   "APLD",
+    "ARM":    "ARM",
+    "SMCI":   "SMCI",
+    "MSTR":   "MSTR",
+    "USOIL":  "CL=F",
+    "XAUUSD": "GLD",
+    "NQ1":    "QQQ",
 }
 
 # Lookback window for 1H bars from Yahoo. 730 days is yfinance's hard cap on
@@ -50,21 +81,10 @@ YAHOO_TICKERS: dict[str, str] = {
 # window; CL=F (near-24h) yields ~16000.
 INTRADAY_LOOKBACK_DAYS = 730
 
-# Symbols on the live watchlist that have NOT yet passed a backtest. Their
-# briefs get a paper-only warning AND `take_trade` is forced to False, so no
-# live alert fires — they're still scanned for data collection only.
-#
-# - APLD: only 6 backtest signals, statistically inconclusive. Holds here
-#   until ≥20 signals accumulated.
-# - TSLA: 10-day win rate dropped to 45.5% on 11 signals (below the 50%
-#   breakeven required for 1:2 R:R) on the 2026-05-08 backtest. Demoted
-#   to paper-only pending another data refresh.
-UNVALIDATED_SYMBOLS: set[str] = {"APLD", "TSLA"}
-
 # Per-symbol Order Block impulse-threshold overrides. The default in
-# smc_detector.OB_IMPULSE_THRESHOLD (3%) is calibrated for large caps like
-# NVDA/TSLA; smaller caps (APLD) move in smaller increments so a 3% bar over
-# 1-3 days is rarer — the lower threshold gives the detector more candidates.
+# smc_detector.OB_IMPULSE_THRESHOLD (3%) is calibrated for large caps;
+# smaller caps move in smaller increments so a 3% bar over 1–3 days is
+# rarer — the lower threshold gives the detector more candidates.
 OB_IMPULSE_OVERRIDES: dict[str, float] = {
     "APLD": 0.02,
 }
@@ -72,22 +92,19 @@ OB_IMPULSE_OVERRIDES: dict[str, float] = {
 # Per-symbol historical win rate at the 10-day TP1-vs-SL horizon. Updated
 # after each backtest run. Used by the daily briefing to display a coarse
 # probability estimate per signal.
-# Active live-trading symbols only. TSLA + APLD are scanned but unvalidated
-# (see UNVALIDATED_SYMBOLS) and therefore intentionally absent here.
-HISTORICAL_WIN_RATES_10D: dict[str, float] = {
-    "NVDA":  0.750,
-    "USOIL": 0.667,
-}
+# Per-symbol historical win rates are no longer hardcoded. The brief reads a
+# rolling rate from `memory.compute_win_rate(symbol)` derived from the live
+# trade log (trades.json). Symbols start with no track record and build one
+# as outcomes are logged via the dashboard.
 
 # Assets that are sensitive to ongoing geopolitical conflict — always warn.
 GEOPOLITICAL_ASSETS = {"USOIL", "XAUUSD"}
 
-# Trading windows by asset class (GMT). Controls the "best_window" suggestion.
+# Trading windows by asset class (GMT). Anything not listed defaults to the
+# US session window, which is correct for the equity majority of the universe.
 TRADING_WINDOWS: dict[str, str] = {
-    "USOIL": "13:30-15:30 GMT (US session + EIA Wednesdays)",
-    "NVDA":  "13:30-16:00 GMT (US open + first 2.5h)",
-    "TSLA":  "13:30-16:00 GMT (US open + first 2.5h)",
-    "APLD":  "13:30-16:00 GMT (US open + first 2.5h)",
+    "USOIL":  "13:30-15:30 GMT (US session + EIA Wednesdays)",
+    "XAUUSD": "08:00-16:00 GMT (London + US overlap)",
 }
 
 # --- API base ---
@@ -98,7 +115,8 @@ MASSIVE_RETRY_MAX = 3
 # --- SMC scoring thresholds ---
 # The two-setup detector emits 0, 50, or 100. Threshold 75 means only
 # dual-confluence (both OB retest AND BOS retest, same direction) fires.
-SCAN_MIN_SCORE = 50      # below this, don't even mention in daily briefing
+SCAN_MIN_SCORE = 50      # below this, don't even mention in scan summary
+DISPLAY_MIN_SCORE = 60   # daily-briefing top-3 cutoff — under this, "no quality setups today"
 ANALYSIS_MIN_SCORE = 75  # below this, take_trade is forced false
 
 # --- Stop-loss placement ---
@@ -137,6 +155,12 @@ HTF_BIAS_BARS = 60  # last 60 days of daily candles
 # before the walk-forward starts firing signals.
 BACKTEST_WARMUP_BARS = 120
 BACKTEST_HORIZONS = (5, 10)  # forward-look windows in trading days
+
+# Cut-off date for backtest signal *firing* — bars before this date are still
+# used as detector context (warmup + swings + OBs) but no signals fire from
+# them. 2025 was unrepresentative of current regime; we want a read on what's
+# working NOW. Format: ISO date.
+BACKTEST_FROM_DATE = "2026-01-01"
 
 # --- Timeframe configs (multiplier, timespan, lookback_bars) ---
 # Daily ONLY. Massive free tier doesn't return usable intraday data

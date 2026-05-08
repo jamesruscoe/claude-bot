@@ -197,6 +197,13 @@
     .scan-table tr.clickable:hover td { background: #1f2731; }
     .scan-table tr.selected td { background: rgba(88,166,255,0.10) !important; }
     .scan-table tr.selected:first-child td { border-top: 1px solid rgba(88,166,255,0.4); }
+    .scan-table tr.top3 td:first-child { border-left: 3px solid var(--accent); padding-left: 10px; }
+    .scan-table .rank-cell {
+      font-family: ui-monospace, monospace;
+      font-weight: 700; color: var(--accent);
+      text-align: center; width: 36px;
+    }
+    .scan-table .rank-cell.muted { color: var(--grey); font-weight: 400; }
     .scan-table .score-cell {
       font-family: ui-monospace, monospace;
       font-weight: 600;
@@ -626,27 +633,36 @@
       const sorted = [...results].sort((a, b) => (b.confluence_score ?? 0) - (a.confluence_score ?? 0));
       const fired   = sorted.filter(r => r.take_trade);
       const partial = sorted.filter(r => !r.take_trade && (r.confluence_score ?? 0) >= PARTIAL_MIN);
+      // Indices 0..2 of `sorted` are the top 3 — highlighted as the only
+      // symbols eligible for live alerts.
+      const topSet = new Set(sorted.slice(0, 3).map(r => r.symbol));
 
       scanSummaryBar.innerHTML = `
+        <span><strong style="color:var(--accent)">top 3</strong> highlighted — only these can fire alerts</span>
         <span><strong style="color:var(--green)">${fired.length}</strong> firing (≥${TAKE_TRADE_MIN})</span>
         <span><strong style="color:var(--amber)">${partial.length}</strong> partial (${PARTIAL_MIN}–${TAKE_TRADE_MIN - 1})</span>
         <span>${results.length} total</span>
       `;
 
-      const rows = sorted.map(r => {
+      const rows = sorted.map((r, idx) => {
         const score = r.confluence_score ?? 0;
         const dir = (r.direction || '—').toUpperCase();
         const dirCls = r.direction === 'long' ? 'dir-long' : (r.direction === 'short' ? 'dir-short' : 'dir-skip');
         const reasonFull = (r.reasoning || '').replace(/\s+/g, ' ').trim();
         const reasonShort = reasonFull.slice(0, 80);
         const isSelected = r.symbol === selectedSymbol;
+        const isTop3 = topSet.has(r.symbol);
+        const rank = isTop3 ? `#${idx + 1}` : '';
+        const rankCls = isTop3 ? 'rank-cell' : 'rank-cell muted';
         const classes = [
           'clickable',
           rowClass(r),
+          isTop3 ? 'top3' : '',
           isSelected ? 'selected' : '',
         ].filter(Boolean).join(' ');
         return `
           <tr class="${classes}" data-symbol="${escapeAttr(r.symbol)}">
+            <td class="${rankCls}">${escapeHtml(rank)}</td>
             <td><strong>${escapeHtml(r.symbol)}</strong></td>
             <td class="score-cell ${scoreClass(score)}">${score}</td>
             <td class="${dirCls}">${escapeHtml(dir)}</td>
@@ -659,7 +675,7 @@
       scanTableWrap.innerHTML = `
         <table class="scan-table">
           <thead>
-            <tr><th>Symbol</th><th>Score</th><th>Dir</th><th>HTF</th><th>Trend</th><th>Notes</th></tr>
+            <tr><th>#</th><th>Symbol</th><th>Score</th><th>Dir</th><th>HTF</th><th>Trend</th><th>Notes</th></tr>
           </thead>
           <tbody>${rows}</tbody>
         </table>
@@ -696,9 +712,10 @@
       const score = brief.confluence_score ?? 0;
       const dir = (brief.direction || '—').toUpperCase();
       const dirCls = brief.direction === 'long' ? 'dir-long' : (brief.direction === 'short' ? 'dir-short' : 'dir-skip');
+      const winRateN = brief.win_rate_sample_size || 0;
       const winRate = brief.historical_win_rate_10d != null
-        ? (brief.historical_win_rate_10d * 100).toFixed(0) + '%'
-        : '—';
+        ? `${(brief.historical_win_rate_10d * 100).toFixed(0)}%  (n=${winRateN})`
+        : 'no data yet';
 
       const stale = (brief.warnings || []).some(w =>
         /left behind|stale/i.test(w || '')
@@ -718,7 +735,7 @@
             <div class="stat"><div class="label">HTF bias</div><div class="value">${escapeHtml(brief.htf_bias || '?')}</div></div>
             <div class="stat"><div class="label">Score</div><div class="value mono">${score}/100</div></div>
             <div class="stat"><div class="label">Direction</div><div class="value ${dirCls}">${escapeHtml(dir)}</div></div>
-            <div class="stat"><div class="label">Hist. win rate (10d)</div><div class="value mono">${escapeHtml(winRate)}</div></div>
+            <div class="stat"><div class="label">Win rate (live log)</div><div class="value mono">${escapeHtml(winRate)}</div></div>
           </div>
         </div>`;
 

@@ -20,14 +20,14 @@ from typing import Any
 
 from config import (
     ANALYSIS_MIN_SCORE,
+    DISPLAY_MIN_SCORE,
     GEOPOLITICAL_ASSETS,
-    HISTORICAL_WIN_RATES_10D,
     SL_ATR_MULT,
     SL_BUFFER_PCT,
     TRADING_WINDOWS,
-    UNVALIDATED_SYMBOLS,
 )
 from enricher import hours_until_next_high_impact
+from memory import compute_win_rate
 
 
 def _zone_from_signals(direction: str, signals: dict[str, Any]) -> tuple[float, float] | None:
@@ -117,8 +117,6 @@ def _patterns_detected(signals: dict[str, Any]) -> list[str]:
 
 def _warnings(symbol: str, direction: str | None, enrichment: dict[str, Any]) -> list[str]:
     warns: list[str] = []
-    if symbol in UNVALIDATED_SYMBOLS:
-        warns.append("UNVALIDATED — this symbol has not yet passed a backtest. Treat the signal as paper-only until it has.")
     if symbol in GEOPOLITICAL_ASSETS:
         warns.append("Active geopolitical risk on this asset — review headlines before entry.")
     events = enrichment.get("upcoming_events", [])
@@ -243,14 +241,17 @@ def build_brief(
         score >= ANALYSIS_MIN_SCORE
         and direction is not None
         and levels is not None
-        and symbol not in UNVALIDATED_SYMBOLS  # paper-only — no live alert
     )
 
     confidence = _confidence_bucket(score)
     if macro_warning and confidence == "high":
         confidence = "medium"
 
-    win_rate = HISTORICAL_WIN_RATES_10D.get(symbol)
+    # Rolling win rate from the live trade log. Returns None until at least
+    # one outcome has been logged via the dashboard.
+    rate_n = compute_win_rate(symbol)
+    win_rate = rate_n[0] if rate_n else None
+    win_rate_n = rate_n[1] if rate_n else 0
 
     warnings = _warnings(symbol, direction, enrichment)
     # Front-load reasons that explain a collapsed/zero score: regime block
@@ -283,8 +284,9 @@ def build_brief(
         "macro_warning": macro_warning,
         "upcoming_events": enrichment.get("upcoming_events", []),
         "warnings": warnings,
-        "best_window": TRADING_WINDOWS.get(symbol, "13:30-16:00 GMT"),
+        "best_window": TRADING_WINDOWS.get(symbol, "13:30-16:00 GMT (US open + first 2.5h)"),
         "historical_win_rate_10d": win_rate,
+        "win_rate_sample_size": win_rate_n,
         "reasoning": "",
         "generated_at": datetime.now(timezone.utc).isoformat(),
     }
@@ -457,22 +459,35 @@ def render_brief(brief: dict[str, Any]) -> str:
 
 
 def render_daily_briefing(results: list[dict[str, Any]]) -> str:
-    """Compact daily briefing: one block per symbol, watchlist order. Shows
-    entry zone, SL, TP1, TP2, R:R, current price, ATR, and the symbol's
-    historical 10-day win rate as a probability hint."""
+    """Top-3 daily briefing. Symbols are ranked by confluence_score; only the
+    top 3 are surfaced. If the top score is below DISPLAY_MIN_SCORE the
+    briefing collapses to a single 'no quality setups today' line — the rest
+    of the universe is intentionally suppressed to keep attention sharp."""
     bar = "═" * 60
-    lines: list[str] = [bar, "  DAILY BRIEFING", bar]
+    lines: list[str] = [bar, "  DAILY BRIEFING — top 3", bar]
     if not results:
         lines.append("  No symbols scanned.")
         lines.append(bar)
         return "\n".join(lines)
 
-    for r in results:
+    sorted_all = sorted(results, key=lambda r: r.get("confluence_score", 0) or 0, reverse=True)
+    top_score = sorted_all[0].get("confluence_score", 0) or 0
+    if top_score < DISPLAY_MIN_SCORE:
+        lines.append("")
+        lines.append(f"  No quality setups today — top score {top_score}/100 (need ≥{DISPLAY_MIN_SCORE}).")
+        lines.append(f"  Scanned {len(results)} symbols.")
+        lines.append("")
+        lines.append(bar)
+        return "\n".join(lines)
+
+    top3 = sorted_all[:3]
+    for rank, r in enumerate(top3, start=1):
         sym = r.get("symbol", "?")
         score = r.get("confluence_score", 0)
         direction = (r.get("direction") or "—").upper()
         win_rate = r.get("historical_win_rate_10d")
-        prob = f"{win_rate * 100:.0f}%" if win_rate is not None else "n/a"
+        n = r.get("win_rate_sample_size", 0) or 0
+        prob = f"{win_rate * 100:.0f}% (n={n})" if win_rate is not None else "n/a"
         price = _fmt(r.get("current_price"))
         atr = _fmt(r.get("atr14"))
 
@@ -484,7 +499,7 @@ def render_daily_briefing(results: list[dict[str, Any]]) -> str:
         macro = r.get("macro_warning")
 
         if r.get("take_trade"):
-            lines.append(f"  ★ {sym} — {direction}  (score {score}, prob {prob})")
+            lines.append(f"  #{rank}  ★ {sym} — {direction}  (score {score}, prob {prob})")
             lines.append(f"      price={price}  ATR(14)={atr}")
             if intraday_line:
                 lines.append(f"      Intraday:      {intraday_line}")
@@ -506,7 +521,7 @@ def render_daily_briefing(results: list[dict[str, Any]]) -> str:
                     continue  # already rendered above
                 lines.append(f"      ⚠ {w}")
         else:
-            lines.append(f"    {sym} — no trade  (score {score}, dir {direction}, prob {prob})")
+            lines.append(f"  #{rank}  {sym} — no trade  (score {score}, dir {direction}, prob {prob})")
             lines.append(f"      price={price}  ATR(14)={atr}")
             if intraday_line:
                 lines.append(f"      Intraday:  {intraday_line}")
@@ -521,6 +536,7 @@ def render_daily_briefing(results: list[dict[str, Any]]) -> str:
                 lines.append(f"      {note[:120]}")
 
     lines.append("")
+    lines.append(f"  ({len(results) - len(top3)} other symbols scored below the top 3 — see scan summary or dashboard.)")
     lines.append(bar)
     return "\n".join(lines)
 

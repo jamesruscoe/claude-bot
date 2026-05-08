@@ -40,6 +40,7 @@ import memory
 import news_sentiment
 import smc_detector
 from config import (
+    BACKTEST_FROM_DATE,
     BACKTEST_HORIZONS,
     BACKTEST_RESULTS_FILE,
     BACKTEST_WARMUP_BARS,
@@ -177,7 +178,12 @@ async def live_main() -> None:
     print()
     print(analyser.render_daily_briefing(results))
 
-    watch_candidates = [r for r in results if r.get("take_trade")]
+    # Only the top 3 by score are eligible to fire a live alert. With a 20-symbol
+    # universe we want to ration attention — anything below the top 3 might still
+    # be take_trade but is suppressed at the alert layer.
+    sorted_by_score = sorted(results, key=lambda r: r.get("confluence_score", 0) or 0, reverse=True)
+    top3 = sorted_by_score[:3]
+    watch_candidates = [r for r in top3 if r.get("take_trade")]
     if watch_candidates:
         print()
         for r in watch_candidates:
@@ -237,9 +243,17 @@ def _check_outcome(
 
 
 def _backtest_one(symbol: str, bars: list[Bar]) -> dict[str, Any]:
-    """Walk-forward backtest on a single symbol's daily series."""
+    """Walk-forward backtest on a single symbol's daily series.
+
+    Only signals firing on or after BACKTEST_FROM_DATE are recorded — earlier
+    bars still feed the detector as context (warmup, swing history, OB origins)
+    so the simulation reflects what would actually have been seen on those
+    dates. The cut-off keeps the read focused on the current market regime."""
+    from datetime import date as _date
+
     horizons = BACKTEST_HORIZONS
     fired: list[dict[str, Any]] = []
+    cut_off = _date.fromisoformat(BACKTEST_FROM_DATE)
 
     if len(bars) < BACKTEST_WARMUP_BARS + max(horizons) + 1:
         log.warning("%s: only %d bars, need at least %d for backtest",
@@ -256,10 +270,16 @@ def _backtest_one(symbol: str, bars: list[Bar]) -> dict[str, Any]:
     last_index = len(bars) - max(horizons) - 1
     days_simulated = 0
     suppressed_dupes = 0
+    skipped_pre_cutoff = 0
     recent_fires: list[dict[str, Any]] = []
 
     threshold = OB_IMPULSE_OVERRIDES.get(symbol, OB_IMPULSE_THRESHOLD)
     for i in range(BACKTEST_WARMUP_BARS, last_index + 1):
+        # Backtest signal-fire cut-off — pre-2026 bars still feed history.
+        if bars[i].dt.date() < cut_off:
+            skipped_pre_cutoff += 1
+            continue
+
         history = bars[:i + 1]
         score, direction, signals = smc_detector.score_setups(history, impulse_threshold=threshold)
         bias = smc_detector.simple_bias(history)
@@ -337,6 +357,8 @@ def _backtest_one(symbol: str, bars: list[Bar]) -> dict[str, Any]:
         "symbol": symbol,
         "bars_total": len(bars),
         "days_simulated": days_simulated,
+        "skipped_pre_cutoff": skipped_pre_cutoff,
+        "cutoff_date": BACKTEST_FROM_DATE,
         "suppressed_duplicates": suppressed_dupes,
         "fired": fired,
         "by_horizon": by_horizon,
@@ -406,7 +428,8 @@ def _render_backtest_report(per_symbol: list[dict[str, Any]]) -> str:
 async def backtest_main() -> None:
     started = datetime.now(timezone.utc)
     print(f"\nBacktesting — {started.isoformat()}\n")
-    print(f"Warmup: {BACKTEST_WARMUP_BARS} bars   Horizons: {BACKTEST_HORIZONS}\n")
+    print(f"Warmup: {BACKTEST_WARMUP_BARS} bars   Horizons: {BACKTEST_HORIZONS}")
+    print(f"Signal-fire cut-off: {BACKTEST_FROM_DATE} (earlier bars feed context only)\n")
 
     per_symbol: list[dict[str, Any]] = []
     async with httpx.AsyncClient(timeout=20.0) as client:
