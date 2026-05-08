@@ -252,3 +252,71 @@ In `smc_detector.py`:
 - **15-min delayed data** even on the daily timeframe (irrelevant for end-of-day analysis).
 - **2026 FOMC dates are hardcoded.** Update `FOMC_2026_DATES` in `enricher.py` annually.
 - **Single-watch only.** `watch.py` runs one symbol per process; start a second terminal for a second symbol.
+
+---
+
+## 13. Cloud deployment via GitHub Actions
+
+The repo ships with a [`.github/workflows/scan.yml`](.github/workflows/scan.yml) workflow that runs `scan.py` four times per weekday on GitHub-hosted runners and emails you on take-trade signals. Free for public repos; for private repos it bills against your 2,000-min/month free Actions quota — each scan run is < 1 min.
+
+### 13.1 Push to GitHub
+
+If you haven't already:
+
+```bash
+git init -b main
+git add .
+git commit -m "Initial commit"
+gh repo create <your-username>/claude-bot --private --source=. --remote=origin --push
+```
+
+(Or create the repo in the GitHub UI, then `git remote add origin …` and `git push -u origin main`.)
+
+`.env` is excluded by `.gitignore` — your API key never leaves the machine. Verify with `git status` before the first push.
+
+### 13.2 Configure five GitHub Secrets
+
+GitHub repo → **Settings → Secrets and variables → Actions → New repository secret**. Add all five:
+
+| Secret | Value | Source |
+|---|---|---|
+| `POLYGON_API_KEY` | your Massive/Polygon key | the same value as `MASSIVE_API_KEY` in your local `.env` |
+| `WEBHOOK_SECRET` | any random string | currently reserved — pass-through env var for future webhook auth |
+| `EMAIL_TO` | the address to notify | e.g. `you@example.com` |
+| `GMAIL_USERNAME` | the Gmail account sending the alert | e.g. `youraccount@gmail.com` |
+| `GMAIL_PASSWORD` | a Gmail **app password** | not your normal Gmail password — see below |
+
+### 13.3 Get a Gmail app password
+
+Gmail will not accept your real password over SMTP from a third-party service — you need a 16-character app password.
+
+1. Enable 2-factor auth on the Gmail account (required before app passwords are unlocked): <https://myaccount.google.com/security>
+2. Go to <https://myaccount.google.com/apppasswords>
+3. Pick **Mail** as the app, name it (e.g. `claude-bot`), click **Create**
+4. Copy the 16-character code Google shows (no spaces) into the `GMAIL_PASSWORD` secret. Google won't show it again — generate a fresh one if you lose it
+
+### 13.4 Schedule
+
+The workflow's `cron` triggers (UTC, weekdays only):
+
+| Cron        | UTC   | Local (BST / GMT+1) | Why                       |
+|-------------|-------|---------------------|---------------------------|
+| `0 7  * * 1-5`  | 07:00 | 08:00 BST           | Pre-Europe open           |
+| `0 13 * * 1-5`  | 13:00 | 14:00 BST           | 30 min before US open     |
+| `0 15 * * 1-5`  | 15:00 | 16:00 BST           | 90 min after US open      |
+| `0 20 * * 1-5`  | 20:00 | 21:00 BST           | After US close — fresh EOD bar |
+
+GitHub-hosted cron is best-effort — runs can be 5–15 min late under platform load. Don't rely on second-level precision.
+
+### 13.5 Manual run
+
+The workflow also exposes `workflow_dispatch`. From the **Actions** tab, pick **SMC Scan** → **Run workflow** to trigger it ad hoc — useful for testing the secrets without waiting for the next cron tick.
+
+### 13.6 What you get back
+
+- **Email** to `EMAIL_TO` whenever any symbol scores ≥ `ANALYSIS_MIN_SCORE` and the live-price staleness check doesn't invalidate the setup. Subject: `Trading Bot — Signal fired: NVDA,TSLA`. Body: the full daily briefing.
+- **Workflow artifact** uploaded on every run (regardless of whether anything fired): `scan_results.json`, the captured `scan_output.txt`, and `trading_bot.log`. Open the run from the **Actions** tab and download from the bottom of the page. Retained 30 days.
+
+### 13.7 Detection mechanism
+
+`scan.py` prints a machine-readable `TAKE TRADE: <SYMBOL> <DIRECTION>` line for each fired signal. The workflow greps `scan_output.txt` for `^TAKE TRADE:` and only invokes the email step when at least one match is found. The symbol list is comma-joined into the subject.

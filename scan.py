@@ -179,6 +179,8 @@ async def live_main() -> None:
         print()
         for r in watch_candidates:
             memory.add_trade(r)
+            # Machine-readable marker for CI / cron pipelines to detect fires.
+            print(f"TAKE TRADE: {r['symbol']} {(r.get('direction') or '?').upper()}")
 
     await dashboard.push_scan_complete(payload["timestamp"], results)
     print(f"\nDone. Results saved to {SCAN_RESULTS_FILE.name}.")
