@@ -76,13 +76,13 @@ async def one_iteration(
     bias = smc_detector.simple_bias(bars)
     atr14 = smc_detector.atr(bars)
 
-    intraday_task = asyncio.create_task(market_data.fetch_yf_hourly(symbol))
-    news_task = asyncio.create_task(news_sentiment.fetch_news(symbol, limit=10))
-    live_price_task = asyncio.create_task(market_data.fetch_live_price(symbol))
-    enrichment = await enricher.enrich(client, symbol)
-    h1_bars = await intraday_task
-    news_items = await news_task
-    live_price = await live_price_task
+    # Sequential yfinance fetches via the throttle — see scan.scan_symbol
+    # for the rationale. Massive enrichment runs in parallel.
+    enrichment_task = asyncio.create_task(enricher.enrich(client, symbol))
+    h1_bars = await market_data.fetch_yf_hourly(symbol)
+    live_price = await market_data.fetch_live_price(symbol)
+    news_items = await news_sentiment.fetch_news(symbol, limit=10)
+    enrichment = await enrichment_task
     h4_bars = market_data.build_synthetic_4h(h1_bars) if h1_bars else []
 
     if live_price is None:

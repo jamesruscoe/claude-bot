@@ -91,15 +91,15 @@ async def scan_symbol(client: httpx.AsyncClient, symbol: str) -> dict[str, Any]:
     bias = smc_detector.simple_bias(bars)
     atr14 = smc_detector.atr(bars)
 
-    # Intraday + yfinance news + live price all run concurrently with the
-    # Massive news fetch.
-    intraday_task = asyncio.create_task(market_data.fetch_yf_hourly(symbol))
-    news_task = asyncio.create_task(news_sentiment.fetch_news(symbol, limit=10))
-    live_price_task = asyncio.create_task(market_data.fetch_live_price(symbol))
-    enrichment = await enricher.enrich(client, symbol)
-    h1_bars = await intraday_task
-    news_items = await news_task
-    live_price = await live_price_task
+    # Massive enrichment (different API) runs in parallel with the yfinance
+    # block. Inside the yfinance block we go strictly sequential so the
+    # 0.5s throttle in market_data.yf_throttle() can space requests out and
+    # avoid Yahoo's silent rate limiting.
+    enrichment_task = asyncio.create_task(enricher.enrich(client, symbol))
+    h1_bars = await market_data.fetch_yf_hourly(symbol)
+    live_price = await market_data.fetch_live_price(symbol)
+    news_items = await news_sentiment.fetch_news(symbol, limit=10)
+    enrichment = await enrichment_task
     h4_bars = market_data.build_synthetic_4h(h1_bars) if h1_bars else []
 
     # Fall back to the Massive daily close (same instrument scale as the OB zones)

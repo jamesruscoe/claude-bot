@@ -19,7 +19,7 @@ import re
 from datetime import datetime, timedelta, timezone
 from typing import Any
 
-from market_data import to_yahoo_ticker
+from market_data import to_yahoo_ticker, yf_throttle
 
 log = logging.getLogger(__name__)
 
@@ -197,7 +197,10 @@ def _fetch_news_sync(symbol: str, limit: int) -> list[dict[str, Any]]:
 
 
 async def fetch_news(symbol: str, limit: int = 10) -> list[dict[str, Any]]:
-    """Async wrapper around blocking yfinance.Ticker(symbol).news."""
+    """Async wrapper around blocking yfinance.Ticker(symbol).news. Goes
+    through the shared yfinance throttle so bursts don't trigger Yahoo's
+    silent rate limiting."""
+    await yf_throttle()
     return await asyncio.to_thread(_fetch_news_sync, symbol, limit)
 
 

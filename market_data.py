@@ -70,6 +70,26 @@ class _RateLimiter:
 _limiter = _RateLimiter(MASSIVE_RATE_LIMIT_PER_MIN, 60.0)
 
 
+# yfinance has no documented limit but Yahoo silently throttles bursts. We
+# enforce a minimum spacing between any two yfinance calls (hourly bars,
+# live price, news) — every async wrapper in this module + news_sentiment.py
+# must `await yf_throttle()` before scheduling blocking work.
+_YF_MIN_INTERVAL_S = 0.5
+_yf_lock = asyncio.Lock()
+_yf_last_call: float = 0.0
+
+
+async def yf_throttle() -> None:
+    """Enforce >= _YF_MIN_INTERVAL_S between consecutive yfinance calls."""
+    global _yf_last_call
+    async with _yf_lock:
+        loop = asyncio.get_event_loop()
+        elapsed = loop.time() - _yf_last_call
+        if elapsed < _YF_MIN_INTERVAL_S:
+            await asyncio.sleep(_YF_MIN_INTERVAL_S - elapsed)
+        _yf_last_call = loop.time()
+
+
 def to_polygon_ticker(symbol: str) -> str:
     return WATCHLIST.get(symbol, symbol.upper())
 
@@ -198,38 +218,10 @@ def to_yahoo_ticker(symbol: str) -> str | None:
     return YAHOO_TICKERS.get(symbol)
 
 
-def _fetch_yf_hourly_sync(symbol: str, lookback_days: int) -> list[Bar]:
-    """Blocking call into yfinance. Always wrap in `asyncio.to_thread` from
-    async code so we don't stall the event loop."""
-    yticker = to_yahoo_ticker(symbol)
-    if yticker is None:
-        log.debug("No Yahoo ticker mapping for %s — skipping intraday", symbol)
-        return []
-    try:
-        # Imported lazily so the rest of the codebase doesn't pay the
-        # pandas/numpy import tax on processes that don't need intraday.
-        import yfinance as yf
-    except ImportError:
-        log.warning("yfinance not installed — run `pip install yfinance`")
-        return []
-
-    try:
-        ticker = yf.Ticker(yticker)
-        df = ticker.history(
-            period=f"{lookback_days}d",
-            interval="1h",
-            auto_adjust=False,
-            prepost=False,
-            actions=False,
-        )
-    except Exception as e:  # yfinance raises a wide variety of errors
-        log.warning("yfinance fetch failed for %s (%s): %s", symbol, yticker, e)
-        return []
-
+def _yf_history_to_bars(df, yticker: str) -> list[Bar]:
+    """Convert a yfinance DataFrame to our Bar list. Skips malformed rows."""
     if df is None or df.empty:
-        log.warning("No yfinance 1H data for %s (%s)", symbol, yticker)
         return []
-
     bars: list[Bar] = []
     for ts, row in df.iterrows():
         try:
@@ -243,9 +235,68 @@ def _fetch_yf_hourly_sync(symbol: str, lookback_days: int) -> list[Bar]:
                 v=float(row.get("Volume", 0)),
             ))
         except (KeyError, TypeError, ValueError) as e:
-            log.debug("Skipping malformed yfinance row for %s: %s", symbol, e)
+            log.debug("Skipping malformed yfinance row for %s: %s", yticker, e)
             continue
     return bars
+
+
+def _try_yf_hourly(ticker, yticker: str, days: int) -> list[Bar]:
+    """One attempt at fetching 1H bars over the last `days` days. Returns []
+    on any failure or empty response."""
+    try:
+        df = ticker.history(
+            period=f"{days}d",
+            interval="1h",
+            auto_adjust=False,
+            prepost=False,
+            actions=False,
+        )
+    except Exception as e:
+        log.debug("yf %s %dd error: %s", yticker, days, e)
+        return []
+    return _yf_history_to_bars(df, yticker)
+
+
+def _fetch_yf_hourly_sync(symbol: str, lookback_days: int) -> list[Bar]:
+    """Blocking yfinance fetch with a graceful fallback for symbols Yahoo
+    won't serve at the requested lookback (e.g. ARM IPO'd 2023-09; its
+    startTime exceeds Yahoo's 730-calendar-day cap on the 1H interval, so
+    the whole 730d request fails outright). We try the requested window,
+    then 360d, then 60d — first non-empty wins.
+
+    Always wrap in `asyncio.to_thread` from async code."""
+    yticker = to_yahoo_ticker(symbol)
+    if yticker is None:
+        log.debug("No Yahoo ticker mapping for %s — skipping intraday", symbol)
+        return []
+    try:
+        # Imported lazily so the rest of the codebase doesn't pay the
+        # pandas/numpy import tax on processes that don't need intraday.
+        import yfinance as yf
+    except ImportError:
+        log.warning("yfinance not installed — run `pip install yfinance`")
+        return []
+
+    ticker = yf.Ticker(yticker)
+    # Build the fallback ladder, deduped, descending. 730d is yfinance's hard
+    # 1H cap; below that, 360d and 60d cover most "recent IPO" cases.
+    windows: list[int] = []
+    for w in (lookback_days, 360, 60):
+        if w > 0 and w not in windows:
+            windows.append(w)
+
+    for days in windows:
+        bars = _try_yf_hourly(ticker, yticker, days)
+        if bars:
+            if days != lookback_days:
+                log.info(
+                    "yf %s: %dd returned empty, succeeded with %dd (%d bars)",
+                    yticker, lookback_days, days, len(bars),
+                )
+            return bars
+
+    log.warning("No yfinance 1H data for %s (%s) at any fallback window", symbol, yticker)
+    return []
 
 
 async def fetch_yf_hourly(symbol: str, lookback_days: int = INTRADAY_LOOKBACK_DAYS) -> list[Bar]:
@@ -254,6 +305,7 @@ async def fetch_yf_hourly(symbol: str, lookback_days: int = INTRADAY_LOOKBACK_DA
     Returns [] if the symbol has no Yahoo mapping or if yfinance fails —
     callers should treat empty as "no intraday signal" rather than an error.
     """
+    await yf_throttle()
     return await asyncio.to_thread(_fetch_yf_hourly_sync, symbol, lookback_days)
 
 
@@ -298,6 +350,7 @@ def _fetch_live_price_sync(symbol: str) -> float | None:
 
 async def fetch_live_price(symbol: str) -> float | None:
     """Async wrapper. Returns None on any failure — caller should fall back."""
+    await yf_throttle()
     return await asyncio.to_thread(_fetch_live_price_sync, symbol)
 
 
