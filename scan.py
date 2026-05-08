@@ -33,6 +33,7 @@ except (AttributeError, ValueError):
     pass
 
 import analyser
+import cooling_off
 import dashboard
 import enricher
 import market_data
@@ -150,6 +151,19 @@ async def scan_symbol(client: httpx.AsyncClient, symbol: str) -> dict[str, Any]:
 async def live_main() -> None:
     started = datetime.now(timezone.utc)
     print(f"\nScanning markets — {started.isoformat()}\n")
+
+    # Refresh cooling-off state before scanning so build_brief sees the
+    # latest blacklist. Bootstrap runs once (idempotent); evaluate adds new
+    # auto-blacklisted symbols based on the live trade log.
+    seeded = cooling_off.bootstrap()
+    if seeded:
+        print(f"Cooling-off bootstrap seeded: {', '.join(seeded)}")
+    auto_added = cooling_off.evaluate(memory.list_trades())
+    if auto_added:
+        print(f"Cooling-off auto-added: {', '.join(auto_added)}")
+    active_cool = cooling_off.current_state()
+    if active_cool:
+        print(f"Cooling-off active ({len(active_cool)}): {', '.join(sorted(active_cool))}")
 
     results: list[dict[str, Any]] = []
     async with httpx.AsyncClient(timeout=20.0) as client:
@@ -290,6 +304,7 @@ def _backtest_one(symbol: str, bars: list[Bar]) -> dict[str, Any]:
             symbol=symbol, score=score, direction=direction, signals=signals,
             current_price=round(history[-1].c, 5), bias=bias, atr14=atr14,
             enrichment={"headlines": [], "upcoming_events": []},
+            skip_cooling_off=True,  # backtest must not be gated by live blacklist
         )
 
         if not brief.get("take_trade"):

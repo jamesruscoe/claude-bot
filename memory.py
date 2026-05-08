@@ -96,6 +96,12 @@ def total_count() -> int:
         return len(_read_all())
 
 
+def list_trades() -> list[dict[str, Any]]:
+    """Snapshot of the entire trade log. Returns a copy."""
+    with _lock:
+        return list(_read_all())
+
+
 def compute_win_rate(symbol: str) -> tuple[float, int] | None:
     """Rolling win rate for `symbol` from logged outcomes.
 

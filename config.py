@@ -14,6 +14,7 @@ TRADES_FILE = ROOT_DIR / "trades.json"
 SCAN_RESULTS_FILE = ROOT_DIR / "scan_results.json"
 WATCHING_STATE_FILE = ROOT_DIR / "watching_state.json"
 BACKTEST_RESULTS_FILE = ROOT_DIR / "backtest_results.json"
+COOLING_OFF_FILE = ROOT_DIR / "cooling_off.json"
 LOG_FILE = ROOT_DIR / "trading_bot.log"
 STATIC_DIR = ROOT_DIR / "static"
 
@@ -117,7 +118,7 @@ MASSIVE_RETRY_MAX = 3
 # dual-confluence (both OB retest AND BOS retest, same direction) fires.
 SCAN_MIN_SCORE = 50      # below this, don't even mention in scan summary
 DISPLAY_MIN_SCORE = 60   # daily-briefing top-3 cutoff — under this, "no quality setups today"
-ANALYSIS_MIN_SCORE = 75  # below this, take_trade is forced false
+ANALYSIS_MIN_SCORE = 80  # below this, take_trade is forced false (raised 75→80 in choppy 2026 regime)
 
 # --- Stop-loss placement ---
 # SL = OB extreme ± max(SL_BUFFER_PCT × price,  SL_ATR_MULT × ATR14)
@@ -134,6 +135,32 @@ SL_ATR_MULT = 0.0       # disabled — see comment above
 # After a take-trade signal fires, identical signals (same direction +
 # entry zone + SL) within this many bars are suppressed.
 SIGNAL_DEDUP_BARS = 5
+
+# --- Dynamic cooling-off blacklist ---
+# When a symbol's rolling 30-day track record falls below COOLDOWN_WR_THRESHOLD
+# on at least COOLDOWN_MIN_RESOLVED resolved trades, it auto-enters a
+# cooldown for COOLDOWN_DAYS days. State lives in COOLING_OFF_FILE.
+COOLDOWN_DAYS = 30
+COOLDOWN_MIN_RESOLVED = 3
+COOLDOWN_WR_THRESHOLD = 0.30  # below this is "broken setup territory"
+
+# One-shot bootstrap. Symbols listed here are marked cooling-off the first
+# time the cooling_off module imports IF they're not already present in the
+# state file. Driven by the 2026-only backtest:
+#   MSTR  0/3 (resolved)
+#   COIN  0/2
+#   PLTR  0/1 (1 still open — counted as 0/1 here)
+#   GOOGL 0/1
+#   CRM   0/1
+#   XAUUSD 0/1
+INITIAL_COOLDOWN_SEED: dict[str, dict[str, int | str]] = {
+    "MSTR":   {"wins": 0, "losses": 3, "reason": "0/3 in 2026 backtest"},
+    "COIN":   {"wins": 0, "losses": 2, "reason": "0/2 in 2026 backtest"},
+    "PLTR":   {"wins": 0, "losses": 1, "reason": "0/1 in 2026 backtest"},
+    "GOOGL":  {"wins": 0, "losses": 1, "reason": "0/1 in 2026 backtest"},
+    "CRM":    {"wins": 0, "losses": 1, "reason": "0/1 in 2026 backtest"},
+    "XAUUSD": {"wins": 0, "losses": 1, "reason": "0/1 in 2026 backtest"},
+}
 
 # --- Watch loop interval ---
 # Massive free tier returns EOD daily candles only, so re-checking faster than

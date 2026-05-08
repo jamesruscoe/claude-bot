@@ -193,6 +193,8 @@
     .scan-table tr:last-child td { border-bottom: none; }
     .scan-table tr.watch td { background: rgba(63,185,80,0.06); }
     .scan-table tr.partial td { background: rgba(210,153,34,0.05); }
+    .scan-table tr.cooling td { background: rgba(110,118,129,0.10); color: var(--muted); }
+    .scan-table tr.cooling td strong { color: var(--muted); }
     .scan-table tr.clickable { cursor: pointer; transition: background 0.12s; }
     .scan-table tr.clickable:hover td { background: #1f2731; }
     .scan-table tr.selected td { background: rgba(88,166,255,0.10) !important; }
@@ -365,10 +367,11 @@
     const detailPanelWrap = document.getElementById('detail-panel-wrap');
 
     // Thresholds — keep in sync with config.py.
-    const TAKE_TRADE_MIN = 75;   // ANALYSIS_MIN_SCORE
+    const TAKE_TRADE_MIN = 80;   // ANALYSIS_MIN_SCORE
     const PARTIAL_MIN = 50;      // SCAN_MIN_SCORE
     const SPARKLINE_LIMIT = 10;
     const SPARKLINE_MAX = 115;   // accommodates 100 base + 15 news bonus
+    const COOLDOWN_DAYS_DISPLAY = 30;
 
     let lastScanResults = [];
     let activeWatching = {};       // symbols watch.py is heartbeating on
@@ -608,6 +611,7 @@
 
     function rowClass(brief) {
       const score = brief.confluence_score ?? 0;
+      if (brief.cooling_off)           return 'cooling';
       if (brief.take_trade)            return 'watch';
       if (score >= PARTIAL_MIN && score < TAKE_TRADE_MIN) return 'partial';
       return '';
@@ -632,7 +636,8 @@
 
       const sorted = [...results].sort((a, b) => (b.confluence_score ?? 0) - (a.confluence_score ?? 0));
       const fired   = sorted.filter(r => r.take_trade);
-      const partial = sorted.filter(r => !r.take_trade && (r.confluence_score ?? 0) >= PARTIAL_MIN);
+      const partial = sorted.filter(r => !r.take_trade && !r.cooling_off && (r.confluence_score ?? 0) >= PARTIAL_MIN);
+      const cooling = sorted.filter(r => r.cooling_off);
       // Indices 0..2 of `sorted` are the top 3 — highlighted as the only
       // symbols eligible for live alerts.
       const topSet = new Set(sorted.slice(0, 3).map(r => r.symbol));
@@ -641,6 +646,7 @@
         <span><strong style="color:var(--accent)">top 3</strong> highlighted — only these can fire alerts</span>
         <span><strong style="color:var(--green)">${fired.length}</strong> firing (≥${TAKE_TRADE_MIN})</span>
         <span><strong style="color:var(--amber)">${partial.length}</strong> partial (${PARTIAL_MIN}–${TAKE_TRADE_MIN - 1})</span>
+        <span><strong style="color:var(--grey)">${cooling.length}</strong> cooling off</span>
         <span>${results.length} total</span>
       `;
 
@@ -648,8 +654,17 @@
         const score = r.confluence_score ?? 0;
         const dir = (r.direction || '—').toUpperCase();
         const dirCls = r.direction === 'long' ? 'dir-long' : (r.direction === 'short' ? 'dir-short' : 'dir-skip');
-        const reasonFull = (r.reasoning || '').replace(/\s+/g, ' ').trim();
-        const reasonShort = reasonFull.slice(0, 80);
+        // Cooling-off symbols replace the truncated reasoning with their
+        // suppression label so the user immediately sees why they're greyed.
+        let reasonFull, reasonShort;
+        if (r.cooling_off) {
+          const co = r.cooling_off;
+          reasonFull = `cooling off (${co.wins ?? 0}/${co.n ?? 0} in last ${COOLDOWN_DAYS_DISPLAY} days) — until ${(co.until || '').slice(0, 10)} — ${co.reason || ''}`;
+          reasonShort = `cooling off (${co.wins ?? 0}/${co.n ?? 0} in last ${COOLDOWN_DAYS_DISPLAY} days)`;
+        } else {
+          reasonFull = (r.reasoning || '').replace(/\s+/g, ' ').trim();
+          reasonShort = reasonFull.slice(0, 80);
+        }
         const isSelected = r.symbol === selectedSymbol;
         const isTop3 = topSet.has(r.symbol);
         const rank = isTop3 ? `#${idx + 1}` : '';
@@ -721,7 +736,8 @@
         /left behind|stale/i.test(w || '')
       );
       let panelClass = 'empty';
-      if (brief.take_trade) panelClass = 'take';
+      if (brief.cooling_off) panelClass = 'invalidated';  // greyed via warning style
+      else if (brief.take_trade) panelClass = 'take';
       else if (stale) panelClass = 'invalidated';
       else if (score >= PARTIAL_MIN) panelClass = 'partial';
 
@@ -837,9 +853,27 @@
            </div>`
         : `<div class="detail-section"><h3>Signals detected</h3>${sigBlocks.join('')}</div>`;
 
-      // Why no trade — only render when there's no firing trade
+      // Cooling-off notice — render before "Why no trade" if applicable
+      let coolingSection = '';
+      if (brief.cooling_off) {
+        const co = brief.cooling_off;
+        const until = (co.until || '').slice(0, 10);
+        const source = co.source === 'manual_seed' ? 'manual seed' : 'auto-blacklisted';
+        coolingSection = `
+          <div class="detail-section">
+            <h3>Cooling off</h3>
+            <div class="why-no-trade">
+              <strong>${escapeHtml(co.wins ?? 0)}/${escapeHtml(co.n ?? 0)} resolved in last ${COOLDOWN_DAYS_DISPLAY} days</strong>
+              — signals suppressed until <span class="mono">${escapeHtml(until)}</span>
+              (${escapeHtml(source)}: ${escapeHtml(co.reason || '')}).
+            </div>
+          </div>`;
+      }
+
+      // Why no trade — only render when there's no firing trade and no cooling-off
+      // (cooling-off has its own dedicated section above).
       let whySection = '';
-      if (!brief.take_trade) {
+      if (!brief.take_trade && !brief.cooling_off) {
         const why = whyNoTrade(brief);
         whySection = `
           <div class="detail-section">
@@ -880,6 +914,7 @@
           ${levelsSection}
           ${intradaySection}
           ${newsSection}
+          ${coolingSection}
           ${signalsSection}
           ${whySection}
           ${warnsSection}

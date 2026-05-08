@@ -20,12 +20,14 @@ from typing import Any
 
 from config import (
     ANALYSIS_MIN_SCORE,
+    COOLDOWN_DAYS,
     DISPLAY_MIN_SCORE,
     GEOPOLITICAL_ASSETS,
     SL_ATR_MULT,
     SL_BUFFER_PCT,
     TRADING_WINDOWS,
 )
+import cooling_off
 from enricher import hours_until_next_high_impact
 from memory import compute_win_rate
 
@@ -228,6 +230,7 @@ def build_brief(
     news_warnings: list[str] | None = None,
     macro_warning: str | None = None,
     staleness_reasons: list[str] | None = None,
+    skip_cooling_off: bool = False,
 ) -> dict[str, Any]:
     enrichment = enrichment or {"headlines": [], "upcoming_events": []}
     headlines = enrichment.get("headlines", [])
@@ -235,12 +238,18 @@ def build_brief(
     staleness_reasons = list(staleness_reasons or [])
     regime_block = (signals or {}).get("regime_blocked")
 
+    # Cooling-off check — symbols with poor recent track records can't fire
+    # alerts even if the technical confluence is high. Backtest disables this
+    # via skip_cooling_off so the simulation isn't gated by the live blacklist.
+    cooling_off_entry = None if skip_cooling_off else cooling_off.is_cooling_off(symbol)
+
     levels = compute_levels(direction, signals, atr14=atr14) if direction else None
 
     take_trade = (
         score >= ANALYSIS_MIN_SCORE
         and direction is not None
         and levels is not None
+        and cooling_off_entry is None
     )
 
     confidence = _confidence_bucket(score)
@@ -254,11 +263,18 @@ def build_brief(
     win_rate_n = rate_n[1] if rate_n else 0
 
     warnings = _warnings(symbol, direction, enrichment)
-    # Front-load reasons that explain a collapsed/zero score: regime block
-    # first (final gate inside the detector), then staleness (live-price
-    # invalidation), then everything else.
+    # Front-load reasons that explain a collapsed/zero score: cooling-off
+    # is the strongest gate (suppresses regardless of score), then regime
+    # block, then staleness, then everything else.
+    if cooling_off_entry:
+        wins = cooling_off_entry.get("wins", 0)
+        n = cooling_off_entry.get("n", 0)
+        warnings.insert(0,
+            f"cooling off ({wins}/{n} in last {COOLDOWN_DAYS} days) — "
+            f"signals suppressed until {cooling_off_entry.get('until', '?')[:10]}"
+        )
     if regime_block:
-        warnings.insert(0, regime_block)
+        warnings.insert(0 if not cooling_off_entry else 1, regime_block)
     warnings = staleness_reasons + warnings
     warnings.extend(news_warnings)
     if macro_warning:
@@ -282,6 +298,7 @@ def build_brief(
         "news_top_headlines": (news_sentiment or {}).get("top_headlines", []),
         "news_headline_count": (news_sentiment or {}).get("headline_count", 0),
         "macro_warning": macro_warning,
+        "cooling_off": cooling_off_entry,
         "upcoming_events": enrichment.get("upcoming_events", []),
         "warnings": warnings,
         "best_window": TRADING_WINDOWS.get(symbol, "13:30-16:00 GMT (US open + first 2.5h)"),

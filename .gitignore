@@ -15,6 +15,7 @@ trades.json
 scan_results.json
 watching_state.json
 backtest_results.json
+cooling_off.json
 trading_bot.log
 *.json.tmp
 
