@@ -15,6 +15,7 @@ Score thresholds:
 """
 from __future__ import annotations
 
+import logging
 from datetime import datetime, timezone
 from typing import Any
 
@@ -28,8 +29,17 @@ from config import (
     TRADING_WINDOWS,
 )
 import cooling_off
+import paper_trader
+import risk_engine
 from enricher import hours_until_next_high_impact
 from memory import compute_win_rate
+
+# Live-price proximity gate. A retest signal should only fire while price is
+# actually inside the entry zone or within ENTRY_PROXIMITY_PCT of it. Beyond
+# that the retest hasn't happened yet — demote to "watching" so the alert
+# pipeline doesn't email on a setup that hasn't triggered. Symmetric for
+# shorts (above the zone) and longs (below).
+ENTRY_PROXIMITY_PCT = 0.01  # 1%
 
 
 def _zone_from_signals(direction: str, signals: dict[str, Any]) -> tuple[float, float] | None:
@@ -231,6 +241,7 @@ def build_brief(
     macro_warning: str | None = None,
     staleness_reasons: list[str] | None = None,
     skip_cooling_off: bool = False,
+    skip_risk_engine: bool = False,
 ) -> dict[str, Any]:
     enrichment = enrichment or {"headlines": [], "upcoming_events": []}
     headlines = enrichment.get("headlines", [])
@@ -252,6 +263,29 @@ def build_brief(
         and cooling_off_entry is None
     )
 
+    # Live-price proximity gate. If price is more than ENTRY_PROXIMITY_PCT
+    # outside the entry zone (below zone_low for longs, above zone_high for
+    # shorts), the retest hasn't happened — demote to "watching" so no
+    # take_trade email fires until price actually approaches the zone.
+    status: str | None = None
+    trigger_price: float | None = None
+    if (
+        take_trade
+        and levels is not None
+        and current_price is not None
+        and direction in ("long", "short")
+    ):
+        zone_low = levels["entry_zone_low"]
+        zone_high = levels["entry_zone_high"]
+        if direction == "long" and current_price < zone_low * (1 - ENTRY_PROXIMITY_PCT):
+            take_trade = False
+            status = "watching — waiting for price to reach entry zone"
+            trigger_price = zone_low
+        elif direction == "short" and current_price > zone_high * (1 + ENTRY_PROXIMITY_PCT):
+            take_trade = False
+            status = "watching — waiting for price to reach entry zone"
+            trigger_price = zone_high
+
     confidence = _confidence_bucket(score)
     if macro_warning and confidence == "high":
         confidence = "medium"
@@ -261,6 +295,34 @@ def build_brief(
     rate_n = compute_win_rate(symbol)
     win_rate = rate_n[0] if rate_n else None
     win_rate_n = rate_n[1] if rate_n else 0
+
+    # Paper-trading stats — the bot's self-built track record. Always
+    # included so the dashboard can show "n=X trades" alongside the rate
+    # even when the rate itself is not yet meaningful. Skipped in the
+    # backtest path (skip_risk_engine=True) so historical simulation
+    # doesn't pollute itself with forward-looking paper data.
+    paper_stats: dict[str, Any] = {
+        "n": 0, "meaningful": False, "win_rate": None, "avg_r": None,
+        "best_pattern": None, "worst_condition": None,
+        "current_win_streak": 0, "current_loss_streak": 0,
+    }
+    position_size: dict[str, Any] | None = None
+    if not skip_risk_engine:
+        try:
+            paper_stats = paper_trader.get_symbol_stats(symbol)
+        except Exception:
+            logging.getLogger(__name__).exception(
+                "paper_trader.get_symbol_stats failed for %s", symbol,
+            )
+        # Position-size recommendation surfaces on every brief so the
+        # dashboard can render the badge even for non-take_trade entries
+        # (useful when a near-miss is forming).
+        try:
+            position_size = risk_engine.get_position_size_recommendation(symbol)
+        except Exception:
+            logging.getLogger(__name__).exception(
+                "risk_engine.get_position_size_recommendation failed for %s", symbol,
+            )
 
     warnings = _warnings(symbol, direction, enrichment)
     # Front-load reasons that explain a collapsed/zero score: cooling-off
@@ -279,9 +341,18 @@ def build_brief(
     warnings.extend(news_warnings)
     if macro_warning:
         warnings.append(macro_warning)
+    if status and trigger_price is not None and current_price is not None:
+        away_pct = abs((current_price - trigger_price) / trigger_price) * 100
+        warnings.insert(
+            0,
+            f"{status} (trigger {round(trigger_price, 5)} — "
+            f"live {round(current_price, 5)} is {away_pct:.2f}% away)",
+        )
 
     brief: dict[str, Any] = {
         "take_trade": take_trade,
+        "status": status,
+        "trigger_price": round(trigger_price, 5) if trigger_price is not None else None,
         "symbol": symbol,
         "direction": direction,
         "current_price": current_price,
@@ -304,6 +375,14 @@ def build_brief(
         "best_window": TRADING_WINDOWS.get(symbol, "13:30-16:00 GMT (US open + first 2.5h)"),
         "historical_win_rate_10d": win_rate,
         "win_rate_sample_size": win_rate_n,
+        "paper_n": paper_stats.get("n", 0),
+        "paper_win_rate": paper_stats.get("win_rate"),
+        "paper_avg_r": paper_stats.get("avg_r"),
+        "paper_best_pattern": paper_stats.get("best_pattern"),
+        "paper_worst_condition": paper_stats.get("worst_condition"),
+        "paper_win_streak": paper_stats.get("current_win_streak", 0),
+        "paper_loss_streak": paper_stats.get("current_loss_streak", 0),
+        "position_size_recommendation": position_size,
         "reasoning": "",
         "generated_at": datetime.now(timezone.utc).isoformat(),
     }
@@ -323,6 +402,11 @@ def build_brief(
         staleness_reasons=staleness_reasons,
         regime_block=regime_block,
     )
+    if status and trigger_price is not None:
+        brief["reasoning"] = (
+            f"WATCHING — waiting for price to reach entry zone "
+            f"(trigger {round(trigger_price, 5)}). " + brief["reasoning"]
+        )
     return brief
 
 
@@ -427,8 +511,21 @@ def render_brief(brief: dict[str, Any]) -> str:
         out.append(f"  Take profit 2: {_fmt(brief['take_profit_2'])}")
         out.append(f"  R:R:           {brief['rr_ratio']}")
         out.append(f"  Best window:   {brief['best_window']}")
+        pos = brief.get("position_size_recommendation")
+        if pos:
+            out.append(f"  Position size: {pos.get('size', '?')}  ({pos.get('reason', '')})")
     else:
         out.append("  No actionable trade — see reasoning below.")
+
+    paper_n = brief.get("paper_n") or 0
+    paper_wr = brief.get("paper_win_rate")
+    if paper_n >= 5 and paper_wr is not None:
+        out.append(
+            f"  Paper record:  {paper_wr * 100:.0f}% win rate over {paper_n} trades "
+            f"(avg {brief.get('paper_avg_r') or 0:.2f}R)"
+        )
+    elif paper_n > 0:
+        out.append(f"  Paper record:  {paper_n} trade(s) — need 5+ for a meaningful rate")
 
     intraday_line = _intraday_summary(brief.get("intraday"))
     if intraday_line:
@@ -533,12 +630,33 @@ def render_daily_briefing(results: list[dict[str, Any]]) -> str:
             lines.append(f"      TP1 / TP2:     {_fmt(r['take_profit_1'])}  /  {_fmt(r['take_profit_2'])}")
             lines.append(f"      R:R:           {r['rr_ratio']}")
             lines.append(f"      Best window:   {r['best_window']}")
+            pos = r.get("position_size_recommendation")
+            if pos:
+                lines.append(f"      Position size: {pos.get('size', '?')}  ({pos.get('reason', '')})")
+            paper_n = r.get("paper_n") or 0
+            paper_wr = r.get("paper_win_rate")
+            if paper_n >= 5 and paper_wr is not None:
+                lines.append(
+                    f"      Paper record:  {paper_wr * 100:.0f}% over {paper_n} paper trades  "
+                    f"(avg {r.get('paper_avg_r') or 0:.2f}R)"
+                )
+            elif paper_n > 0:
+                lines.append(f"      Paper record:  {paper_n} paper trade(s) — need 5+ for a rate")
             for w in r.get("warnings", []) or []:
                 if w == macro:
                     continue  # already rendered above
                 lines.append(f"      ⚠ {w}")
         else:
-            lines.append(f"  #{rank}  {sym} — no trade  (score {score}, dir {direction}, prob {prob})")
+            status = r.get("status") or ""
+            if status.startswith("watching"):
+                trigger = r.get("trigger_price")
+                trig_str = f", trigger {_fmt(trigger)}" if trigger is not None else ""
+                lines.append(
+                    f"  #{rank}  {sym} — watching {direction}  "
+                    f"(score {score}{trig_str}, prob {prob})"
+                )
+            else:
+                lines.append(f"  #{rank}  {sym} — no trade  (score {score}, dir {direction}, prob {prob})")
             lines.append(f"      price={price}  ATR(14)={atr}")
             if intraday_line:
                 lines.append(f"      Intraday:  {intraday_line}")

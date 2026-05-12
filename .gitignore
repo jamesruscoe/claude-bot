@@ -16,8 +16,16 @@ scan_results.json
 watching_state.json
 backtest_results.json
 cooling_off.json
+fired_signals.json
+paper_trades.json
 trading_bot.log
 *.json.tmp
+
+# Chart screenshots — uploaded as a workflow artifact, not committed
+charts/
+
+# Claude Code session state
+.claude/
 
 # IDE
 .vscode/

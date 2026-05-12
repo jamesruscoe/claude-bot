@@ -320,6 +320,75 @@
     }
     .history-item .sym { font-weight: 600; }
     .history-item .when { color: var(--muted); font-size: 11px; }
+
+    /* Paper trading panel */
+    .paper-section { grid-column: 1 / -1; }
+    .paper-section h3 {
+      margin: 18px 0 8px 0;
+      font-size: 12px; font-weight: 600;
+      text-transform: uppercase; letter-spacing: 0.05em;
+      color: var(--muted);
+    }
+    .paper-stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 10px;
+    }
+    .paper-stats .stat .value { font-size: 16px; font-weight: 600; }
+    .paper-stats .stat .value.pos { color: var(--green); }
+    .paper-stats .stat .value.neg { color: var(--red); }
+
+    .paper-table {
+      width: 100%; border-collapse: collapse;
+      background: var(--panel); border: 1px solid var(--border);
+      border-radius: 8px; overflow: hidden;
+      font-size: 12px;
+    }
+    .paper-table th, .paper-table td {
+      padding: 7px 11px; text-align: left;
+      border-bottom: 1px solid var(--border);
+    }
+    .paper-table th {
+      background: var(--panel-2); color: var(--muted);
+      text-transform: uppercase; letter-spacing: 0.05em;
+      font-weight: 600; font-size: 10.5px;
+    }
+    .paper-table tr:last-child td { border-bottom: none; }
+    .paper-table td.mono { font-family: ui-monospace, monospace; }
+    .paper-table .r-pos { color: var(--green); font-weight: 600; }
+    .paper-table .r-neg { color: var(--red); font-weight: 600; }
+    .paper-table .dir-long { color: var(--green); font-weight: 600; }
+    .paper-table .dir-short { color: var(--red); font-weight: 600; }
+
+    .wr-bars { display: flex; flex-direction: column; gap: 6px; }
+    .wr-row {
+      display: grid;
+      grid-template-columns: 70px 1fr 100px;
+      gap: 10px; align-items: center;
+      font-size: 12px;
+    }
+    .wr-row .label { font-weight: 600; }
+    .wr-row .bar {
+      display: flex; height: 14px;
+      background: rgba(110,118,129,0.18);
+      border: 1px solid var(--border);
+      border-radius: 4px; overflow: hidden;
+    }
+    .wr-row .bar .win  { background: var(--green); }
+    .wr-row .bar .loss { background: var(--red); }
+    .wr-row .meta { color: var(--muted); font-family: ui-monospace, monospace; font-size: 11px; }
+
+    .badge.size-full   { background: rgba(63,185,80,0.18);  border-color: rgba(63,185,80,0.55);  color: var(--green); }
+    .badge.size-half   { background: rgba(210,153,34,0.14); border-color: rgba(210,153,34,0.45); color: var(--amber); }
+    .badge.size-quarter{ background: rgba(110,118,129,0.18); border-color: rgba(110,118,129,0.55); color: var(--muted); }
+    .badge.size-skip   { background: rgba(248,81,73,0.18);  border-color: rgba(248,81,73,0.55);  color: var(--red); }
+
+    .scan-table tr.losing-symbol td { background: rgba(248,81,73,0.06); }
+    .badge.losing-sym {
+      background: rgba(248,81,73,0.18);
+      border-color: rgba(248,81,73,0.55);
+      color: var(--red);
+    }
   </style>
 </head>
 <body>
@@ -352,6 +421,22 @@
       <div id="scan-table-wrap"></div>
       <div id="detail-panel-wrap"></div>
     </section>
+
+    <section class="paper-section">
+      <h2>Paper Trading Performance</h2>
+      <div class="paper-stats" id="paper-stats-row">
+        <div class="empty" style="grid-column: 1 / -1">Waiting for paper-trading data…</div>
+      </div>
+
+      <h3>Open positions</h3>
+      <div id="paper-open-wrap"><div class="empty">No open paper trades.</div></div>
+
+      <h3>Per-symbol win rate</h3>
+      <div id="paper-symbol-wrap"><div class="empty">No closed paper trades yet.</div></div>
+
+      <h3>Closed trades</h3>
+      <div id="paper-closed-wrap"><div class="empty">No closed paper trades yet.</div></div>
+    </section>
   </main>
 
   <script>
@@ -365,6 +450,10 @@
     const scanSummaryBar = document.getElementById('scan-summary-bar');
     const scanTableWrap = document.getElementById('scan-table-wrap');
     const detailPanelWrap = document.getElementById('detail-panel-wrap');
+    const paperStatsRow = document.getElementById('paper-stats-row');
+    const paperOpenWrap = document.getElementById('paper-open-wrap');
+    const paperClosedWrap = document.getElementById('paper-closed-wrap');
+    const paperSymbolWrap = document.getElementById('paper-symbol-wrap');
 
     // Thresholds — keep in sync with config.py.
     const TAKE_TRADE_MIN = 80;   // ANALYSIS_MIN_SCORE
@@ -374,8 +463,12 @@
     const COOLDOWN_DAYS_DISPLAY = 30;
 
     let lastScanResults = [];
+    let lastScanTimestamp = null;  // original ISO ts of the most recent scan
     let activeWatching = {};       // symbols watch.py is heartbeating on
     let selectedSymbol = null;     // currently expanded detail panel
+    // Symbols paper-trading flagged as below-edge (WR < 45% with 5+ trades).
+    // Drives the red row tint and "losing" badge in the scan table.
+    let losingSymbols = new Set();
 
     function fmt(n) {
       if (n === null || n === undefined || n === '') return '—';
@@ -402,6 +495,24 @@
       // Same as escapeHtml — included as a separate name so intent is clear
       // when used inside attribute values (e.g. title="…").
       return escapeHtml(s);
+    }
+
+    function sizeBadgeClass(size) {
+      const s = String(size || '').toLowerCase();
+      if (s.startsWith('full'))    return 'size-full';
+      if (s.startsWith('half'))    return 'size-half';
+      if (s.startsWith('quarter')) return 'size-quarter';
+      if (s.startsWith('skip'))    return 'size-skip';
+      return '';
+    }
+
+    function positionSizeBadge(pos) {
+      if (!pos || !pos.size) return '';
+      const cls = sizeBadgeClass(pos.size);
+      const reason = pos.reason ? ` — ${pos.reason}` : '';
+      return `<span class="badge ${cls}" title="${escapeAttr(pos.reason || '')}">
+        size: ${escapeHtml(pos.size)}${pos.n != null ? ` <span style="opacity:0.7">(n=${pos.n})</span>` : ''}
+      </span>`;
     }
 
     // ---------- Score history (localStorage-backed) ----------
@@ -505,6 +616,7 @@
             <span class="badge ${conf}">confidence: ${escapeHtml(conf)}</span>
             <span class="badge mono">score ${escapeHtml(score)}/100</span>
             <span class="badge">HTF ${escapeHtml(trade.htf_bias || '?')}</span>
+            ${positionSizeBadge(trade.position_size_recommendation)}
           </div>
           ${patterns ? `<div class="meta">${patterns}</div>` : ''}
           ${warns ? `<div class="meta">${warns}</div>` : ''}
@@ -621,6 +733,7 @@
       const ts = payload.timestamp;
       const results = payload.results || [];
       lastScanResults = results;
+      lastScanTimestamp = ts || lastScanTimestamp;
       lastScanEl.textContent = 'last scan: ' + (ts ? fmtTime(ts) : 'never');
 
       // Persist score history per symbol — drives the sparklines.
@@ -667,6 +780,7 @@
         }
         const isSelected = r.symbol === selectedSymbol;
         const isTop3 = topSet.has(r.symbol);
+        const isLosing = losingSymbols.has(r.symbol);
         const rank = isTop3 ? `#${idx + 1}` : '';
         const rankCls = isTop3 ? 'rank-cell' : 'rank-cell muted';
         const classes = [
@@ -674,11 +788,15 @@
           rowClass(r),
           isTop3 ? 'top3' : '',
           isSelected ? 'selected' : '',
+          isLosing ? 'losing-symbol' : '',
         ].filter(Boolean).join(' ');
+        const losingBadge = isLosing
+          ? ` <span class="badge losing-sym" title="Paper trading flagged this symbol as below-edge">losing</span>`
+          : '';
         return `
           <tr class="${classes}" data-symbol="${escapeAttr(r.symbol)}">
             <td class="${rankCls}">${escapeHtml(rank)}</td>
-            <td><strong>${escapeHtml(r.symbol)}</strong></td>
+            <td><strong>${escapeHtml(r.symbol)}</strong>${losingBadge}</td>
             <td class="score-cell ${scoreClass(score)}">${score}</td>
             <td class="${dirCls}">${escapeHtml(dir)}</td>
             <td>${escapeHtml(r.htf_bias || '?')}</td>
@@ -820,6 +938,36 @@
             <div class="meta" style="margin-top:10px">
               <span class="badge">⏱ ${escapeHtml(brief.best_window || '—')}</span>
               <span class="badge ${(brief.confidence || 'medium')}">confidence: ${escapeHtml(brief.confidence || 'medium')}</span>
+              ${positionSizeBadge(brief.position_size_recommendation)}
+            </div>
+          </div>`;
+      }
+
+      // Paper-trading per-symbol track record.
+      const paperN = brief.paper_n || 0;
+      const paperWR = brief.paper_win_rate;
+      const paperAvgR = brief.paper_avg_r;
+      const paperWS = brief.paper_win_streak || 0;
+      const paperLS = brief.paper_loss_streak || 0;
+      let paperSection = '';
+      if (paperN > 0) {
+        const wrCell = paperWR != null
+          ? `${(paperWR * 100).toFixed(0)}%`
+          : 'n/a';
+        const meaningful = paperN >= 5;
+        const streakText = paperWS
+          ? `${paperWS} wins`
+          : paperLS ? `${paperLS} losses` : '—';
+        paperSection = `
+          <div class="detail-section">
+            <h3>Paper trading record</h3>
+            <div class="detail-grid">
+              <div class="stat"><div class="label">Trades</div><div class="value mono">${paperN}${meaningful ? '' : '  (need 5+)'}</div></div>
+              <div class="stat"><div class="label">Win rate</div><div class="value mono">${wrCell}</div></div>
+              <div class="stat"><div class="label">Avg R</div><div class="value mono">${paperAvgR != null ? paperAvgR.toFixed(2) + 'R' : '—'}</div></div>
+              <div class="stat"><div class="label">Streak</div><div class="value mono">${streakText}</div></div>
+              <div class="stat"><div class="label">Best pattern</div><div class="value">${escapeHtml(brief.paper_best_pattern || '—')}</div></div>
+              <div class="stat"><div class="label">Worst condition</div><div class="value">${escapeHtml(brief.paper_worst_condition || '—')}</div></div>
             </div>
           </div>`;
       }
@@ -912,6 +1060,7 @@
           </div>
           ${summarySection}
           ${levelsSection}
+          ${paperSection}
           ${intradaySection}
           ${newsSection}
           ${coolingSection}
@@ -993,6 +1142,171 @@
       watchingList.innerHTML = greenPills + amberPills;
     }
 
+    // ---------- Paper trading panel ----------
+    function fmtR(r) {
+      if (r == null || !Number.isFinite(Number(r))) return '—';
+      const v = Number(r);
+      const sign = v >= 0 ? '+' : '';
+      return `${sign}${v.toFixed(2)}R`;
+    }
+
+    function outcomeBadge(outcome) {
+      if (!outcome) return '<span class="badge low">open</span>';
+      if (outcome === 'WIN_TP1' || outcome === 'WIN_TP2') {
+        return `<span class="badge win">${escapeHtml(outcome)}</span>`;
+      }
+      if (outcome === 'LOSS') return `<span class="badge loss">${escapeHtml(outcome)}</span>`;
+      return `<span class="badge stopped">${escapeHtml(outcome)}</span>`;
+    }
+
+    function renderPaper(payload) {
+      const stats = payload.stats || {};
+      const open = payload.open || [];
+      const closed = payload.closed || [];
+      const perSymbol = payload.per_symbol || [];
+
+      // Refresh losing-symbol set so the scan table picks it up on the
+      // next render. We also re-render any open detail panel to keep its
+      // paper-trading section in sync.
+      losingSymbols = new Set(
+        perSymbol
+          .filter(s => s && s.meaningful && s.win_rate != null && s.win_rate < 0.45)
+          .map(s => s.symbol)
+      );
+
+      // ---- Stats row ----
+      const wr = stats.win_rate;
+      const pf = stats.profit_factor;
+      const streak = stats.current_win_streak
+        ? { label: 'win streak', value: `${stats.current_win_streak}`, cls: 'pos' }
+        : stats.current_loss_streak
+          ? { label: 'loss streak', value: `${stats.current_loss_streak}`, cls: 'neg' }
+          : { label: 'current streak', value: '—', cls: '' };
+      const totalR = stats.total_r ?? 0;
+      const totalRCls = totalR > 0 ? 'pos' : totalR < 0 ? 'neg' : '';
+      const wrStr = wr != null ? `${(wr * 100).toFixed(0)}%` : '—';
+      const wrCls = wr != null ? (wr >= 0.65 ? 'pos' : wr < 0.45 ? 'neg' : '') : '';
+      const pfStr = pf == null ? '—' : (pf === Infinity || pf > 1e6 ? '∞' : pf.toFixed(2));
+      const pfCls = pf != null && pf !== Infinity ? (pf >= 1.5 ? 'pos' : pf < 1 ? 'neg' : '') : (pf === Infinity ? 'pos' : '');
+      paperStatsRow.innerHTML = `
+        <div class="stat"><div class="label">Total trades</div><div class="value mono">${stats.total_trades ?? 0}</div></div>
+        <div class="stat"><div class="label">Open</div><div class="value mono">${stats.open_trades ?? open.length}</div></div>
+        <div class="stat"><div class="label">Win rate</div><div class="value mono ${wrCls}">${wrStr}</div></div>
+        <div class="stat"><div class="label">Profit factor</div><div class="value mono ${pfCls}">${pfStr}</div></div>
+        <div class="stat"><div class="label">Total R</div><div class="value mono ${totalRCls}">${fmtR(totalR)}</div></div>
+        <div class="stat"><div class="label">${streak.label}</div><div class="value mono ${streak.cls}">${streak.value}</div></div>
+        <div class="stat"><div class="label">Best symbol</div><div class="value">${escapeHtml(stats.best_symbol || '—')}</div></div>
+        <div class="stat"><div class="label">Worst symbol</div><div class="value">${escapeHtml(stats.worst_symbol || '—')}</div></div>
+      `;
+
+      // ---- Open positions ----
+      if (open.length === 0) {
+        paperOpenWrap.innerHTML = '<div class="empty">No open paper trades.</div>';
+      } else {
+        const rows = open.map(t => {
+          const dirCls = t.direction === 'long' ? 'dir-long' : 'dir-short';
+          const r = t.unrealised_r;
+          const rCls = r == null ? '' : (r > 0 ? 'r-pos' : r < 0 ? 'r-neg' : '');
+          return `
+            <tr>
+              <td><strong>${escapeHtml(t.symbol)}</strong></td>
+              <td class="${dirCls}">${escapeHtml((t.direction || '').toUpperCase())}</td>
+              <td class="mono">${fmt(t.entry_price)}</td>
+              <td class="mono">${fmt(t.current_price)}</td>
+              <td class="mono">${fmt(t.sl)}</td>
+              <td class="mono">${fmt(t.tp1)}</td>
+              <td class="mono">${fmt(t.tp2)}</td>
+              <td class="mono ${rCls}">${fmtR(r)}</td>
+              <td class="mono" style="color:var(--muted)">${escapeHtml((t.opened_at || '').slice(0, 16).replace('T', ' '))}</td>
+            </tr>`;
+        }).join('');
+        paperOpenWrap.innerHTML = `
+          <table class="paper-table">
+            <thead><tr>
+              <th>Symbol</th><th>Dir</th><th>Entry</th><th>Live</th>
+              <th>SL</th><th>TP1</th><th>TP2</th><th>R now</th><th>Opened</th>
+            </tr></thead>
+            <tbody>${rows}</tbody>
+          </table>`;
+      }
+
+      // ---- Per-symbol bars ----
+      if (perSymbol.length === 0) {
+        paperSymbolWrap.innerHTML = '<div class="empty">No closed paper trades yet.</div>';
+      } else {
+        const rows = perSymbol.slice().sort((a, b) => {
+          // Push meaningful (≥5) above noisy, then by win rate desc.
+          if (a.meaningful !== b.meaningful) return b.meaningful - a.meaningful;
+          return (b.win_rate ?? 0) - (a.win_rate ?? 0);
+        }).map(s => {
+          const n = s.n || 0;
+          const wRate = s.win_rate;
+          const winPct = wRate != null ? wRate * 100 : 0;
+          const lossPct = wRate != null ? 100 - winPct : 0;
+          const wrLabel = wRate != null ? `${winPct.toFixed(0)}%` : 'n/a';
+          const meaningfulNote = s.meaningful ? '' : ' (n<5)';
+          return `
+            <div class="wr-row">
+              <span class="label">${escapeHtml(s.symbol)}</span>
+              <div class="bar">
+                <span class="win"  style="width:${winPct}%"></span>
+                <span class="loss" style="width:${lossPct}%"></span>
+              </div>
+              <span class="meta">${wrLabel} · n=${n}${meaningfulNote}</span>
+            </div>`;
+        }).join('');
+        paperSymbolWrap.innerHTML = `<div class="wr-bars">${rows}</div>`;
+      }
+
+      // ---- Closed trades ----
+      if (closed.length === 0) {
+        paperClosedWrap.innerHTML = '<div class="empty">No closed paper trades yet.</div>';
+      } else {
+        const rows = closed.slice(0, 50).map(t => {
+          const dirCls = t.direction === 'long' ? 'dir-long' : 'dir-short';
+          const r = t.pnl_r;
+          const rCls = r == null ? '' : (r > 0 ? 'r-pos' : r < 0 ? 'r-neg' : '');
+          return `
+            <tr>
+              <td><strong>${escapeHtml(t.symbol)}</strong></td>
+              <td class="${dirCls}">${escapeHtml((t.direction || '').toUpperCase())}</td>
+              <td>${outcomeBadge(t.outcome)}</td>
+              <td class="mono">${fmt(t.entry_price)}</td>
+              <td class="mono">${fmt(t.close_price)}</td>
+              <td class="mono ${rCls}">${fmtR(r)}</td>
+              <td class="mono" style="color:var(--muted)">${escapeHtml((t.opened_at || '').slice(0, 16).replace('T', ' '))}</td>
+              <td class="mono" style="color:var(--muted)">${escapeHtml((t.closed_at || '').slice(0, 16).replace('T', ' '))}</td>
+            </tr>`;
+        }).join('');
+        const moreNote = closed.length > 50
+          ? `<div style="margin-top:6px;color:var(--muted);font-size:11px">Showing the 50 most recent of ${closed.length} closed trades.</div>`
+          : '';
+        paperClosedWrap.innerHTML = `
+          <table class="paper-table">
+            <thead><tr>
+              <th>Symbol</th><th>Dir</th><th>Outcome</th>
+              <th>Entry</th><th>Close</th><th>P&amp;L (R)</th>
+              <th>Opened</th><th>Closed</th>
+            </tr></thead>
+            <tbody>${rows}</tbody>
+          </table>${moreNote}`;
+      }
+
+      // Re-render the scan table so losing-symbol classes / badges update.
+      // Pass the original ISO timestamp so pushScoreHistory remains
+      // idempotent (it dedupes on exact ts match).
+      if (lastScanResults.length) {
+        renderScan({ timestamp: lastScanTimestamp, results: lastScanResults });
+      }
+    }
+
+    async function loadPaperTrades() {
+      try {
+        const resp = await fetch('/paper_trades');
+        renderPaper(await resp.json());
+      } catch (e) { console.error('paper trades load failed:', e); }
+    }
+
     // ---------- SSE wiring ----------
     function connect() {
       const es = new EventSource('/events');
@@ -1012,6 +1326,9 @@
         activeWatching = state?.watching || {};
         renderWatchingHeader();
       });
+      es.addEventListener('paper_update', (ev) => {
+        renderPaper(JSON.parse(ev.data));
+      });
       es.addEventListener('error_event', (ev) => {
         if (ev.data) { try { renderAlert(JSON.parse(ev.data)); } catch (_) {} }
       });
@@ -1024,6 +1341,7 @@
     }
 
     loadHistory();
+    loadPaperTrades();
     connect();
   </script>
 </body>

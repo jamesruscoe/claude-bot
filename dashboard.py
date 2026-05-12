@@ -23,6 +23,7 @@ from pydantic import BaseModel, Field
 from sse_starlette.sse import EventSourceResponse
 
 import memory
+import paper_trader
 from config import (
     DASHBOARD_HOST,
     DASHBOARD_PORT,
@@ -133,6 +134,39 @@ async def scan_results() -> dict[str, Any]:
     return _read_scan_results()
 
 
+def _paper_payload() -> dict[str, Any]:
+    """Snapshot of paper-trading state for the dashboard. Open trades are
+    annotated with current_price + unrealised_r using the live prices from
+    the most recent scan, so the UI doesn't have to re-fetch."""
+    scan = _read_scan_results()
+    prices = {
+        r["symbol"]: r["current_price"]
+        for r in scan.get("results", []) or []
+        if r.get("symbol") and r.get("current_price") is not None
+    }
+    open_trades = paper_trader.compute_unrealised(paper_trader.list_open(), prices)
+    closed_trades = paper_trader.list_closed()
+    # Newest closes first — dashboard renders the table top-down.
+    closed_trades.sort(key=lambda t: t.get("closed_at") or "", reverse=True)
+    # Per-symbol breakdown for the win-rate bar chart.
+    per_symbol: dict[str, dict[str, Any]] = {}
+    for t in closed_trades:
+        sym = t.get("symbol") or "?"
+        if sym not in per_symbol:
+            per_symbol[sym] = paper_trader.get_symbol_stats(sym)
+    return {
+        "open": open_trades,
+        "closed": closed_trades,
+        "stats": paper_trader.get_system_stats(),
+        "per_symbol": list(per_symbol.values()),
+    }
+
+
+@app.get("/paper_trades")
+async def paper_trades() -> dict[str, Any]:
+    return _paper_payload()
+
+
 @app.get("/watching")
 async def watching_state() -> dict[str, Any]:
     return _read_watching_state()
@@ -158,6 +192,9 @@ async def internal_alert(req: InternalAlertPush) -> dict[str, str]:
 @app.post("/internal/scan_complete")
 async def internal_scan_complete(req: InternalScanPush) -> dict[str, str]:
     await _broadcast("scan_complete", {"timestamp": req.timestamp, "results": req.results})
+    # Paper-trading state is updated by scan.py before push_scan_complete
+    # runs, so we can broadcast the fresh snapshot in the same event tick.
+    await _broadcast("paper_update", _paper_payload())
     return {"ok": "true"}
 
 
@@ -195,6 +232,7 @@ async def events(request: Request) -> EventSourceResponse:
             # Send the current state on connect so the page populates immediately
             yield {"event": "scan_complete", "data": json.dumps(_read_scan_results(), default=str)}
             yield {"event": "watching_changed", "data": json.dumps(_read_watching_state(), default=str)}
+            yield {"event": "paper_update", "data": json.dumps(_paper_payload(), default=str)}
 
             while True:
                 if await request.is_disconnected():

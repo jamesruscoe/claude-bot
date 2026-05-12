@@ -33,12 +33,15 @@ except (AttributeError, ValueError):
     pass
 
 import analyser
+import chart_capture
 import cooling_off
 import dashboard
 import enricher
 import market_data
 import memory
 import news_sentiment
+import paper_trader
+import risk_engine
 import smc_detector
 from config import (
     BACKTEST_FROM_DATE,
@@ -50,6 +53,7 @@ from config import (
     SCAN_MIN_SCORE,
     SCAN_RESULTS_FILE,
     SIGNAL_DEDUP_BARS,
+    TRADINGVIEW_SYMBOLS,
     WATCHLIST,
     assert_configured,
 )
@@ -145,6 +149,23 @@ async def scan_symbol(client: httpx.AsyncClient, symbol: str) -> dict[str, Any]:
         macro_warning=macro_warn,
         staleness_reasons=stale_reasons,
     )
+
+    # Adaptive confidence based on the paper-trading track record. Runs
+    # after build_brief so the brief's base confidence is already set, and
+    # only the live path uses it — backtest stays deterministic via the
+    # skip_risk_engine flag on build_brief.
+    try:
+        adjusted_conf, risk_warnings = risk_engine.adjust_confidence(
+            symbol=symbol,
+            base_score=brief.get("confluence_score", 0),
+            signals_detected=brief.get("patterns_detected") or [],
+            news_sentiment=brief.get("news_sentiment"),
+        )
+        brief["confidence"] = adjusted_conf
+        if risk_warnings:
+            brief["warnings"] = list(brief.get("warnings") or []) + risk_warnings
+    except Exception as e:
+        log.warning("risk_engine.adjust_confidence failed for %s: %s", symbol, e)
     return brief
 
 
@@ -183,6 +204,31 @@ async def live_main() -> None:
             direction = (brief.get("direction") or "—").upper()
             print(f"  {symbol:<7}  score {score:>3}  dir {direction:<5}  bias {brief.get('htf_bias', '?')}")
 
+    # Live prices collected during the scan loop — used for both the
+    # paper-trader resolution pass and the dashboard's open-trade P&L.
+    current_prices: dict[str, float] = {
+        r["symbol"]: r["current_price"]
+        for r in results
+        if r.get("symbol") and r.get("current_price") is not None
+    }
+
+    # Resolve any open paper trades against the latest snapshot before
+    # rendering, so the briefing and the paper-trading summary at the end
+    # of the run reflect the same state. This is the bot's self-learning
+    # loop — every scan it adjudicates the previous batch of bets.
+    newly_closed: list[dict[str, Any]] = []
+    try:
+        newly_closed = paper_trader.check_open_trades(current_prices)
+    except Exception as e:
+        log.warning("paper_trader.check_open_trades failed: %s", e)
+    if newly_closed:
+        print(f"\nResolved {len(newly_closed)} paper trade(s):")
+        for t in newly_closed:
+            print(
+                f"  {t['symbol']:<7} {t['direction']:<5} {t['outcome']:<10} "
+                f"{t.get('pnl_r', 0):+.2f}R @ {t.get('close_price')}"
+            )
+
     payload = {"timestamp": started.isoformat(), "results": results}
     tmp = SCAN_RESULTS_FILE.with_suffix(".json.tmp")
     with tmp.open("w", encoding="utf-8") as f:
@@ -198,18 +244,163 @@ async def live_main() -> None:
     sorted_by_score = sorted(results, key=lambda r: r.get("confluence_score", 0) or 0, reverse=True)
     top3 = sorted_by_score[:3]
     watch_candidates = [r for r in top3 if r.get("take_trade")]
+    fired_candidates: list[dict[str, Any]] = []
     if watch_candidates:
         print()
         for r in watch_candidates:
+            symbol = r["symbol"]
+            direction = r.get("direction")
+            entry_low = r.get("entry_zone_low")
+            entry_high = r.get("entry_zone_high")
+            sl = r.get("stop_loss")
+
+            # Suppress identical re-fires inside the 6h dedup window. A signal
+            # only counts as new when the entry zone has drifted past the
+            # SIGNAL_DEDUP_ZONE_PCT tolerance — i.e. price has moved.
+            if (
+                direction
+                and entry_low is not None
+                and entry_high is not None
+                and memory.check_recent_signal(symbol, direction, entry_low, entry_high)
+            ):
+                print(f"{symbol}: identical signal fired recently — skipping to avoid repeat alert")
+                continue
+
             memory.add_trade(r)
+            if (
+                direction
+                and entry_low is not None
+                and entry_high is not None
+                and sl is not None
+            ):
+                memory.log_fired_signal(
+                    symbol, direction, entry_low, entry_high, sl, payload["timestamp"]
+                )
+
+            # Automatically open a paper trade so the bot builds its own
+            # track record. risk_engine reads from this on the next scan.
+            entry_price = r.get("entry")
+            tp1 = r.get("take_profit_1")
+            tp2 = r.get("take_profit_2")
+            if (
+                direction
+                and entry_price is not None
+                and sl is not None
+                and tp1 is not None
+                and tp2 is not None
+            ):
+                try:
+                    paper_trader.open_paper_trade(
+                        symbol=symbol,
+                        direction=direction,
+                        entry_price=entry_price,
+                        sl=sl,
+                        tp1=tp1,
+                        tp2=tp2,
+                        signal_score=r.get("confluence_score") or 0,
+                        signals_detected=r.get("patterns_detected") or [],
+                        news_sentiment=r.get("news_sentiment"),
+                        regime=r.get("htf_bias"),
+                        timestamp=payload["timestamp"],
+                    )
+                except Exception as e:
+                    log.warning("paper_trader.open_paper_trade failed for %s: %s", symbol, e)
+
+            fired_candidates.append(r)
             # Machine-readable marker for CI / cron pipelines to detect fires.
-            print(f"TAKE TRADE: {r['symbol']} {(r.get('direction') or '?').upper()}")
+            print(f"TAKE TRADE: {symbol} {(direction or '?').upper()}")
+
+    # Visual confirmation: capture Yahoo charts for any symbol at the alert-watch
+    # threshold (looser than take_trade so we get screenshots for setups we want
+    # to manually review, not only the ones that auto-fire). Charts are uploaded
+    # as a separate artifact by the workflow.
+    chart_targets = [
+        r for r in results
+        if (r.get("confluence_score") or 0) >= chart_capture.CHART_CAPTURE_MIN_SCORE
+    ]
+    captured_any = False
+    if chart_targets:
+        print(f"\nCapturing charts for {len(chart_targets)} symbol(s) "
+              f"at score ≥ {chart_capture.CHART_CAPTURE_MIN_SCORE}…")
+        for r in chart_targets:
+            symbol = r["symbol"]
+            tv_symbol = TRADINGVIEW_SYMBOLS.get(symbol, symbol)
+            paths = await chart_capture.capture_charts(symbol, tv_symbol)
+            if paths:
+                captured_any = True
+                print(f"  {symbol} ({r.get('confluence_score')}): {len(paths)} chart(s)")
+                for p in paths:
+                    print(f"    {p}")
+            else:
+                print(f"  {symbol}: chart capture returned no files")
+        if captured_any:
+            print("\nChart screenshots attached as workflow artifacts — "
+                  "open Actions run to view")
 
     await dashboard.push_scan_complete(payload["timestamp"], results)
     print(f"\nDone. Results saved to {SCAN_RESULTS_FILE.name}.")
-    if watch_candidates:
-        symbols = ", ".join(r["symbol"] for r in watch_candidates)
+    if fired_candidates:
+        symbols = ", ".join(r["symbol"] for r in fired_candidates)
         print(f"To live-watch: py watch.py --symbol <one of: {symbols}>")
+
+    _print_paper_trading_summary(current_prices, newly_closed)
+
+
+def _print_paper_trading_summary(
+    current_prices: dict[str, float],
+    newly_closed: list[dict[str, Any]],
+) -> None:
+    """End-of-scan summary of the self-built track record. Always prints,
+    even with no trades, so the user can confirm the system is wired."""
+    open_trades = paper_trader.list_open()
+    stats = paper_trader.get_system_stats()
+    bar = "─" * 60
+    print()
+    print(bar)
+    print("  PAPER TRADING SUMMARY")
+    print(bar)
+    print(f"  Open trades:       {len(open_trades)}")
+    print(f"  Closed trades:     {stats['total_trades']}")
+    if stats["total_trades"]:
+        wr = stats["win_rate"]
+        print(f"  Win rate:          {wr * 100:.1f}%" if wr is not None else "  Win rate:          n/a")
+        pf = stats["profit_factor"]
+        if pf is None:
+            pf_str = "n/a"
+        elif pf == float("inf"):
+            pf_str = "∞ (no losses yet)"
+        else:
+            pf_str = f"{pf:.2f}"
+        print(f"  Profit factor:     {pf_str}")
+        print(f"  Total R:           {stats['total_r']:+.2f}R")
+        if stats["current_win_streak"]:
+            print(f"  Current streak:    {stats['current_win_streak']} wins")
+        elif stats["current_loss_streak"]:
+            print(f"  Current streak:    {stats['current_loss_streak']} losses")
+        if stats.get("best_symbol"):
+            print(f"  Best symbol:       {stats['best_symbol']}")
+        if stats.get("worst_symbol"):
+            print(f"  Worst symbol:      {stats['worst_symbol']}")
+    if newly_closed:
+        print(f"  Resolved this run: {len(newly_closed)}")
+    if open_trades:
+        print()
+        print(f"  Open positions ({len(open_trades)}):")
+        annotated = paper_trader.compute_unrealised(open_trades, current_prices)
+        for t in annotated:
+            cp = t.get("current_price")
+            r_now = t.get("unrealised_r")
+            if cp is not None and r_now is not None:
+                print(
+                    f"    {t['symbol']:<7} {t['direction']:<5} entry {t['entry_price']:<10} "
+                    f"live {cp:<10} ({r_now:+.2f}R)"
+                )
+            else:
+                print(
+                    f"    {t['symbol']:<7} {t['direction']:<5} entry {t['entry_price']:<10} "
+                    "(no live price)"
+                )
+    print(bar)
 
 
 # ---------- Backtest ----------
@@ -305,6 +496,7 @@ def _backtest_one(symbol: str, bars: list[Bar]) -> dict[str, Any]:
             current_price=round(history[-1].c, 5), bias=bias, atr14=atr14,
             enrichment={"headlines": [], "upcoming_events": []},
             skip_cooling_off=True,  # backtest must not be gated by live blacklist
+            skip_risk_engine=True,  # backtest must not be biased by forward paper data
         )
 
         if not brief.get("take_trade"):

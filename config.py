@@ -15,65 +15,66 @@ SCAN_RESULTS_FILE = ROOT_DIR / "scan_results.json"
 WATCHING_STATE_FILE = ROOT_DIR / "watching_state.json"
 BACKTEST_RESULTS_FILE = ROOT_DIR / "backtest_results.json"
 COOLING_OFF_FILE = ROOT_DIR / "cooling_off.json"
+FIRED_SIGNALS_FILE = ROOT_DIR / "fired_signals.json"
+PAPER_TRADES_FILE = ROOT_DIR / "paper_trades.json"
 LOG_FILE = ROOT_DIR / "trading_bot.log"
 STATIC_DIR = ROOT_DIR / "static"
 
-# --- Scan universe (broad, dynamic) ---
-# 20 liquid US stocks + commodity/index proxies. Every scan covers all 20;
-# the daily briefing surfaces only the top 3 by confluence score. There is
-# no static curation any more — symbols that work will be revealed by the
-# rolling win rate computed from logged outcomes (memory.compute_win_rate).
+# --- Scan universe (focused, dynamic) ---
+# 10 symbols — the trimmed core after 2026-Q1 review. Every scan covers all
+# 10; the daily briefing surfaces only the top 3 by confluence score. The
+# previous 20-symbol universe was too broad — too many low-quality fires on
+# names with no edge. Symbols that earn a track record stay in via the
+# rolling win rate (memory.compute_win_rate); the cooling-off blacklist
+# culls those that don't.
 #
 # symbol → Polygon/Massive ticker (used for daily candles + reference news).
-# Aliases: USOIL→USO, XAUUSD→GLD, NQ1→QQQ.
+# Alias: USOIL→USO.
 WATCHLIST: dict[str, str] = {
-    "NVDA":   "NVDA",
-    "AAPL":   "AAPL",
-    "TSLA":   "TSLA",
-    "MSFT":   "MSFT",
-    "META":   "META",
-    "AMZN":   "AMZN",
-    "AMD":    "AMD",
-    "GOOGL":  "GOOGL",
-    "NFLX":   "NFLX",
-    "CRM":    "CRM",
-    "UBER":   "UBER",
-    "COIN":   "COIN",
-    "PLTR":   "PLTR",
-    "APLD":   "APLD",
     "ARM":    "ARM",
-    "SMCI":   "SMCI",
-    "MSTR":   "MSTR",
+    "NVDA":   "NVDA",
+    "TSLA":   "TSLA",
     "USOIL":  "USO",
-    "XAUUSD": "GLD",
-    "NQ1":    "QQQ",
+    "SMCI":   "SMCI",
+    "APLD":   "APLD",
+    "AMZN":   "AMZN",
+    "NFLX":   "NFLX",
+    "AMD":    "AMD",
+    "COIN":   "COIN",
 }
 
 # Yahoo Finance tickers (yfinance) for intraday data + news + live price.
-# Most symbols are direct equities so Yahoo and Polygon use the same ticker;
-# the three commodity/index aliases use a sympathetic proxy on each side
-# (CL=F for crude futures, GLD for gold ETF, QQQ for Nasdaq-100).
+# All equities use the same ticker on both sides; USOIL is the lone alias —
+# CL=F gives true near-24h crude futures intraday vs. the USO ETF used for
+# daily candles on the Massive side.
 YAHOO_TICKERS: dict[str, str] = {
-    "NVDA":   "NVDA",
-    "AAPL":   "AAPL",
-    "TSLA":   "TSLA",
-    "MSFT":   "MSFT",
-    "META":   "META",
-    "AMZN":   "AMZN",
-    "AMD":    "AMD",
-    "GOOGL":  "GOOGL",
-    "NFLX":   "NFLX",
-    "CRM":    "CRM",
-    "UBER":   "UBER",
-    "COIN":   "COIN",
-    "PLTR":   "PLTR",
-    "APLD":   "APLD",
     "ARM":    "ARM",
-    "SMCI":   "SMCI",
-    "MSTR":   "MSTR",
+    "NVDA":   "NVDA",
+    "TSLA":   "TSLA",
     "USOIL":  "CL=F",
-    "XAUUSD": "GLD",
-    "NQ1":    "QQQ",
+    "SMCI":   "SMCI",
+    "APLD":   "APLD",
+    "AMZN":   "AMZN",
+    "NFLX":   "NFLX",
+    "AMD":    "AMD",
+    "COIN":   "COIN",
+}
+
+# TradingView fully-qualified symbols (exchange:ticker). Used by
+# chart_capture.py to build chart URLs. Stocks all live on NASDAQ; USOIL
+# uses the front-month crude futures contract on NYMEX (CL1!) for the
+# truest live read on crude rather than an ETF proxy.
+TRADINGVIEW_SYMBOLS: dict[str, str] = {
+    "ARM":    "NASDAQ:ARM",
+    "NVDA":   "NASDAQ:NVDA",
+    "TSLA":   "NASDAQ:TSLA",
+    "USOIL":  "NYMEX:CL1!",
+    "SMCI":   "NASDAQ:SMCI",
+    "APLD":   "NASDAQ:APLD",
+    "AMZN":   "NASDAQ:AMZN",
+    "NFLX":   "NASDAQ:NFLX",
+    "AMD":    "NASDAQ:AMD",
+    "COIN":   "NASDAQ:COIN",
 }
 
 # Lookback window for 1H bars from Yahoo. 730 days is yfinance's hard cap on

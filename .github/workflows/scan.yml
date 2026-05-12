@@ -38,6 +38,11 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
+      - name: Install Playwright + Chromium
+        run: |
+          pip install playwright
+          playwright install --with-deps chromium
+
       - name: Run scan
         id: scan
         env:
@@ -84,4 +89,13 @@ jobs:
             scan_output.txt
             trading_bot.log
           if-no-files-found: warn
+          retention-days: 30
+
+      - name: Upload chart screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: chart-screenshots
+          path: charts/
+          if-no-files-found: ignore
           retention-days: 30
