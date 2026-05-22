@@ -106,11 +106,29 @@ async def scan_symbol(client: httpx.AsyncClient, symbol: str) -> dict[str, Any]:
     enrichment = await enrichment_task
     h4_bars = market_data.build_synthetic_4h(h1_bars) if h1_bars else []
 
-    # Fall back to the Massive daily close (same instrument scale as the OB zones)
-    # if live yfinance lookup fails. Don't fall back to 1H close — for USOIL the
-    # 1H bars come from CL=F which is on a different price scale than USO daily.
+    # Fall back to the most recent daily close if the live yfinance fetch fails.
+    # Daily and intraday now share the same instrument for every symbol (USOIL
+    # uses CL=F on both sides after the USO ETF rip-out), so any of the bar
+    # sources would do — daily close is just the most stable.
     if live_price is None:
         live_price = bars[-1].c
+
+    # Sanity guard against ticker-scale mismatches. If the live price differs
+    # from the most recent daily close by more than 25%, something is wrong:
+    # either the daily and live feeds are on different instruments (the bug
+    # we fixed for USOIL) or a corporate action wasn't picked up. NFLX is
+    # the only symbol with a known recent split (10:1 on 2025-11-17) and
+    # both Polygon (adjusted=true) and yfinance return the post-split scale,
+    # so this guard shouldn't trip there.
+    daily_close = bars[-1].c
+    if daily_close > 0:
+        gap = abs(live_price - daily_close) / daily_close
+        if gap > 0.25:
+            log.warning(
+                "Price-scale mismatch for %s: daily close %.4f vs live %.4f (%.0f%% gap). "
+                "Check ticker mappings.",
+                symbol, daily_close, live_price, gap * 100,
+            )
 
     # Invalidate signals where intraday has already left the OB/BOS zone behind.
     signals, stale_reasons = smc_detector.invalidate_by_price(signals, live_price)
@@ -279,9 +297,22 @@ async def live_main() -> None:
 
             # Automatically open a paper trade so the bot builds its own
             # track record. risk_engine reads from this on the next scan.
-            entry_price = r.get("entry")
+            #
+            # Paper-trade fill price = the worst-case edge of the entry zone
+            # (zone_low for longs, zone_high for shorts) rather than the
+            # midpoint. This is intentionally pessimistic: real fills inside
+            # a retest zone tend to land where the order rests against the
+            # impulse, not at the mathematical centre — and using the bad
+            # edge here makes the +2R/+3R targets harder to reach, which
+            # keeps the self-built track record honest.
             tp1 = r.get("take_profit_1")
             tp2 = r.get("take_profit_2")
+            if direction == "long":
+                entry_price = entry_low
+            elif direction == "short":
+                entry_price = entry_high
+            else:
+                entry_price = r.get("entry")
             if (
                 direction
                 and entry_price is not None
@@ -390,15 +421,17 @@ def _print_paper_trading_summary(
         for t in annotated:
             cp = t.get("current_price")
             r_now = t.get("unrealised_r")
+            status = t.get("status") or "open"
+            status_tag = f"  [{status}]" if status != "open" else ""
             if cp is not None and r_now is not None:
                 print(
                     f"    {t['symbol']:<7} {t['direction']:<5} entry {t['entry_price']:<10} "
-                    f"live {cp:<10} ({r_now:+.2f}R)"
+                    f"live {cp:<10} ({r_now:+.2f}R){status_tag}"
                 )
             else:
                 print(
                     f"    {t['symbol']:<7} {t['direction']:<5} entry {t['entry_price']:<10} "
-                    "(no live price)"
+                    f"(no live price){status_tag}"
                 )
     print(bar)
 

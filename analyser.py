@@ -68,8 +68,13 @@ def compute_levels(
 ) -> dict[str, Any] | None:
     """Compute entry zone, SL, TP1, TP2, R:R from the active signals.
 
-    SL placement is range-aware: SL = OB extreme ± max(0.3% × price, 0.5 × ATR14).
-    Falls back to the fixed 0.3% buffer if ATR is unavailable.
+    SL placement is ATR-based — 0.5 × ATR14 outside the entry zone — so
+    stops adapt to each symbol's realised volatility. R:R is targeted at
+    1:3 (TP2 = the real exit under "let winners run"); TP1 marks the
+    trail-to-breakeven trigger at +2R.
+
+    Falls back to the fixed `SL_BUFFER_PCT` if ATR isn't available — only
+    happens on first-bar / cold-start, after which ATR is always populated.
     """
     zone = _zone_from_signals(direction, signals)
     if zone is None:
@@ -79,11 +84,16 @@ def compute_levels(
         return None
     entry = round((zone_low + zone_high) / 2, 5)
 
-    atr_buf = SL_ATR_MULT * atr14 if (atr14 is not None and atr14 > 0) else 0.0
+    if atr14 is not None and atr14 > 0:
+        buf = SL_ATR_MULT * atr14
+        buf_source = "atr"
+    else:
+        # ATR missing — use the percentage fallback against the relevant
+        # zone edge (low for longs, high for shorts).
+        buf = (zone_low if direction == "long" else zone_high) * SL_BUFFER_PCT
+        buf_source = "pct"
 
     if direction == "long":
-        pct_buf = zone_low * SL_BUFFER_PCT
-        buf = max(pct_buf, atr_buf)
         sl = round(zone_low - buf, 5)
         if sl >= entry:
             return None
@@ -91,8 +101,6 @@ def compute_levels(
         tp1 = round(entry + 2 * risk, 5)
         tp2 = round(entry + 3 * risk, 5)
     else:
-        pct_buf = zone_high * SL_BUFFER_PCT
-        buf = max(pct_buf, atr_buf)
         sl = round(zone_high + buf, 5)
         if sl <= entry:
             return None
@@ -110,9 +118,12 @@ def compute_levels(
         "stop_loss": sl,
         "take_profit_1": tp1,
         "take_profit_2": tp2,
-        "rr_ratio": "1:2.00",
+        # Target is TP2 (+3R) under "let winners run". TP1 (+2R) is the
+        # trail trigger, not the exit — so the displayed R:R is the
+        # full-run ratio, not the trail trigger.
+        "rr_ratio": "1:3",
         "sl_buffer_used": round(buf, 5),
-        "sl_buffer_source": "atr" if atr_buf > pct_buf else "pct",
+        "sl_buffer_source": buf_source,
     }
 
 

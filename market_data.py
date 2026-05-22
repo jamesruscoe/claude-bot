@@ -28,6 +28,7 @@ from config import (
     TIMEFRAMES,
     WATCHLIST,
     YAHOO_TICKERS,
+    YFINANCE_DAILY_SYMBOLS,
 )
 
 log = logging.getLogger(__name__)
@@ -90,8 +91,13 @@ async def yf_throttle() -> None:
         _yf_last_call = loop.time()
 
 
-def to_polygon_ticker(symbol: str) -> str:
-    return WATCHLIST.get(symbol, symbol.upper())
+def to_polygon_ticker(symbol: str) -> str | None:
+    """Polygon/Massive ticker for `symbol`. Returns None when the symbol has
+    no Polygon source (e.g. USOIL → CL=F is futures-only and not on Stocks
+    Basic). Callers must handle None as 'skip Polygon for this symbol'."""
+    if symbol in WATCHLIST:
+        return WATCHLIST[symbol]
+    return symbol.upper()
 
 
 async def _get_json(client: httpx.AsyncClient, url: str, params: dict[str, str]) -> dict[str, Any] | None:
@@ -156,6 +162,9 @@ async def fetch_candles(
         raise ValueError(f"Unknown timeframe: {timeframe}")
     cfg = TIMEFRAMES[timeframe]
     ticker = to_polygon_ticker(symbol)
+    if ticker is None:
+        log.debug("No Polygon ticker for %s — caller should use yfinance", symbol)
+        return []
     multiplier = cfg["multiplier"]
     timespan = cfg["timespan"]
     bar_count = cfg["bars"]
@@ -208,8 +217,44 @@ async def fetch_candles(
     return bars[-bar_count:]
 
 
+def _fetch_yf_daily_sync(symbol: str) -> list[Bar]:
+    """Blocking yfinance daily fetch. Used for symbols where Polygon doesn't
+    have the right instrument (USOIL → CL=F crude futures). Always wrap in
+    asyncio.to_thread from async code."""
+    yticker = to_yahoo_ticker(symbol)
+    if yticker is None:
+        log.debug("No Yahoo ticker mapping for %s — skipping daily", symbol)
+        return []
+    try:
+        import yfinance as yf
+    except ImportError:
+        log.warning("yfinance not installed — run `pip install yfinance`")
+        return []
+    try:
+        df = yf.Ticker(yticker).history(
+            period="10y",
+            interval="1d",
+            auto_adjust=False,
+            prepost=False,
+            actions=False,
+        )
+    except Exception as e:
+        log.warning("yf daily fetch failed for %s (%s): %s", symbol, yticker, e)
+        return []
+    return _yf_history_to_bars(df, yticker)
+
+
+async def fetch_yf_daily(symbol: str) -> list[Bar]:
+    """Async wrapper for yfinance daily fetch. Returns [] on failure."""
+    await yf_throttle()
+    return await asyncio.to_thread(_fetch_yf_daily_sync, symbol)
+
+
 async def fetch_daily(client: httpx.AsyncClient, symbol: str) -> list[Bar]:
-    """Convenience: fetch the daily bars for one symbol."""
+    """Convenience: fetch the daily bars for one symbol. Routes through
+    yfinance for symbols in YFINANCE_DAILY_SYMBOLS (e.g. USOIL → CL=F)."""
+    if symbol in YFINANCE_DAILY_SYMBOLS:
+        return await fetch_yf_daily(symbol)
     return await fetch_candles(client, symbol, "D")
 
 
@@ -311,17 +356,20 @@ async def fetch_yf_hourly(symbol: str, lookback_days: int = INTRADAY_LOOKBACK_DA
 
 def _fetch_live_price_sync(symbol: str) -> float | None:
     """Latest live-ish price from yfinance, on the SAME instrument the daily
-    detector is using (Polygon/Massive ticker, e.g. USO for USOIL — NOT the
-    CL=F front-month future used for intraday).
+    detector is using.
 
-    Keeping this on the same ticker as `fetch_daily` is critical for the
-    staleness check: the OB zones come from USO daily bars, so the live
-    price must also be in USO terms or the 2% threshold compares apples
-    to oranges and false-invalidates every USOIL setup.
+    For Polygon-sourced symbols (NVDA, TSLA, …) the Yahoo ticker equals the
+    Polygon ticker so it doesn't matter which mapping we use. For symbols in
+    YFINANCE_DAILY_SYMBOLS (USOIL → CL=F) the Polygon mapping is None, so we
+    MUST use the Yahoo mapping — otherwise the staleness check compares the
+    OB zones (now in crude-futures terms) against a wrong instrument.
 
     Tries fast_info.last_price first; falls back to the most recent 1m close.
     Returns None on any failure — caller should fall back further."""
-    yticker = to_polygon_ticker(symbol)  # USO / NVDA / TSLA — yfinance handles all of these
+    yticker = to_yahoo_ticker(symbol) or to_polygon_ticker(symbol)
+    if yticker is None:
+        log.debug("No yfinance ticker mapping for %s — skipping live price", symbol)
+        return None
     try:
         import yfinance as yf
     except ImportError:
@@ -381,6 +429,9 @@ def build_synthetic_4h(hourly_candles: list[Bar]) -> list[Bar]:
 
 async def fetch_news(client: httpx.AsyncClient, symbol: str, limit: int = 3) -> list[dict[str, str]]:
     ticker = to_polygon_ticker(symbol)
+    if ticker is None:
+        log.debug("No Polygon ticker for %s — skipping Polygon news (yfinance covers it)", symbol)
+        return []
     url = f"{MASSIVE_BASE_URL}/v2/reference/news"
     params = {
         "ticker": ticker,

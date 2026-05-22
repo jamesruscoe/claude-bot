@@ -149,6 +149,8 @@
     .badge.danger { background: rgba(248,81,73,0.14); border-color: rgba(248,81,73,0.5); color: var(--red); }
     .badge.win { background: rgba(63,185,80,0.18); border-color: rgba(63,185,80,0.5); color: var(--green); }
     .badge.loss { background: rgba(248,81,73,0.18); border-color: rgba(248,81,73,0.5); color: var(--red); }
+    .badge.breakeven { background: rgba(210,153,34,0.12); border-color: rgba(210,153,34,0.4); color: var(--amber); }
+    .badge.trailing { background: rgba(63,185,80,0.10); border-color: rgba(63,185,80,0.45); color: var(--green); }
     .badge.stopped { background: rgba(110,118,129,0.18); border-color: rgba(110,118,129,0.5); color: var(--muted); }
     .badge.bullish { background: rgba(63,185,80,0.12); border-color: rgba(63,185,80,0.4); color: var(--green); }
     .badge.bearish { background: rgba(248,81,73,0.14); border-color: rgba(248,81,73,0.5); color: var(--red); }
@@ -1156,6 +1158,7 @@
         return `<span class="badge win">${escapeHtml(outcome)}</span>`;
       }
       if (outcome === 'LOSS') return `<span class="badge loss">${escapeHtml(outcome)}</span>`;
+      if (outcome === 'BREAKEVEN') return `<span class="badge breakeven">${escapeHtml(outcome)}</span>`;
       return `<span class="badge stopped">${escapeHtml(outcome)}</span>`;
     }
 
@@ -1207,6 +1210,9 @@
           const dirCls = t.direction === 'long' ? 'dir-long' : 'dir-short';
           const r = t.unrealised_r;
           const rCls = r == null ? '' : (r > 0 ? 'r-pos' : r < 0 ? 'r-neg' : '');
+          const statusBadge = t.tp1_hit
+            ? '<span class="badge trailing" title="TP1 was touched — SL trailed to entry, holding for TP2">trailing to TP2</span>'
+            : '<span class="badge low">open</span>';
           return `
             <tr>
               <td><strong>${escapeHtml(t.symbol)}</strong></td>
@@ -1217,6 +1223,7 @@
               <td class="mono">${fmt(t.tp1)}</td>
               <td class="mono">${fmt(t.tp2)}</td>
               <td class="mono ${rCls}">${fmtR(r)}</td>
+              <td>${statusBadge}</td>
               <td class="mono" style="color:var(--muted)">${escapeHtml((t.opened_at || '').slice(0, 16).replace('T', ' '))}</td>
             </tr>`;
         }).join('');
@@ -1224,7 +1231,7 @@
           <table class="paper-table">
             <thead><tr>
               <th>Symbol</th><th>Dir</th><th>Entry</th><th>Live</th>
-              <th>SL</th><th>TP1</th><th>TP2</th><th>R now</th><th>Opened</th>
+              <th>SL</th><th>TP1</th><th>TP2</th><th>R now</th><th>Status</th><th>Opened</th>
             </tr></thead>
             <tbody>${rows}</tbody>
           </table>`;

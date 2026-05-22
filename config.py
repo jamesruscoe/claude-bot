@@ -29,12 +29,17 @@ STATIC_DIR = ROOT_DIR / "static"
 # culls those that don't.
 #
 # symbol → Polygon/Massive ticker (used for daily candles + reference news).
-# Alias: USOIL→USO.
-WATCHLIST: dict[str, str] = {
+# A value of None means "no Polygon source for this symbol" — daily candles
+# and live price come exclusively from yfinance (see YFINANCE_DAILY_SYMBOLS).
+# USOIL is the only such symbol: Polygon free tier is Stocks Basic so it
+# can't serve crude futures (CL=F), and the USO ETF trades on a different
+# price scale (~$140) than WTI crude (~$97), so mixing the two yielded
+# garbage staleness checks and a wrong "current price" in the brief.
+WATCHLIST: dict[str, str | None] = {
     "ARM":    "ARM",
     "NVDA":   "NVDA",
     "TSLA":   "TSLA",
-    "USOIL":  "USO",
+    "USOIL":  None,
     "SMCI":   "SMCI",
     "APLD":   "APLD",
     "AMZN":   "AMZN",
@@ -42,6 +47,11 @@ WATCHLIST: dict[str, str] = {
     "AMD":    "AMD",
     "COIN":   "COIN",
 }
+
+# Symbols that source daily candles, live price, and intraday from yfinance
+# instead of Polygon/Massive. Crude futures live here because Polygon free
+# tier won't return CL=F.
+YFINANCE_DAILY_SYMBOLS: set[str] = {"USOIL"}
 
 # Yahoo Finance tickers (yfinance) for intraday data + news + live price.
 # All equities use the same ticker on both sides; USOIL is the lone alias —
@@ -122,15 +132,19 @@ DISPLAY_MIN_SCORE = 60   # daily-briefing top-3 cutoff — under this, "no quali
 ANALYSIS_MIN_SCORE = 80  # below this, take_trade is forced false (raised 75→80 in choppy 2026 regime)
 
 # --- Stop-loss placement ---
-# SL = OB extreme ± max(SL_BUFFER_PCT × price,  SL_ATR_MULT × ATR14)
+# SL = OB extreme ± (SL_ATR_MULT × ATR14)
+#   — long:  SL = entry_zone_low  - 0.5 × ATR14
+#   — short: SL = entry_zone_high + 0.5 × ATR14
 #
-# ATR multiplier intentionally set to 0 after the 2026-05-08 ATR-fix
-# experiment dropped aggregate 10-day win rate from 52.2% → 18.8%. The
-# tight 0.3% buffer pairs with tight TP1 which actually fills within
-# the 10-day horizon on these volatile names. Re-enabling ATR scaling
-# would require also changing the TP1 multiplier (currently 2× risk).
-SL_BUFFER_PCT = 0.003   # 0.3%
-SL_ATR_MULT = 0.0       # disabled — see comment above
+# ATR-based stops adapt to per-symbol volatility (NVDA's $6 ATR gives a
+# $3 buffer; APLD's $3 ATR gives a $1.50 buffer). Paired with "let
+# winners run" (trail SL to entry once TP1 = +2R is touched, hold for
+# TP2 = +3R), so the 2026-05-08 worry — that wider stops + tight TP1
+# would tank the win rate — is mitigated by TP1 becoming a trail-trigger
+# rather than the exit. SL_BUFFER_PCT remains only as the cold-start
+# fallback when ATR isn't yet populated.
+SL_BUFFER_PCT = 0.003   # 0.3% — fallback only, used when ATR14 is missing
+SL_ATR_MULT = 0.5       # 0.5 × ATR14 is the live stop buffer
 
 # --- Signal dedup window (bars) ---
 # After a take-trade signal fires, identical signals (same direction +

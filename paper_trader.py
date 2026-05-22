@@ -35,11 +35,18 @@ PAPER_TRADE_EXPIRY_DAYS = 10
 
 # Outcome string constants — exported so consumers can switch on them
 # without re-spelling the literals.
-OUTCOME_WIN_TP1 = "WIN_TP1"
+OUTCOME_WIN_TP1 = "WIN_TP1"        # legacy — no longer emitted live (kept for
+                                   # historical records before "trail to TP2"
+                                   # became the default).
 OUTCOME_WIN_TP2 = "WIN_TP2"
+OUTCOME_BREAKEVEN = "BREAKEVEN"    # TP1 was hit, SL trailed to entry, then
+                                   # that breakeven stop got hit. Counts as
+                                   # neither win nor loss — 0R, no streak.
 OUTCOME_LOSS = "LOSS"
 OUTCOME_EXPIRED = "EXPIRED"
 
+# Wins / losses for stats purposes. BREAKEVEN deliberately appears in neither
+# — banking 0R after touching TP1 isn't a fail, but it isn't a win either.
 _WIN_OUTCOMES = {OUTCOME_WIN_TP1, OUTCOME_WIN_TP2}
 _LOSS_OUTCOMES = {OUTCOME_LOSS}
 
@@ -98,6 +105,9 @@ def open_paper_trade(
         "sl": float(sl),
         "tp1": float(tp1),
         "tp2": float(tp2),
+        "original_sl": float(sl),    # frozen — `sl` may trail to entry once TP1 hits
+        "tp1_hit": False,
+        "tp1_hit_at": None,
         "score": signal_score,
         "signals": list(signals_detected or []),
         "news_sentiment": news_sentiment,
@@ -137,7 +147,11 @@ def _trading_days_between(start: datetime, end: datetime) -> int:
 def _pnl_r(entry: float, sl: float, close_price: float, direction: str) -> float:
     """R-multiple of the realised P&L. 1R = the initial risk distance
     (entry − sl for longs, sl − entry for shorts). +2R at TP1, +3R at
-    TP2, ≈-1R at SL."""
+    TP2, 0R at breakeven (post-TP1 SL trail), ≈-1R at SL.
+
+    Pass `sl` = the ORIGINAL stop, not the trailed one — otherwise a
+    breakeven exit after the SL was moved to entry would look like
+    division-by-zero noise instead of a clean 0R."""
     risk = abs(entry - sl)
     if risk <= 0:
         return 0.0
@@ -150,45 +164,65 @@ def _resolve_trade(
     trade: dict[str, Any],
     current_price: float,
     now: datetime,
-) -> str | None:
-    """Decide whether `trade` should close at `current_price` right now.
-    Returns the outcome string, or None if the trade stays open."""
+) -> tuple[str | None, bool]:
+    """Decide what to do with `trade` given `current_price` right now.
+
+    Returns `(outcome, mutated)`:
+      - `outcome` is the close reason (WIN_TP2 / BREAKEVEN / LOSS / EXPIRED)
+        or None if the trade stays open.
+      - `mutated` is True when the trade dict was modified in place but the
+        trade stays open — currently only happens on the TP1→trailing
+        transition. Callers must persist when `mutated` is True even if
+        `outcome` is None.
+
+    Two phases for the "let winners run" strategy:
+      1. Pre-TP1: standard. SL → LOSS, TP2 → WIN_TP2, TP1 → mutate to
+         trailing mode (`tp1_hit=True`, SL trails to entry) and stay open.
+      2. Post-TP1: SL (now at entry) → BREAKEVEN, TP2 → WIN_TP2."""
     direction = trade.get("direction")
     if direction not in ("long", "short"):
-        return None
+        return None, False
     sl = trade["sl"]
     tp1 = trade["tp1"]
     tp2 = trade["tp2"]
+    tp1_hit = bool(trade.get("tp1_hit"))
 
     # We only see a single price snapshot per scan, so we can't tell
     # intra-bar ordering — apply a conservative priority: SL first
-    # (worst-case slippage on the loss side), then TP2 (best case so we
-    # don't downgrade a runner to TP1), then TP1.
+    # (worst-case slippage on the loss side), then TP2 (best case so
+    # we don't downgrade a runner to TP1's breakeven).
     if direction == "long":
         if current_price <= sl:
-            return OUTCOME_LOSS
+            return (OUTCOME_BREAKEVEN if tp1_hit else OUTCOME_LOSS), False
         if current_price >= tp2:
-            return OUTCOME_WIN_TP2
-        if current_price >= tp1:
-            return OUTCOME_WIN_TP1
+            return OUTCOME_WIN_TP2, False
+        if not tp1_hit and current_price >= tp1:
+            # TP1 reached — bank the move, trail SL to entry, keep running.
+            trade["tp1_hit"] = True
+            trade["tp1_hit_at"] = now.isoformat()
+            trade["sl"] = float(trade["entry_price"])
+            return None, True
     else:
         if current_price >= sl:
-            return OUTCOME_LOSS
+            return (OUTCOME_BREAKEVEN if tp1_hit else OUTCOME_LOSS), False
         if current_price <= tp2:
-            return OUTCOME_WIN_TP2
-        if current_price <= tp1:
-            return OUTCOME_WIN_TP1
+            return OUTCOME_WIN_TP2, False
+        if not tp1_hit and current_price <= tp1:
+            trade["tp1_hit"] = True
+            trade["tp1_hit_at"] = now.isoformat()
+            trade["sl"] = float(trade["entry_price"])
+            return None, True
 
     # Time-based expiry. Compare against the trade's open timestamp.
     try:
         opened = datetime.fromisoformat(str(trade["opened_at"]))
     except (KeyError, ValueError):
-        return None
+        return None, False
     if opened.tzinfo is None:
         opened = opened.replace(tzinfo=timezone.utc)
     if _trading_days_between(opened, now) >= PAPER_TRADE_EXPIRY_DAYS:
-        return OUTCOME_EXPIRED
-    return None
+        return OUTCOME_EXPIRED, False
+    return None, False
 
 
 def check_open_trades(current_prices: dict[str, float]) -> list[dict[str, Any]]:
@@ -211,28 +245,40 @@ def check_open_trades(current_prices: dict[str, float]) -> list[dict[str, Any]]:
                 # from the watchlist. Leave it open for now; a later scan
                 # that re-includes the symbol will resolve it.
                 continue
-            outcome = _resolve_trade(trade, price, now)
+            outcome, mutated = _resolve_trade(trade, price, now)
             if outcome is None:
+                if mutated:
+                    # TP1→trailing transition. Trade stays open; persist the
+                    # new tp1_hit flag + trailed SL so the next scan sees it.
+                    dirty = True
+                    log.info(
+                        "paper trade %s %s trailing to TP2 — TP1 hit @ %s, SL moved to entry %s",
+                        symbol, trade["direction"], price, trade["entry_price"],
+                    )
                 continue
             if outcome == OUTCOME_EXPIRED:
                 close_price = float(price)
+            elif outcome == OUTCOME_WIN_TP2:
+                close_price = float(trade["tp2"])
+            elif outcome == OUTCOME_BREAKEVEN:
+                # Trade fully closes at the trailed SL, which is the entry
+                # price — a clean 0R after banking nothing extra past TP1's
+                # touch.
+                close_price = float(trade["entry_price"])
+            elif outcome == OUTCOME_LOSS:
+                close_price = float(trade["sl"])
             else:
-                # For SL/TP outcomes, use the threshold the price crossed
-                # rather than the noisy intra-scan tick — that way the
-                # R-multiple lines up exactly with the +2R / +3R / -1R
-                # expectation instead of drifting on whichever scan tick
-                # happened to register the cross.
-                if outcome == OUTCOME_WIN_TP1:
-                    close_price = float(trade["tp1"])
-                elif outcome == OUTCOME_WIN_TP2:
-                    close_price = float(trade["tp2"])
-                else:
-                    close_price = float(trade["sl"])
+                # Defensive — only legacy OUTCOME_WIN_TP1 should land here
+                # and only for trades from before "let winners run" landed.
+                close_price = float(trade.get("tp1", price))
             trade["outcome"] = outcome
             trade["close_price"] = close_price
             trade["closed_at"] = now.isoformat()
+            # R-multiple uses the ORIGINAL stop so the +2R/+3R/-1R/0R scale
+            # is comparable across trades regardless of trailing.
+            risk_sl = trade.get("original_sl", trade["sl"])
             trade["pnl_r"] = round(
-                _pnl_r(trade["entry_price"], trade["sl"], close_price, trade["direction"]),
+                _pnl_r(trade["entry_price"], risk_sl, close_price, trade["direction"]),
                 3,
             )
             closed.append(dict(trade))
@@ -445,19 +491,25 @@ def get_system_stats() -> dict[str, Any]:
 
 def compute_unrealised(open_trades: list[dict[str, Any]],
                        prices: dict[str, float]) -> list[dict[str, Any]]:
-    """Annotate open trades with `current_price` and `unrealised_r` based on
-    the latest live prices. Used by the dashboard to render running P&L."""
+    """Annotate open trades with `current_price`, `unrealised_r`, and a
+    `status` string ('trailing to TP2' once TP1 has been hit, else
+    'open'). Used by the dashboard and scan summary."""
     out: list[dict[str, Any]] = []
     for t in open_trades:
         clone = dict(t)
+        tp1_hit = bool(t.get("tp1_hit"))
+        clone["status"] = "trailing to TP2" if tp1_hit else "open"
         price = prices.get(t.get("symbol"))
         if price is None:
             clone["current_price"] = None
             clone["unrealised_r"] = None
         else:
             clone["current_price"] = float(price)
+            # Always score against the original SL so the displayed R is
+            # apples-to-apples with the final outcome's R.
+            risk_sl = t.get("original_sl", t["sl"])
             clone["unrealised_r"] = round(
-                _pnl_r(t["entry_price"], t["sl"], float(price), t["direction"]),
+                _pnl_r(t["entry_price"], risk_sl, float(price), t["direction"]),
                 3,
             )
         out.append(clone)
