@@ -66,10 +66,13 @@ jobs:
         env:
           MASSIVE_API_KEY: ${{ secrets.POLYGON_API_KEY }}
           BOT_STATE_DIR: ${{ github.workspace }}/state
-          # Claude judgment stays OFF unless you set these in repo secrets AND
-          # flip BOT_LLM. Leave off until the free version proves an edge.
-          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          # LLM judgment is OFF (BOT_LLM=0) — the free deterministic brain runs.
+          # To turn it on: add GROQ_API_KEY to repo secrets (free, from
+          # console.groq.com) and set BOT_LLM to "1". Provider defaults to Groq
+          # (Llama 3.3 70B), which is free and runs fine from CI.
           BOT_LLM: "0"
+          BOT_LLM_PROVIDER: "groq"
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
           PYTHONIOENCODING: utf-8
         run: |
           set -o pipefail

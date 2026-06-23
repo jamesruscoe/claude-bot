@@ -32,15 +32,31 @@ SCAN_OUTPUT_FILE = STATE_DIR / "last_scan.json"  # latest brief, for the dashboa
 
 # --- LLM (OPTIONAL, OFF BY DEFAULT) -----------------------------------------
 # The system runs entirely free on the deterministic, memory-driven brain
-# (see brain.py). Claude judgment is a dormant upgrade you switch on AFTER the
-# free version has proven it has an edge — so you don't pay an API bill to find
-# out whether the strategy works. Enable by setting ANTHROPIC_API_KEY *and*
-# BOT_LLM=1. The llm.py adapter must be validated against the current Anthropic
-# API reference before you flip this on.
+# (see brain.py). An LLM judge/reflector is a dormant upgrade you switch on
+# with BOT_LLM=1 once you want richer reasoning + journal prose.
+#
+# Default provider is Groq's FREE hosted API (Llama 3.3 70B) — fast, works from
+# GitHub Actions, no cost. Anthropic (Claude) is also supported but paid, so
+# it's opt-in via BOT_LLM_PROVIDER=anthropic. Either way nothing fires unless
+# BOT_LLM=1 and the selected provider has a key.
+LLM_PROVIDER = os.getenv("BOT_LLM_PROVIDER", "groq")  # "groq" | "anthropic"
+
+# Groq (free tier) — get a key at https://console.groq.com
+GROQ_API_KEY = os.getenv("GROQ_API_KEY", "")
+GROQ_BASE_URL = os.getenv("BOT_GROQ_BASE_URL", "https://api.groq.com/openai/v1")
+GROQ_MODEL = os.getenv("BOT_GROQ_MODEL", "llama-3.3-70b-versatile")
+
+# Anthropic (paid) — only if you deliberately switch provider.
 ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY", "")
 JUDGE_MODEL = os.getenv("BOT_JUDGE_MODEL", "claude-sonnet-4-6")
 REFLECT_MODEL = os.getenv("BOT_REFLECT_MODEL", "claude-opus-4-8")
-LLM_ENABLED = bool(ANTHROPIC_API_KEY) and os.getenv("BOT_LLM", "0") == "1"
+
+
+def _provider_key_present() -> bool:
+    return bool(GROQ_API_KEY) if LLM_PROVIDER == "groq" else bool(ANTHROPIC_API_KEY)
+
+
+LLM_ENABLED = _provider_key_present() and os.getenv("BOT_LLM", "0") == "1"
 
 # --- Signal gating ----------------------------------------------------------
 # The deterministic engine still scores 0/50/100. We only hand candidates to

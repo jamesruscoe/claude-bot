@@ -8,4 +8,7 @@ yfinance>=0.2.40
 
 # v2 additions
 pandas-market-calendars>=4.4.0   # NYSE open/holiday gate (graceful fallback if absent)
-# anthropic>=0.40.0              # OPTIONAL — only needed if you enable Claude judgment (BOT_LLM=1)
+# LLM judgment is optional (BOT_LLM=1). Default provider is Groq (free), which
+# uses httpx (already above) — no extra dependency. Only the paid Anthropic
+# provider needs an SDK:
+# anthropic>=0.40.0              # OPTIONAL — only if BOT_LLM_PROVIDER=anthropic

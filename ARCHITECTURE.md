@@ -97,10 +97,20 @@ start at half size; single-setup signals need a proven record; a meaningful
 sub-35% win rate is a hard skip (this replaces v1's separate cooling-off
 blacklist with one coherent rule); strong records size up.
 
-Claude judgment (`v2/llm.py`) is a **dormant upgrade** behind `BOT_LLM=1` +
-`ANTHROPIC_API_KEY`. The point is to **prove the strategy has an edge on the
-free path before paying for inference.** ⚠ Validate `llm.py` against the
-current Anthropic API reference before enabling.
+LLM judgment (`v2/llm.py`) is a **dormant upgrade** behind `BOT_LLM=1`. It's
+provider-pluggable:
+
+- **`groq`** (default, **free**) — Llama 3.3 70B via Groq's OpenAI-compatible
+  API. Fast, runs from GitHub Actions, no cost. Set `GROQ_API_KEY`
+  (console.groq.com). Uses `httpx` + JSON mode; no extra dependency.
+- **`anthropic`** (paid) — Claude, via `BOT_LLM_PROVIDER=anthropic` +
+  `ANTHROPIC_API_KEY`. Needs the `anthropic` SDK.
+
+Any LLM failure (network, bad JSON) silently falls back to the deterministic
+judge, so a flaky model can never break a scan. Verify a key with
+`python run.py --llm-test`. The point stands: **prove an edge on the free path
+first**, and a free model (Groq) is smart enough for this task anyway — it's
+structured summarization + a simple decision, not hard reasoning.
 
 ## Persistence in CI
 
