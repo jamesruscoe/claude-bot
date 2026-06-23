@@ -24,6 +24,10 @@ trading_bot.log
 # Chart screenshots — uploaded as a workflow artifact, not committed
 charts/
 
+# v2 durable state — lives on the `state` branch / CI worktree, never on main
+state/
+scan_output.txt
+
 # Claude Code session state
 .claude/
 

@@ -1,0 +1,124 @@
+name: SMC Scan v2
+
+# Memory-driven scan. The bot's entire state (SQLite ledger + markdown journal)
+# lives on a dedicated `state` branch which this job checks out before the run
+# and commits back after — so the bot accumulates a track record instead of
+# starting blank every run (the v1 amnesia bug). run.py self-gates on the
+# market calendar, so a holiday/weekend run is a cheap no-op rather than a
+# false signal (the v1 Juneteenth bug).
+
+on:
+  schedule:
+    - cron: '0 13 * * 1-5'   # 13:00 UTC — pre-US open
+    - cron: '0 20 * * 1-5'   # 20:00 UTC — after the close prints the daily bar
+  workflow_dispatch:
+    inputs:
+      force:
+        description: "Scan even if the market is closed"
+        type: boolean
+        default: false
+
+concurrency:
+  group: smc-scan-v2
+  cancel-in-progress: false
+
+permissions:
+  contents: write          # required to push the state branch back
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0     # need full history to add the state worktree
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Restore state branch
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          if git ls-remote --exit-code --heads origin state >/dev/null 2>&1; then
+            git fetch origin state
+            git worktree add state origin/state
+          else
+            echo "state branch does not exist yet — bootstrapping an orphan"
+            git worktree add --detach state
+            cd state
+            git checkout --orphan state
+            git rm -rf . >/dev/null 2>&1 || true
+            git clean -fdx >/dev/null 2>&1 || true
+          fi
+          mkdir -p state/journal state/lessons
+
+      - name: Run scan
+        id: scan
+        env:
+          MASSIVE_API_KEY: ${{ secrets.POLYGON_API_KEY }}
+          BOT_STATE_DIR: ${{ github.workspace }}/state
+          # LLM judgment is OFF (BOT_LLM=0) — the free deterministic brain runs.
+          # To turn it on: add GROQ_API_KEY to repo secrets (free, from
+          # console.groq.com) and set BOT_LLM to "1". Provider defaults to Groq
+          # (Llama 3.3 70B), which is free and runs fine from CI.
+          BOT_LLM: "0"
+          BOT_LLM_PROVIDER: "groq"
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+          PYTHONIOENCODING: utf-8
+        run: |
+          set -o pipefail
+          FORCE_FLAG=""
+          if [ "${{ github.event.inputs.force }}" = "true" ]; then FORCE_FLAG="--force"; fi
+          python run.py $FORCE_FLAG 2>&1 | tee scan_output.txt
+          if grep -q '^TAKE TRADE:' scan_output.txt; then
+            echo "fired=true" >> "$GITHUB_OUTPUT"
+            syms=$(grep '^TAKE TRADE:' scan_output.txt | awk '{print $3}' | paste -sd ',' -)
+            echo "symbols=$syms" >> "$GITHUB_OUTPUT"
+          else
+            echo "fired=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Persist state branch
+        if: always()
+        run: |
+          cd state
+          git add -A
+          if git diff --cached --quiet; then
+            echo "no state changes to commit"
+          else
+            git commit -m "state: scan $(date -u +%FT%TZ)"
+            git push origin HEAD:state
+          fi
+
+      - name: Email on take-trade
+        if: steps.scan.outputs.fired == 'true'
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: smtp.gmail.com
+          server_port: 465
+          secure: true
+          username: ${{ secrets.GMAIL_USERNAME }}
+          password: ${{ secrets.GMAIL_PASSWORD }}
+          from: Trading Bot v2 <${{ secrets.GMAIL_USERNAME }}>
+          to: ${{ secrets.EMAIL_TO }}
+          subject: "Trading Bot v2 — Signal: ${{ steps.scan.outputs.symbols }}"
+          body: file://scan_output.txt
+          convert_markdown: false
+
+      - name: Upload scan log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: scan-v2-${{ github.run_id }}
+          path: scan_output.txt
+          if-no-files-found: warn
+          retention-days: 30
