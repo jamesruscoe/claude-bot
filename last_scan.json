@@ -1,0 +1,75 @@
+{
+  "scan_ts": "2026-06-23T13:08:38.095219+00:00",
+  "skipped": false,
+  "llm": false,
+  "results": [
+    {
+      "symbol": "ARM",
+      "candidate": false
+    },
+    {
+      "symbol": "NVDA",
+      "candidate": false
+    },
+    {
+      "symbol": "TSLA",
+      "candidate": false
+    },
+    {
+      "symbol": "USOIL",
+      "candidate": true,
+      "score": 50,
+      "direction": "short",
+      "setups": [
+        "ob_retest"
+      ],
+      "regime": "bearish",
+      "price": 73.56,
+      "atr": 5.17249,
+      "entry": 75.285,
+      "entry_low": 73.58,
+      "entry_high": 76.99,
+      "stop_loss": 79.57624,
+      "tp1": 66.70252,
+      "tp2": 62.41128,
+      "rr": 2.0,
+      "take": false,
+      "confidence": "low",
+      "size": "none",
+      "rationale": "skip \u2014 single-setup signal without a proven track record on USOIL (win rate n/a, 0 closed)",
+      "decided_by": "deterministic"
+    },
+    {
+      "symbol": "SMCI",
+      "candidate": false
+    },
+    {
+      "symbol": "APLD",
+      "candidate": false
+    },
+    {
+      "symbol": "AMZN",
+      "candidate": false
+    },
+    {
+      "symbol": "NFLX",
+      "candidate": false
+    },
+    {
+      "symbol": "AMD",
+      "candidate": false
+    },
+    {
+      "symbol": "COIN",
+      "candidate": false
+    }
+  ],
+  "opened": [],
+  "closed": [],
+  "system_stats": {
+    "total_closed": 0,
+    "open": 0,
+    "win_rate": null,
+    "total_r": 0.0
+  }
+}
