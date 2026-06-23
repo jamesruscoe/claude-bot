@@ -1,5 +1,5 @@
 {
-  "scan_ts": "2026-06-23T13:08:38.095219+00:00",
+  "scan_ts": "2026-06-23T13:25:20.681198+00:00",
   "skipped": false,
   "llm": false,
   "results": [
@@ -24,7 +24,7 @@
         "ob_retest"
       ],
       "regime": "bearish",
-      "price": 73.56,
+      "price": 73.52,
       "atr": 5.17249,
       "entry": 75.285,
       "entry_low": 73.58,
