@@ -26,6 +26,10 @@ def _setup_logging() -> None:
         format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
         handlers=[logging.StreamHandler(), logging.FileHandler(LOG_FILE, encoding="utf-8")],
     )
+    # httpx logs the full request URL at INFO — and the Massive API key rides in
+    # the query string. Silence it so the key never lands in logs or artifacts.
+    logging.getLogger("httpx").setLevel(logging.WARNING)
+    logging.getLogger("httpcore").setLevel(logging.WARNING)
 
 
 def main() -> None:
