@@ -1,5 +1,5 @@
 {
-  "scan_ts": "2026-06-24T15:32:22.335736+00:00",
+  "scan_ts": "2026-06-24T21:16:00.610784+00:00",
   "skipped": false,
   "llm": false,
   "results": [
@@ -50,8 +50,7 @@
       "confidence": "medium",
       "size": "half",
       "rationale": "score 100 (ob_retest+bos_retest); R:R 2.0; dual-confluence (OB + BOS agree); thin sample on AMZN (0 closed) \u2014 capped size",
-      "decided_by": "deterministic",
-      "opened": true
+      "decided_by": "deterministic"
     },
     {
       "symbol": "NFLX",
@@ -86,29 +85,7 @@
       "candidate": false
     }
   ],
-  "opened": [
-    {
-      "id": "9ec25b36-cb2c-4043-8533-71e644d06609",
-      "signal_id": "65c141a2-c724-4537-8e3a-e11e20841dad",
-      "symbol": "AMZN",
-      "direction": "short",
-      "setups": "[\"ob_retest\", \"bos_retest\"]",
-      "regime": "bullish",
-      "entry_price": 240.875,
-      "stop_loss": 249.61798,
-      "original_sl": 249.61798,
-      "tp1": 223.38904,
-      "tp2": 214.64606,
-      "tp1_hit": 0,
-      "tp1_hit_at": null,
-      "opened_at": "2026-06-24T15:32:22.335736+00:00",
-      "closed_at": null,
-      "close_price": null,
-      "outcome": null,
-      "pnl_r": null,
-      "journaled": 0
-    }
-  ],
+  "opened": [],
   "closed": [],
   "system_stats": {
     "total_closed": 0,
