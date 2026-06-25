@@ -1,5 +1,5 @@
 {
-  "scan_ts": "2026-06-24T21:16:00.610784+00:00",
+  "scan_ts": "2026-06-25T15:42:29.733987+00:00",
   "skipped": false,
   "llm": false,
   "results": [
@@ -29,28 +29,7 @@
     },
     {
       "symbol": "AMZN",
-      "candidate": true,
-      "score": 100,
-      "direction": "short",
-      "setups": [
-        "ob_retest",
-        "bos_retest"
-      ],
-      "regime": "bullish",
-      "price": 234.11,
-      "atr": 7.77596,
-      "entry": 240.875,
-      "entry_low": 236.02,
-      "entry_high": 245.73,
-      "stop_loss": 249.61798,
-      "tp1": 223.38904,
-      "tp2": 214.64606,
-      "rr": 2.0,
-      "take": true,
-      "confidence": "medium",
-      "size": "half",
-      "rationale": "score 100 (ob_retest+bos_retest); R:R 2.0; dual-confluence (OB + BOS agree); thin sample on AMZN (0 closed) \u2014 capped size",
-      "decided_by": "deterministic"
+      "candidate": false
     },
     {
       "symbol": "NFLX",
@@ -58,27 +37,7 @@
     },
     {
       "symbol": "AMD",
-      "candidate": true,
-      "score": 50,
-      "direction": "long",
-      "setups": [
-        "ob_retest"
-      ],
-      "regime": "bullish",
-      "price": 519.85,
-      "atr": 33.41666,
-      "entry": 519.9004,
-      "entry_low": 507.3008,
-      "entry_high": 532.5,
-      "stop_loss": 490.59247,
-      "tp1": 578.51626,
-      "tp2": 607.82419,
-      "rr": 2.0,
-      "take": false,
-      "confidence": "low",
-      "size": "none",
-      "rationale": "skip \u2014 single-setup signal without a proven track record on AMD (win rate n/a, 0 closed)",
-      "decided_by": "deterministic"
+      "candidate": false
     },
     {
       "symbol": "COIN",
