@@ -1,5 +1,5 @@
 {
-  "scan_ts": "2026-06-25T21:20:35.037440+00:00",
+  "scan_ts": "2026-06-26T15:22:12.297082+00:00",
   "skipped": false,
   "llm": false,
   "results": [
@@ -9,7 +9,27 @@
     },
     {
       "symbol": "NVDA",
-      "candidate": false
+      "candidate": true,
+      "score": 50,
+      "direction": "short",
+      "setups": [
+        "bos_retest"
+      ],
+      "regime": "bullish",
+      "price": 195.74,
+      "atr": 7.50384,
+      "entry": 199.34,
+      "entry_low": 199.04099,
+      "entry_high": 199.63901,
+      "stop_loss": 203.39093,
+      "tp1": 191.23814,
+      "tp2": 187.18721,
+      "rr": 2.0,
+      "take": false,
+      "confidence": "low",
+      "size": "none",
+      "rationale": "skip \u2014 single-setup signal without a proven track record on NVDA (win rate n/a, 0 closed)",
+      "decided_by": "deterministic"
     },
     {
       "symbol": "TSLA",

@@ -5,3 +5,5 @@
 2026-06-23 21:23:40,411 [WARNING] market_data: 429 rate-limited, waiting 4s (attempt 3)
 2026-06-24 15:33:25,673 [INFO] v2.store: trade opened: AMZN short @ 240.8750 (sl 249.6180 tp1 223.3890 tp2 214.6461)
 2026-06-24 21:17:02,583 [INFO] v2.pipeline: skip open AMZN short — already in an open position
+2026-06-26 15:22:14,586 [WARNING] market_data: 429 rate-limited, waiting 1s (attempt 1)
+2026-06-26 15:23:14,820 [WARNING] market_data: 429 rate-limited, waiting 1s (attempt 1)
