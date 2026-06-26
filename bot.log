@@ -7,3 +7,6 @@
 2026-06-24 21:17:02,583 [INFO] v2.pipeline: skip open AMZN short — already in an open position
 2026-06-26 15:22:14,586 [WARNING] market_data: 429 rate-limited, waiting 1s (attempt 1)
 2026-06-26 15:23:14,820 [WARNING] market_data: 429 rate-limited, waiting 1s (attempt 1)
+2026-06-26 21:12:08,526 [WARNING] market_data: 429 rate-limited, waiting 1s (attempt 1)
+2026-06-26 21:13:08,331 [WARNING] market_data: 429 rate-limited, waiting 1s (attempt 1)
+2026-06-26 21:13:09,402 [WARNING] market_data: 429 rate-limited, waiting 2s (attempt 2)
