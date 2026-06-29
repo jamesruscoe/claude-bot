@@ -1,5 +1,5 @@
 {
-  "scan_ts": "2026-06-29T16:37:17.738394+00:00",
+  "scan_ts": "2026-06-29T21:16:01.987396+00:00",
   "skipped": false,
   "llm": false,
   "results": [
@@ -44,14 +44,14 @@
         "ob_retest"
       ],
       "regime": "bearish",
-      "price": 70.79,
-      "atr": 4.61917,
+      "price": 70.42,
+      "atr": 4.63203,
       "entry": 70.7,
       "entry_low": 68.9,
       "entry_high": 72.5,
-      "stop_loss": 74.80959,
-      "tp1": 62.48082,
-      "tp2": 58.37123,
+      "stop_loss": 74.81601,
+      "tp1": 62.46798,
+      "tp2": 58.35197,
       "rr": 2.0,
       "take": false,
       "confidence": "low",

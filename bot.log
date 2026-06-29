@@ -10,3 +10,7 @@
 2026-06-26 21:12:08,526 [WARNING] market_data: 429 rate-limited, waiting 1s (attempt 1)
 2026-06-26 21:13:08,331 [WARNING] market_data: 429 rate-limited, waiting 1s (attempt 1)
 2026-06-26 21:13:09,402 [WARNING] market_data: 429 rate-limited, waiting 2s (attempt 2)
+2026-06-29 21:16:04,404 [WARNING] market_data: 429 rate-limited, waiting 1s (attempt 1)
+2026-06-29 21:16:05,465 [WARNING] market_data: 429 rate-limited, waiting 2s (attempt 2)
+2026-06-29 21:17:04,405 [WARNING] market_data: 429 rate-limited, waiting 1s (attempt 1)
+2026-06-29 21:17:05,465 [WARNING] market_data: 429 rate-limited, waiting 2s (attempt 2)
