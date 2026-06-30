@@ -1,0 +1,104 @@
+name: FX Paper Scan
+
+# Daily FX paper-trading run (Phase 5). PAPER ONLY — fills are simulated against
+# yfinance bars + an assumed per-pair spread; there is NO live execution.
+#
+# The bot's entire state (SQLite ledger + markdown journal) lives on a dedicated
+# `state-fx` branch, checked out before the run and committed back after, so the
+# honest ledger accumulates a track record across runs. The deterministic brain
+# runs free (BOT_LLM=0); the Claude judge stays off until you opt in.
+
+on:
+  schedule:
+    - cron: '30 21 * * 1-5'   # 21:30 UTC — after the FX day's daily bar prints
+  workflow_dispatch:
+    inputs:
+      force:
+        description: "Scan even if the market is closed"
+        type: boolean
+        default: false
+
+concurrency:
+  group: fx-paper-scan
+  cancel-in-progress: false
+
+permissions:
+  contents: write          # required to push the state branch back
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Restore state branch
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          if git ls-remote --exit-code --heads origin state-fx >/dev/null 2>&1; then
+            git fetch origin state-fx
+            git worktree add state origin/state-fx
+          else
+            echo "state-fx branch does not exist yet — bootstrapping an orphan"
+            git worktree add --detach state
+            cd state
+            git checkout --orphan state-fx
+            git rm -rf . >/dev/null 2>&1 || true
+            git clean -fdx >/dev/null 2>&1 || true
+          fi
+          mkdir -p state/journal state/lessons
+
+      - name: Run FX paper scan
+        id: scan
+        env:
+          BOT_MARKET: fx
+          BOT_STATE_DIR: ${{ github.workspace }}/state
+          # Claude judge OFF — deterministic brain runs free. To enable the
+          # second-opinion comparison, add ANTHROPIC_API_KEY to repo secrets and
+          # run the (separate) batch job; flip BOT_LLM=1 only after reviewing it.
+          BOT_LLM: "0"
+          BOT_LLM_PROVIDER: "anthropic"
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          PYTHONIOENCODING: utf-8
+        run: |
+          set -o pipefail
+          FORCE_FLAG=""
+          if [ "${{ github.event.inputs.force }}" = "true" ]; then FORCE_FLAG="--force"; fi
+          python run.py $FORCE_FLAG 2>&1 | tee scan_output.txt
+          python run.py --report > /dev/null 2>&1 || true
+
+      - name: Persist state branch
+        if: always()
+        run: |
+          cd state
+          git add -A
+          if git diff --cached --quiet; then
+            echo "no state changes to commit"
+          else
+            git commit -m "state-fx: paper scan $(date -u +%FT%TZ)"
+            git push origin HEAD:state-fx
+          fi
+
+      - name: Upload report + log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: fx-paper-${{ github.run_id }}
+          path: |
+            scan_output.txt
+            state/daily_report.md
+          if-no-files-found: warn
+          retention-days: 30

@@ -148,3 +148,48 @@ and selftest green. Equities path unchanged.
 
 **Exit criterion met:** judge integrated behind a flag (off by default), JSON parsing + fallback
 tested, committed.
+
+---
+
+## Phase 5 — Run harness (paper only) ✅
+
+**What changed**
+- **Daily cron entry point**: `.github/workflows/scan-fx.yml` runs the FX scan daily (21:30 UTC),
+  persisting the honest ledger to a dedicated **`state-fx`** branch (mirrors the equities v2
+  workflow). Claude judge **off** in CI; deterministic brain runs free.
+- **Simulated fills only** — entries use the yfinance **mid + assumed per-pair spread**
+  (`levels.compute_levels_fx`); resolution is intrabar SL-first (`store.walk_trade`). **No live
+  execution path exists anywhere** in the codebase.
+- **Daily report** (`v2/report.py`, `run.py --report`, also written automatically each scan to
+  `state/daily_report.md`): candidates + verdicts, rejections-by-reason, paper trades opened/closed
+  this run, running **sized** expectancy, and the Claude↔deterministic agreement rate when present.
+- **OANDA practice** left as a documented TODO (ARCHITECTURE.md → *TODO — OANDA practice*) — a new
+  `DataSource` impl for real bid/ask; strategy layer unchanged.
+- **Tests**: +2 (report rendering incl. opened/blocked/skipped). **43 total, all green.**
+
+**Verified live:** `BOT_MARKET=fx python run.py --force` end-to-end — found a candidate, the
+graduated judge took it at quarter size, the calibrated `FX_MIN_SCORE=100` correctly held it back
+(paper-conservative), and the daily report rendered.
+
+**Exit criterion met:** cron runs end-to-end in paper mode and produces a daily report.
+
+---
+
+## Final deliverables & status
+
+- **Working FX paper bot**, equities path still switchable (`BOT_MARKET`, default equities).
+- **`BASELINE.md`** (raw setup edge), **`CALIBRATION.md`** (frequency vs expectancy + proposed
+  threshold), **`PROGRESS.md`** (this file).
+- New code behind flags defaulting safe/off; **43 tests passing**; no hardcoded secrets
+  (`ANTHROPIC_API_KEY` from env); **no live execution path**.
+
+### ⚠ Awaiting your review
+1. **`FX_MIN_SCORE` threshold (Phase 3 GATE).** Default is the conservative **100** (dual-confluence,
+   +0.35R, ~0.7/week). Alternative is 50 (~3/week, +0.05R marginal). Confirm or change — see
+   `CALIBRATION.md`.
+2. **Whether to turn the Claude judge on.** Off by default. Recommend running `--batch-second-opinion`
+   for a while and reading the agreement rate before flipping `BOT_LLM=1` live.
+3. **Assumptions made** (proceeding on the brief, since `REFACTOR_PLAN.md` was absent): FX OB impulse
+   calibrated to 0.8%; assumed per-pair spreads (config table); fixed-fractional risk 0.5%; honest
+   resolution applied to both paths (it's the audit fix); graduated sizing applied to the shared
+   deterministic brain (so equities decisions changed too). Flag any you'd like revisited.

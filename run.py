@@ -46,6 +46,8 @@ def main() -> None:
                         help="replay + write CALIBRATION.md (frequency vs expectancy, proposed threshold)")
     parser.add_argument("--batch-second-opinion", action="store_true",
                         help="offline nightly Claude batch re-judge of the day's candidates (observational)")
+    parser.add_argument("--report", action="store_true",
+                        help="print/write the daily paper-trading report from the latest scan + ledger")
     args = parser.parse_args()
 
     try:
@@ -66,6 +68,11 @@ def main() -> None:
     if args.replay or args.calibrate:
         from v2 import replay
         replay.main(calibrate=args.calibrate)
+        return
+
+    if args.report:
+        from v2 import report
+        print(report.write_daily_report())
         return
 
     if args.batch_second_opinion:

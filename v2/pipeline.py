@@ -248,6 +248,11 @@ def _emit(payload: dict[str, Any]) -> None:
     tmp.replace(SCAN_OUTPUT_FILE)
 
     print(render_summary(payload))
+    try:
+        from v2 import report
+        report.write_daily_report(payload)
+    except Exception as e:  # never let reporting break a scan
+        log.debug("daily report failed: %s", e)
     for t in payload["opened"]:
         # CI marker — the workflow greps this to decide whether to email.
         print(f"TAKE TRADE: {t['symbol']} {t['direction'].upper()} "

@@ -131,12 +131,35 @@ python run.py --force        # real scan now (needs MASSIVE_API_KEY in .env)
 
 State lands in `./state/` locally (gitignored), mirroring the CI layout.
 
+## FX mode (Phases 1–5)
+
+`BOT_MARKET=fx` routes the same pipeline through a yfinance FX adapter
+(`v2/datasource.py`) with pip/spread-aware risk math (`v2/levels.py`), FX-native
+filters (session / scheduled-news / correlation cap in `v2/fx_filters.py` +
+`v2/news_calendar.py`), graduated probationary sizing (`v2/brain.py`), and an
+optional Claude Haiku judge + offline batch second-opinion (`v2/llm.py`,
+`v2/batch_judge.py`). Trade resolution is honest and intrabar (`store.walk_trade`,
+SL-first). `run.py --replay/--calibrate` produce `BASELINE.md`/`CALIBRATION.md`;
+`run.py --report` writes the daily paper summary; CI runs `.github/workflows/
+scan-fx.yml` daily on the `state-fx` branch. Equities (`BOT_MARKET=equities`,
+default) is unchanged and still switchable. See `PROGRESS.md` for the per-phase
+record and the threshold awaiting review.
+
+### TODO — OANDA practice (real bid/ask)
+
+The FX feed is yfinance **mid price**, so spread is *assumed* (fixed per-pair, in
+config) and baked into entry/R:R. The next data-layer step is an OANDA practice
+adapter behind the existing `DataSource` interface to source **real bid/ask** and
+true fills — paper only, no live order placement. Slotting it in is a new
+`DataSource` implementation + a factory branch; nothing in the strategy layer
+changes.
+
 ## What's intentionally deferred
 
-The dashboard, chart capture, watch loop, and the walk-forward backtest still
-live in the v1 files and are **not yet ported** to v2. The highest-value next
-step is porting the backtest onto the v2 levels so the new R-multiple targets
-can be validated on history before the free judge runs live for a while.
+The dashboard, chart capture, and watch loop still live in the v1 files and are
+**not yet ported** to v2. (The walk-forward backtest is now ported — see
+`v2/replay.py` / `run.py --replay`.) The highest-value next step is the OANDA
+practice adapter above, so the paper record reflects real spreads.
 
 ## Honest caveat
 
