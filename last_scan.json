@@ -1,5 +1,5 @@
 {
-  "scan_ts": "2026-06-30T19:09:44.329018+00:00",
+  "scan_ts": "2026-06-30T21:21:55.002853+00:00",
   "skipped": false,
   "llm": false,
   "market": "equities",
@@ -31,8 +31,7 @@
       "confidence": "low",
       "size": "quarter",
       "rationale": "score 50 (bos_retest); R:R 2.0; probation (0 decided) \u2014 tiny stake to learn",
-      "decided_by": "deterministic",
-      "opened": true
+      "decided_by": "deterministic"
     },
     {
       "symbol": "TSLA",
@@ -75,60 +74,8 @@
       "reject_reason": "regime_blocked"
     }
   ],
-  "opened": [
-    {
-      "id": "ed2632e3-8803-4260-b4c9-7f4704024dad",
-      "signal_id": "c5fcb7c7-c4dd-452e-ba3e-69094c99920b",
-      "symbol": "NVDA",
-      "direction": "short",
-      "setups": "[\"bos_retest\"]",
-      "regime": "bullish",
-      "entry_price": 194.74,
-      "stop_loss": 198.64494,
-      "original_sl": 198.64494,
-      "tp1": 186.93012,
-      "tp2": 183.02518,
-      "tp1_hit": 0,
-      "tp1_hit_at": null,
-      "size": "quarter",
-      "size_mult": 0.25,
-      "lots": null,
-      "opened_at": "2026-06-30T19:09:44.329018+00:00",
-      "closed_at": null,
-      "close_price": null,
-      "outcome": null,
-      "pnl_r": null,
-      "raw_r": null,
-      "journaled": 0
-    }
-  ],
-  "closed": [
-    {
-      "id": "9ec25b36-cb2c-4043-8533-71e644d06609",
-      "signal_id": "65c141a2-c724-4537-8e3a-e11e20841dad",
-      "symbol": "AMZN",
-      "direction": "short",
-      "setups": "[\"ob_retest\", \"bos_retest\"]",
-      "regime": "bullish",
-      "entry_price": 240.875,
-      "stop_loss": 249.61798,
-      "original_sl": 249.61798,
-      "tp1": 223.38904,
-      "tp2": 214.64606,
-      "tp1_hit": 0,
-      "tp1_hit_at": null,
-      "opened_at": "2026-06-24T15:32:22.335736+00:00",
-      "closed_at": "2026-06-30T19:10:50.579339+00:00",
-      "close_price": 249.61798,
-      "outcome": "LOSS",
-      "pnl_r": -1.0,
-      "journaled": 0,
-      "size": null,
-      "size_mult": 1.0,
-      "lots": null,
-      "raw_r": -1.0
-    }
-  ],
+  "opened": [],
+  "closed": [],
   "system_stats": {
     "total_closed": 1,
     "open": 1,
