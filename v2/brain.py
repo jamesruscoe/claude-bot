@@ -44,14 +44,46 @@ def judge(candidate: dict[str, Any], retrieval: dict[str, Any]) -> dict[str, Any
     return _judge_deterministic(candidate, retrieval)
 
 
+_CONF_FOR = {"quarter": "low", "half": "medium", "full": "high"}
+
+
+def _graduated_size(score: int, n_decided: int, wr: float | None,
+                    avg_r: float | None, meaningful: bool) -> tuple[str, str]:
+    """Graduated PROBATIONARY sizing (Phase 3 — replaces the hard 5-trade
+    cold-start skip that deadlocked the audit). A structurally-valid candidate is
+    never skipped for *lack* of history; instead size ramps with the decided-
+    trade count and the symbol's win rate:
+
+      • cold (0–1 decided): quarter — tiny probation stake, just enough to learn.
+      • thin (2–4 decided):  quarter single-setup, half dual-confluence.
+      • meaningful (≥5):     win-rate-driven — full at ≥60%/+avg, half at ≥50%,
+                             quarter otherwise.
+
+    (A proven-BAD meaningful record is hard-skipped upstream, not here.)
+    Returns (size, reason_fragment).
+    """
+    dual = score >= 100
+    if not meaningful:
+        if n_decided < 2:
+            return "quarter", f"probation ({n_decided} decided) — tiny stake to learn"
+        return ("half" if dual else "quarter",
+                f"thin sample ({n_decided} decided) — ramping")
+    if wr is not None and wr >= 0.6 and (avg_r or 0) > 0:
+        return "full", f"strong record ({_pct(wr)}, {_r(avg_r)})"
+    if wr is not None and wr >= 0.5:
+        return "half", f"decent record ({_pct(wr)})"
+    return "quarter", f"weak-ish record ({_pct(wr)}) — trim"
+
+
 def _judge_deterministic(candidate: dict[str, Any], retrieval: dict[str, Any]) -> dict[str, Any]:
     """Track-record-driven judgment. The free, always-on path.
 
     Logic, in plain terms:
-      • Structure must be there — score 100 (both setups agree) is the strong
-        case; 50 (one setup) needs the symbol's history to back it.
-      • The symbol's own win rate moves size up or down, but only once the
-        sample is meaningful (>= 5 decided trades). Thin samples stay small.
+      • Structure must be there — score 100 (both setups agree) sizes up faster
+        than 50 (one setup), but neither is skipped for lack of history.
+      • Size ramps with the decided-trade count (graduated probation) and the
+        symbol's win rate — see _graduated_size. This fixes the audit's cold-
+        start deadlock where single-setups could never accrue a record.
       • A clearly bad track record (meaningful sample, sub-35% win rate or
         negative expectancy) is a hard skip — this replaces v1's separate
         cooling-off blacklist with one coherent rule.
@@ -70,33 +102,11 @@ def _judge_deterministic(candidate: dict[str, Any], retrieval: dict[str, Any]) -
                          f"skip — {stats['symbol']} track record is negative "
                          f"(win rate {_pct(wr)}, avg {_r(avg_r)} over {stats['n_closed']} trades)")
 
-    # Base confidence from structure.
     if score >= 100:
-        confidence, size = "medium", "half"
         reasons.append("dual-confluence (OB + BOS agree)")
-    else:
-        # Single-setup: only take it if the symbol has earned trust.
-        if not (meaningful and wr is not None and wr >= 0.5):
-            return _decision(False, "low", "none",
-                             "skip — single-setup signal without a proven track record "
-                             f"on {stats['symbol']} (win rate {_pct(wr)}, "
-                             f"{stats['n_closed']} closed)")
-        confidence, size = "low", "quarter"
-        reasons.append("single setup, but symbol history supports it")
-
-    # Track record nudges size.
-    if meaningful and wr is not None:
-        if wr >= 0.6 and avg_r and avg_r > 0:
-            confidence, size = "high", "full"
-            reasons.append(f"strong history ({_pct(wr)}, {_r(avg_r)})")
-        elif wr < 0.45:
-            size = "quarter"
-            reasons.append(f"weak-ish history ({_pct(wr)}) — trim size")
-    elif not meaningful:
-        # Building a track record — keep stakes small regardless of structure.
-        if size == "full":
-            size = "half"
-        reasons.append(f"thin sample on {stats['symbol']} ({stats['n_closed']} closed) — capped size")
+    size, frag = _graduated_size(score, stats["wins"] + stats["losses"], wr, avg_r, meaningful)
+    confidence = _CONF_FOR[size]
+    reasons.append(frag)
 
     # A relevant negative lesson tempers confidence.
     neg = [l for l in retrieval["lessons"] if any(

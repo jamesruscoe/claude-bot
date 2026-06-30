@@ -354,54 +354,6 @@ async def fetch_yf_hourly(symbol: str, lookback_days: int = INTRADAY_LOOKBACK_DA
     return await asyncio.to_thread(_fetch_yf_hourly_sync, symbol, lookback_days)
 
 
-def _fetch_live_price_sync(symbol: str) -> float | None:
-    """Latest live-ish price from yfinance, on the SAME instrument the daily
-    detector is using.
-
-    For Polygon-sourced symbols (NVDA, TSLA, …) the Yahoo ticker equals the
-    Polygon ticker so it doesn't matter which mapping we use. For symbols in
-    YFINANCE_DAILY_SYMBOLS (USOIL → CL=F) the Polygon mapping is None, so we
-    MUST use the Yahoo mapping — otherwise the staleness check compares the
-    OB zones (now in crude-futures terms) against a wrong instrument.
-
-    Tries fast_info.last_price first; falls back to the most recent 1m close.
-    Returns None on any failure — caller should fall back further."""
-    yticker = to_yahoo_ticker(symbol) or to_polygon_ticker(symbol)
-    if yticker is None:
-        log.debug("No yfinance ticker mapping for %s — skipping live price", symbol)
-        return None
-    try:
-        import yfinance as yf
-    except ImportError:
-        return None
-    try:
-        ticker = yf.Ticker(yticker)
-        try:
-            fi = ticker.fast_info
-            price = fi["last_price"] if "last_price" in fi else getattr(fi, "last_price", None)
-            if price is not None:
-                p = float(price)
-                if p > 0:
-                    return p
-        except (KeyError, TypeError, ValueError, AttributeError) as e:
-            log.debug("fast_info miss for %s: %s", yticker, e)
-        df = ticker.history(
-            period="1d", interval="1m",
-            auto_adjust=False, prepost=False, actions=False,
-        )
-        if df is not None and not df.empty:
-            return float(df["Close"].iloc[-1])
-    except Exception as e:
-        log.warning("Live price fetch failed for %s (%s): %s", symbol, yticker, e)
-    return None
-
-
-async def fetch_live_price(symbol: str) -> float | None:
-    """Async wrapper. Returns None on any failure — caller should fall back."""
-    await yf_throttle()
-    return await asyncio.to_thread(_fetch_live_price_sync, symbol)
-
-
 def build_synthetic_4h(hourly_candles: list[Bar]) -> list[Bar]:
     """Group every 4 consecutive 1H candles into one 4H candle.
 

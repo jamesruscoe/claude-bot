@@ -18,55 +18,97 @@ import logging
 from datetime import datetime, timezone
 from typing import Any
 
-import httpx
-
-import market_data
-from v2 import brain, journal, signals, store
+from v2 import brain, datasource, fx_filters, journal, news_calendar, signals, store
 from v2.calendar_gate import bars_are_fresh, is_trading_day
 from v2.config import (
+    FX_ACCOUNT_EQUITY,
+    FX_ENABLED,
+    FX_OB_IMPULSE_THRESHOLD,
+    FX_RISK_PCT,
+    FX_STD_LOT_UNITS,
     LLM_ENABLED,
     SCAN_OUTPUT_FILE,
-    WATCHLIST,
     ensure_state_dirs,
+    fx_pip_size,
+    fx_spread_pips,
 )
 
 log = logging.getLogger(__name__)
 
 
+def _attach_fx_context(candidate: dict[str, Any]) -> None:
+    """Annotate an FX candidate with session / news / correlation context so the
+    LLM judge can weigh them. The deterministic brain ignores these keys."""
+    if not FX_ENABLED:
+        return
+    sym, direction = candidate["symbol"], candidate["direction"]
+    _, session = fx_filters.session_ok(sym)
+    _, news = news_calendar.news_blackout(sym)
+    _, corr = fx_filters.correlation_cap_ok(sym, direction, store.list_open_trades())
+    candidate["session"] = session
+    candidate["news_proximity"] = news
+    candidate["correlation"] = corr
+
+
+def _fx_open_block(symbol: str, candidate: dict[str, Any]) -> str | None:
+    """FX-only open-time gates (session / news / correlation). Returns a block
+    reason, or None if the trade is clear to open. Can only ever block."""
+    if not FX_ENABLED:
+        return None
+    from v2.config import FX_MIN_SCORE
+    if candidate["score"] < FX_MIN_SCORE:
+        return f"threshold:below calibrated FX_MIN_SCORE ({candidate['score']}<{FX_MIN_SCORE})"
+    ok, why = fx_filters.session_ok(symbol)
+    if not ok:
+        return f"session:{why}"
+    blocked, why = news_calendar.news_blackout(symbol)
+    if blocked:
+        return f"news:{why}"
+    ok, why = fx_filters.correlation_cap_ok(
+        symbol, candidate["direction"], store.list_open_trades())
+    if not ok:
+        return f"correlation:{why}"
+    return None
+
+
+def _instrument_for(symbol: str) -> signals.Instrument | None:
+    """FX risk-math context for a symbol, or None for the equities path."""
+    if not FX_ENABLED:
+        return None
+    return signals.Instrument(
+        symbol=symbol, pip_size=fx_pip_size(symbol), spread_pips=fx_spread_pips(symbol),
+        equity=FX_ACCOUNT_EQUITY, risk_pct=FX_RISK_PCT, std_lot=FX_STD_LOT_UNITS,
+    )
+
+
 # ---------- live scan -------------------------------------------------------
-
-async def _fetch(symbol: str, client: httpx.AsyncClient) -> tuple[str, list]:
-    try:
-        bars = await market_data.fetch_daily(client, symbol)
-    except Exception as e:
-        log.warning("fetch failed for %s: %s", symbol, e)
-        bars = []
-    return symbol, bars
-
 
 async def run_scan(*, force: bool = False) -> dict[str, Any]:
     """Run one live scan. `force` bypasses the market-open gate (manual runs)."""
     ensure_state_dirs()
     store.init_db()
     scan_ts = datetime.now(timezone.utc).isoformat()
+    source = datasource.get_data_source()
 
+    # FX trades through US holidays, so for FX we only gate on the weekend (the
+    # staleness check below catches a feed that didn't update). Equities keep the
+    # full NYSE holiday calendar.
     gate = is_trading_day()
     if not gate and not force:
-        log.info("market closed — %s. Skipping scan.", gate.reason)
-        return {"scan_ts": scan_ts, "skipped": True, "reason": gate.reason,
-                "candidates": [], "opened": [], "closed": []}
+        weekend = "weekend" in gate.reason
+        if not FX_ENABLED or weekend:
+            log.info("market closed — %s. Skipping scan.", gate.reason)
+            return {"scan_ts": scan_ts, "skipped": True, "reason": gate.reason,
+                    "candidates": [], "opened": [], "closed": []}
 
-    # Fetch daily bars for the whole universe (sequential — Massive is 5/min
-    # rate-limited and the shared limiter serialises anyway).
     bars_by_symbol: dict[str, list] = {}
-    async with httpx.AsyncClient(timeout=20.0) as client:
-        for symbol in WATCHLIST:
-            _, bars = await _fetch(symbol, client)
-            if bars:
-                bars_by_symbol[symbol] = bars
+    for symbol in source.symbols():
+        bars = await source.fetch_daily(symbol)
+        if bars:
+            bars_by_symbol[symbol] = bars
 
     if not bars_by_symbol:
-        log.warning("no data for any symbol — aborting scan")
+        log.warning("no data for any symbol — aborting scan (never act on an empty feed)")
         return {"scan_ts": scan_ts, "skipped": True, "reason": "no data",
                 "candidates": [], "opened": [], "closed": []}
 
@@ -78,13 +120,18 @@ async def run_scan(*, force: bool = False) -> dict[str, Any]:
         fresh = bars_are_fresh(bars[-1].dt)
         if not fresh and not force:
             log.info("skip %s — %s", symbol, fresh.reason)
+            store.record_rejection(scan_ts, symbol, "data", "stale_feed")
             continue
 
-        candidate = signals.build_candidate(symbol, bars, live_price=prices[symbol])
+        candidate, reason = signals.build_candidate(
+            symbol, bars, live_price=prices[symbol], instrument=_instrument_for(symbol),
+            impulse_threshold=FX_OB_IMPULSE_THRESHOLD if FX_ENABLED else None)
         if candidate is None:
-            rows.append({"symbol": symbol, "candidate": False})
+            store.record_rejection(scan_ts, symbol, "detector", reason or "unknown")
+            rows.append({"symbol": symbol, "candidate": False, "reject_reason": reason})
             continue
 
+        _attach_fx_context(candidate)
         retrieval = journal.retrieve_for(candidate)
         decision = brain.judge(candidate, retrieval)
 
@@ -96,26 +143,83 @@ async def run_scan(*, force: bool = False) -> dict[str, Any]:
             "size": decision["size"], "rationale": decision["rationale"],
             "decided_by": decision["source"]}}
 
-        if decision["take"] and _should_open(symbol, candidate):
+        if not decision["take"]:
+            store.record_rejection(scan_ts, symbol, "judge", "judge_skip",
+                                   candidate["score"], candidate["direction"])
+        elif not _should_open(symbol, candidate):
+            pass  # already in this symbol+direction (logged in _should_open)
+        elif (block := _fx_open_block(symbol, candidate)) is not None:
+            stage, _, why = block.partition(":")
+            log.info("skip open %s — %s", symbol, why)
+            store.record_rejection(scan_ts, symbol, f"fx_{stage}", why,
+                                   candidate["score"], candidate["direction"])
+            row["fx_blocked"] = why
+        else:
             fill = candidate["entry"]
-            trade = store.open_trade(sig_id, candidate, fill, opened_at=scan_ts)
+            trade = store.open_trade(sig_id, candidate, fill, opened_at=scan_ts,
+                                     size=decision["size"])
             opened.append(trade)
             row["opened"] = True
         rows.append(row)
 
-    # Adjudicate everything currently open against today's closes.
-    closed = store.resolve_open_trades(prices)
+    closed = await _resolve(source, bars_by_symbol)
     journaled = brain.reflect_on_closed(closed)
     if journaled:
         log.info("reflected on %d resolved trade(s)", journaled)
 
+    if hasattr(source, "aclose"):
+        await source.aclose()
+
     payload = {
-        "scan_ts": scan_ts, "skipped": False, "llm": LLM_ENABLED,
+        "scan_ts": scan_ts, "skipped": False, "llm": LLM_ENABLED, "market": source.name,
         "results": rows, "opened": opened, "closed": closed,
         "system_stats": store.system_stats(),
+        "rejections": store.rejection_counts(since=scan_ts),
     }
     _emit(payload)
     return payload
+
+
+async def _resolve(source: "datasource.DataSource",
+                   daily_by_symbol: dict[str, list]) -> list[dict[str, Any]]:
+    """Adjudicate open trades honestly. FX uses intraday bars (SL/TP-first);
+    equities fall back to the daily bars already fetched this scan."""
+    open_trades = store.list_open_trades()
+    if not open_trades:
+        return []
+    res_bars: dict[str, list] = {}
+    for t in open_trades:
+        sym = t["symbol"]
+        if sym in res_bars:
+            continue
+        if source.intraday_supported:
+            try:
+                opened = datetime.fromisoformat(str(t["opened_at"]))
+                if opened.tzinfo is None:
+                    opened = opened.replace(tzinfo=timezone.utc)
+            except ValueError:
+                opened = datetime.now(timezone.utc)
+            res_bars[sym] = await source.resolution_bars(sym, opened)
+        else:
+            res_bars[sym] = daily_by_symbol.get(sym, [])
+    return store.resolve_open_trades(res_bars)
+
+
+async def resolve_only() -> dict[str, Any]:
+    """Adjudicate open trades against fresh data WITHOUT scanning for new ones.
+    Backs the --resolve-only flag (previously dead — audit cleanup)."""
+    ensure_state_dirs()
+    store.init_db()
+    source = datasource.get_data_source()
+    closed = await _resolve(source, {})
+    journaled = brain.reflect_on_closed(closed)
+    if hasattr(source, "aclose"):
+        await source.aclose()
+    log.info("resolve-only: %d closed, %d journaled", len(closed), journaled)
+    print(f"\nResolve-only — {len(closed)} trade(s) closed:")
+    for t in closed:
+        print(f"  {t['symbol']} {t['outcome']} ({t['pnl_r']}R)")
+    return {"closed": closed, "system_stats": store.system_stats()}
 
 
 def _public(candidate: dict[str, Any]) -> dict[str, Any]:
@@ -144,6 +248,11 @@ def _emit(payload: dict[str, Any]) -> None:
     tmp.replace(SCAN_OUTPUT_FILE)
 
     print(render_summary(payload))
+    try:
+        from v2 import report
+        report.write_daily_report(payload)
+    except Exception as e:  # never let reporting break a scan
+        log.debug("daily report failed: %s", e)
     for t in payload["opened"]:
         # CI marker — the workflow greps this to decide whether to email.
         print(f"TAKE TRADE: {t['symbol']} {t['direction'].upper()} "
@@ -215,16 +324,19 @@ def selftest() -> bool:
     # pullback into the OB zone (current bar retests)
     bars.append(Bar(t=t0 + 64 * day, o=base, h=base, l=ob - 0.7, c=ob - 0.2, v=1e6))
 
-    cand = signals.build_candidate("TEST", bars, live_price=bars[-1].c)
-    assert cand is not None, "selftest: detector failed to produce a candidate"
+    cand, reason = signals.build_candidate("TEST", bars, live_price=bars[-1].c)
+    assert cand is not None, f"selftest: detector failed to produce a candidate ({reason})"
     retrieval = journal.retrieve_for(cand)
     decision = brain.judge(cand, retrieval)
     sig_id = store.record_signal("2026-01-05T00:00:00+00:00", cand)
     store.record_decision(sig_id, "2026-01-05T00:00:00+00:00", "TEST", decision)
-    trade = store.open_trade(sig_id, cand, cand["entry"], opened_at="2026-01-05T00:00:00+00:00")
+    trade = store.open_trade(sig_id, cand, cand["entry"],
+                             opened_at="2026-01-05T00:00:00+00:00", size="full")
 
-    # Force a win: price jumps past TP2, resolve, reflect.
-    closed = store.resolve_open_trades({"TEST": cand["tp2"] + 1})
+    # Force a win: a later bar whose HIGH pierces TP2 (honest intrabar resolve).
+    win_bar = Bar(t=t0 + 70 * day, o=cand["entry"], h=cand["tp2"] + 1,
+                  l=cand["entry"], c=cand["tp2"] + 0.5, v=1e6)
+    closed = store.resolve_open_trades({"TEST": [win_bar]})
     assert closed and closed[0]["outcome"] == "WIN_TP2", f"selftest: expected WIN_TP2, got {closed}"
     n = brain.reflect_on_closed(closed)
     assert n == 1, "selftest: reflection did not journal the trade"

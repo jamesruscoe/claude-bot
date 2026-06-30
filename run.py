@@ -40,6 +40,14 @@ def main() -> None:
                         help="only resolve open trades, don't look for new ones")
     parser.add_argument("--llm-test", action="store_true",
                         help="send one sample judgment to the configured LLM provider to verify the key")
+    parser.add_argument("--replay", action="store_true",
+                        help="walk-forward replay over history → BASELINE.md (honest, sized R)")
+    parser.add_argument("--calibrate", action="store_true",
+                        help="replay + write CALIBRATION.md (frequency vs expectancy, proposed threshold)")
+    parser.add_argument("--batch-second-opinion", action="store_true",
+                        help="offline nightly Claude batch re-judge of the day's candidates (observational)")
+    parser.add_argument("--report", action="store_true",
+                        help="print/write the daily paper-trading report from the latest scan + ledger")
     args = parser.parse_args()
 
     try:
@@ -56,6 +64,25 @@ def main() -> None:
 
     if args.llm_test:
         sys.exit(0 if _llm_test() else 1)
+
+    if args.replay or args.calibrate:
+        from v2 import replay
+        replay.main(calibrate=args.calibrate)
+        return
+
+    if args.report:
+        from v2 import report
+        print(report.write_daily_report())
+        return
+
+    if args.batch_second_opinion:
+        from v2 import batch_judge
+        batch_judge.run_batch_second_opinion()
+        return
+
+    if args.resolve_only:
+        asyncio.run(pipeline.resolve_only())
+        return
 
     asyncio.run(pipeline.run_scan(force=args.force))
 
