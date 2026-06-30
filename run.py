@@ -48,6 +48,8 @@ def main() -> None:
                         help="offline nightly Claude batch re-judge of the day's candidates (observational)")
     parser.add_argument("--report", action="store_true",
                         help="print/write the daily paper-trading report from the latest scan + ledger")
+    parser.add_argument("--backfill", action="store_true",
+                        help="in-sample seed: walk-forward replay the last 30 days into a SEPARATE backfill ledger")
     args = parser.parse_args()
 
     try:
@@ -68,6 +70,11 @@ def main() -> None:
     if args.replay or args.calibrate:
         from v2 import replay
         replay.main(calibrate=args.calibrate)
+        return
+
+    if args.backfill:
+        from v2 import backfill
+        backfill.main()
         return
 
     if args.report:
