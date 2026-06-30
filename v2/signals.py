@@ -78,17 +78,20 @@ def build_candidate(
     *,
     live_price: float | None = None,
     instrument: Instrument | None = None,
+    impulse_threshold: float | None = None,
 ) -> tuple[dict[str, Any] | None, str | None]:
     """Return (candidate, None) on success, or (None, reason) on rejection.
 
     A returned candidate has passed: detector score >= floor, a directional
     zone, and the levels R:R floor. `instrument` (FX) switches the risk math to
     pip/spread-aware levels; absent it, the original price-based levels run.
+    `impulse_threshold` overrides the OB impulse % (FX calibration).
     """
     if not bars or len(bars) < 20:
         return None, "too_few_bars"
 
-    threshold = OB_IMPULSE_OVERRIDES.get(symbol, OB_IMPULSE_THRESHOLD)
+    threshold = (impulse_threshold if impulse_threshold is not None
+                 else OB_IMPULSE_OVERRIDES.get(symbol, OB_IMPULSE_THRESHOLD))
     score, direction, signals = smc_detector.score_setups(bars, impulse_threshold=threshold)
 
     price = live_price if live_price is not None else bars[-1].c

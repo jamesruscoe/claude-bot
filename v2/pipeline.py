@@ -18,11 +18,12 @@ import logging
 from datetime import datetime, timezone
 from typing import Any
 
-from v2 import brain, datasource, journal, signals, store
+from v2 import brain, datasource, fx_filters, journal, news_calendar, signals, store
 from v2.calendar_gate import bars_are_fresh, is_trading_day
 from v2.config import (
     FX_ACCOUNT_EQUITY,
     FX_ENABLED,
+    FX_OB_IMPULSE_THRESHOLD,
     FX_RISK_PCT,
     FX_STD_LOT_UNITS,
     LLM_ENABLED,
@@ -33,6 +34,24 @@ from v2.config import (
 )
 
 log = logging.getLogger(__name__)
+
+
+def _fx_open_block(symbol: str, candidate: dict[str, Any]) -> str | None:
+    """FX-only open-time gates (session / news / correlation). Returns a block
+    reason, or None if the trade is clear to open. Can only ever block."""
+    if not FX_ENABLED:
+        return None
+    ok, why = fx_filters.session_ok(symbol)
+    if not ok:
+        return f"session:{why}"
+    blocked, why = news_calendar.news_blackout(symbol)
+    if blocked:
+        return f"news:{why}"
+    ok, why = fx_filters.correlation_cap_ok(
+        symbol, candidate["direction"], store.list_open_trades())
+    if not ok:
+        return f"correlation:{why}"
+    return None
 
 
 def _instrument_for(symbol: str) -> signals.Instrument | None:
@@ -88,7 +107,8 @@ async def run_scan(*, force: bool = False) -> dict[str, Any]:
             continue
 
         candidate, reason = signals.build_candidate(
-            symbol, bars, live_price=prices[symbol], instrument=_instrument_for(symbol))
+            symbol, bars, live_price=prices[symbol], instrument=_instrument_for(symbol),
+            impulse_threshold=FX_OB_IMPULSE_THRESHOLD if FX_ENABLED else None)
         if candidate is None:
             store.record_rejection(scan_ts, symbol, "detector", reason or "unknown")
             rows.append({"symbol": symbol, "candidate": False, "reject_reason": reason})
@@ -108,7 +128,15 @@ async def run_scan(*, force: bool = False) -> dict[str, Any]:
         if not decision["take"]:
             store.record_rejection(scan_ts, symbol, "judge", "judge_skip",
                                    candidate["score"], candidate["direction"])
-        elif _should_open(symbol, candidate):
+        elif not _should_open(symbol, candidate):
+            pass  # already in this symbol+direction (logged in _should_open)
+        elif (block := _fx_open_block(symbol, candidate)) is not None:
+            stage, _, why = block.partition(":")
+            log.info("skip open %s — %s", symbol, why)
+            store.record_rejection(scan_ts, symbol, f"fx_{stage}", why,
+                                   candidate["score"], candidate["direction"])
+            row["fx_blocked"] = why
+        else:
             fill = candidate["entry"]
             trade = store.open_trade(sig_id, candidate, fill, opened_at=scan_ts,
                                      size=decision["size"])

@@ -51,3 +51,34 @@ Equities remains the default/safe path (`BOT_MARKET=equities`); FX is opt-in
 
 **Exit criterion met:** honest ledger (sized R, intrabar-resolved) + `BASELINE.md` exist; tests
 and selftest green. Equities path unchanged.
+
+---
+
+## Phase 2 — FX-native strategy + filters ✅
+
+**What changed** (all FX-only, gated on `FX_ENABLED`; equities untouched)
+- **FX detector calibration**: OB impulse threshold is now configurable and defaults to **0.8%**
+  for FX (the equities 3% almost never fires on sub-1% FX daily ranges). Threaded through
+  `build_candidate(impulse_threshold=…)` and the replay so Phase 3 calibrates the tuned detector.
+- **Session filter** (`v2/fx_filters.py::session_ok`): `off` (default, safe) | `overlap`
+  (London/NY 12–16 UTC) | `skip_asia` (block thin Asia hours for non-JPY pairs). Config-driven.
+- **Scheduled-news avoidance** (`v2/news_calendar.py`): ForexFactory weekly JSON, cached 1h,
+  blocks opening within ±45 min of a high-impact event for either of the pair's currencies.
+  **Fails open** — a feed outage logs + allows (never silently freezes the bot) and the attempt
+  is recorded. Parsing is isolated from fetching and unit-tested offline.
+- **Correlation-aware exposure cap** (`v2/fx_filters.py::correlation_cap_ok`): caps net same-
+  direction exposure per currency at `FX_MAX_PER_CCY` (default **2**). Long EURUSD + long GBPUSD
+  count as two USD-shorts toward the cap, so one macro view can't open as six tickets. A cap only
+  blocks, so it's on by default (conservative direction).
+- **Regime filter kept** (audit-confirmed). Period exposed via `FX_REGIME_MA_PERIOD` (50) for
+  re-fitting; not removed.
+- All three open-time gates wired into the pipeline's open branch and recorded as rejection
+  reasons (`fx_session` / `fx_news` / `fx_correlation`).
+- **Tests**: +9 cases (session modes, correlation cap incl. offsetting exposure, news parse /
+  blackout window / fail-open). 27 total, all green.
+
+**Needs review**
+- The 0.8% FX OB impulse is a sensible starting calibration, not a tuned value — Phase 3's
+  `CALIBRATION.md` shows the frequency/expectancy curve and proposes the score threshold.
+
+**Exit criterion met:** filters implemented, config-driven, unit-tested, committed.

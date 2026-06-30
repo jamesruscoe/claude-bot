@@ -99,6 +99,37 @@ FX_STD_LOT_UNITS = 100_000   # 1.0 lot = 100k base units
 FX_CACHE_TTL_SECONDS = int(os.getenv("BOT_FX_CACHE_TTL", "900"))  # 15 min
 CACHE_DIR = STATE_DIR / "cache"
 
+# --- FX strategy filters (Phase 2; all FX-only, gated on FX_ENABLED) --------
+# Detector calibration: FX daily ranges are <1%, so the equities 3% OB impulse
+# almost never fires. Calibrate the impulse threshold for FX. (Phase 3 tunes the
+# score threshold against measured expectancy — this just makes OB fireable.)
+FX_OB_IMPULSE_THRESHOLD = float(os.getenv("BOT_FX_OB_IMPULSE", "0.008"))  # 0.8%
+
+# Session filter (UTC hours). "off" = no restriction (safe default, behaviour
+# unchanged). "overlap" = London/NY overlap only. "skip_asia" = block thin Asia
+# hours for non-JPY pairs. Mainly bites once Phase 5 runs intraday.
+FX_SESSION_MODE = os.getenv("BOT_FX_SESSION", "off")  # off | overlap | skip_asia
+FX_OVERLAP_UTC = (12, 16)     # London/NY overlap, [start, end)
+FX_ASIA_UTC = (23, 8)         # Tokyo session wraps midnight
+
+# Correlation-aware exposure cap (audit gap). One macro view must not open as six
+# tickets. Cap the number of open trades pushing the SAME currency the SAME way.
+# A cap only ever blocks, so it's the conservative direction — on by default.
+FX_MAX_PER_CCY = int(os.getenv("BOT_FX_MAX_PER_CCY", "2"))
+
+# Scheduled high-impact news avoidance (ForexFactory weekly JSON). Block opening
+# a trade within +/- this many minutes of a high-impact event for either of the
+# pair's currencies. Fail-OPEN: if the feed is unreachable we log and don't block
+# (so a feed outage can't silently freeze the bot), but the attempt is recorded.
+FX_NEWS_FILTER = os.getenv("BOT_FX_NEWS", "1") == "1"
+FX_NEWS_WINDOW_MIN = int(os.getenv("BOT_FX_NEWS_WINDOW_MIN", "45"))
+FF_CALENDAR_URL = os.getenv(
+    "BOT_FF_CALENDAR_URL", "https://nfs.faireconomy.media/ff_calendar_thisweek.json")
+
+# Regime filter period (kept — audit confirmed it's correct caution). The 50-bar
+# default is fine for FX daily too; exposed for re-fitting.
+FX_REGIME_MA_PERIOD = int(os.getenv("BOT_FX_REGIME_MA", "50"))
+
 # --- Signal gating ----------------------------------------------------------
 # The deterministic engine still scores 0/50/100. We only hand candidates to
 # the judge at or above this score — below it there isn't enough structure to
