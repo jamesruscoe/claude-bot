@@ -47,26 +47,30 @@ def run_batch_second_opinion(*, lookback_hours: int = 24) -> dict:
 
     try:
         import anthropic
-        from anthropic.types.message_create_params import MessageCreateParamsNonStreaming
-        from anthropic.types.messages.batch_create_params import Request
     except ImportError:
         log.warning("anthropic SDK not installed — `pip install anthropic`")
         return {"skipped": True, "reason": "no sdk"}
 
     client = anthropic.Anthropic(api_key=cfg.ANTHROPIC_API_KEY)
+    if not hasattr(client.messages, "batches"):
+        log.warning("installed anthropic SDK has no Batches API — upgrade `anthropic>=0.42`")
+        return {"skipped": True, "reason": "sdk too old for batches"}
+
+    # Plain-dict requests work across SDK versions (the typed Request/
+    # MessageCreateParamsNonStreaming import path moved between releases).
     by_id: dict[str, dict] = {}
     requests = []
     for sig in signals:
         cand = _candidate_from_signal(sig)
         memory = journal.render_memory_block(journal.retrieve_for(cand))
         by_id[sig["id"]] = sig
-        requests.append(Request(
-            custom_id=sig["id"],
-            params=MessageCreateParamsNonStreaming(
-                model=cfg.JUDGE_MODEL, max_tokens=400, system=llm._JUDGE_SYSTEM,
-                messages=[{"role": "user", "content": llm._judge_user(cand, memory)}],
-            ),
-        ))
+        requests.append({
+            "custom_id": sig["id"],
+            "params": {
+                "model": cfg.JUDGE_MODEL, "max_tokens": 400, "system": llm._JUDGE_SYSTEM,
+                "messages": [{"role": "user", "content": llm._judge_user(cand, memory)}],
+            },
+        })
 
     batch = client.messages.batches.create(requests=requests)
     log.info("batch %s submitted — %d candidates; polling…", batch.id, len(requests))
