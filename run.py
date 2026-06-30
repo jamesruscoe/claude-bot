@@ -42,6 +42,8 @@ def main() -> None:
                         help="send one sample judgment to the configured LLM provider to verify the key")
     parser.add_argument("--replay", action="store_true",
                         help="walk-forward replay over history → BASELINE.md (honest, sized R)")
+    parser.add_argument("--calibrate", action="store_true",
+                        help="replay + write CALIBRATION.md (frequency vs expectancy, proposed threshold)")
     args = parser.parse_args()
 
     try:
@@ -59,9 +61,9 @@ def main() -> None:
     if args.llm_test:
         sys.exit(0 if _llm_test() else 1)
 
-    if args.replay:
+    if args.replay or args.calibrate:
         from v2 import replay
-        replay.main()
+        replay.main(calibrate=args.calibrate)
         return
 
     if args.resolve_only:

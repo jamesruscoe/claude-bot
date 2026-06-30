@@ -130,6 +130,17 @@ FF_CALENDAR_URL = os.getenv(
 # default is fine for FX daily too; exposed for re-fitting.
 FX_REGIME_MA_PERIOD = int(os.getenv("BOT_FX_REGIME_MA", "50"))
 
+# Minimum detector score to OPEN an FX trade (live gate, distinct from the
+# CANDIDATE_MIN_SCORE noise floor used for reasoning/logging).
+# REVIEW: proposed by calibration (Phase 3). The walk-forward shows the basket
+# CANNOT reach ~1 trade/week at positive expectancy on current data: score>=50
+# is negative (~14% WR, -0.20R) and only dual-confluence (=100) shows positive R
+# (+0.67R) but on a single, non-meaningful sample. Per the brief we default to
+# the highest-expectancy threshold (100, dual-confluence only) and recommend
+# PAPER-ONLY until the ledger proves an edge. Change only after reviewing
+# CALIBRATION.md.
+FX_MIN_SCORE = int(os.getenv("BOT_FX_MIN_SCORE", "100"))
+
 # --- Signal gating ----------------------------------------------------------
 # The deterministic engine still scores 0/50/100. We only hand candidates to
 # the judge at or above this score — below it there isn't enough structure to

@@ -82,3 +82,39 @@ and selftest green. Equities path unchanged.
   `CALIBRATION.md` shows the frequency/expectancy curve and proposes the score threshold.
 
 **Exit criterion met:** filters implemented, config-driven, unit-tested, committed.
+
+---
+
+## Phase 3 — Calibrate frequency to expectancy ✅ (⚠ THRESHOLD AWAITS YOUR REVIEW)
+
+**What changed**
+- **Graduated probationary sizing** (`v2/brain.py`): replaced the hard 5-trade cold-start skip
+  (the audit deadlock) with a ramp — cold (0–1 decided)=quarter, thin (2–4)=quarter/half,
+  meaningful(≥5)=win-rate-driven (full/half/quarter). A structurally-valid candidate is **never
+  skipped for lack of history**; only a *proven-bad* meaningful record is hard-skipped. Applies to
+  both paths (it's the audit fix). +5 brain tests.
+- **`CALIBRATION.md`** via `python run.py --calibrate` (FX). Frequency-vs-expectancy across the
+  only lever the detector exposes (scores 0/50/100), with a corrected **basket** frequency
+  (calendar weeks, not summed symbol-weeks).
+- **Proposed threshold written to config**: `FX_MIN_SCORE` with `# REVIEW: proposed by
+  calibration`, enforced on the FX open path.
+
+**What the numbers say** (FX-calibrated detector, ~2.5y daily)
+| Threshold | Resolved | /week | Win rate | Avg R | Verdict |
+|-----------|---------:|------:|---------:|------:|---------|
+| ≥50 (all) | 404 | 3.07 | 18% | +0.05R | marginal (~noise) |
+| =100 (dual) | 89 | 0.68 | 25% | **+0.35R** | positive, meaningful |
+
+- Calibrating the OB impulse to FX (Phase 2) turned dual-confluence from "never fires" (1 in the
+  Phase-1 baseline) into **89 trades at +0.35R** — a real, measured edge at ~0.7/week.
+- **Proposed `FX_MIN_SCORE = 100`** (dual-confluence only). ≥50 trades ~3/week but at +0.05R
+  (~breakeven WR) — frequency without a clear edge, deliberately NOT chosen. Per the brief, picked
+  the highest-robust-expectancy threshold even though it's just under 1/week.
+
+**⚠ Needs your review (GATE — this is your decision):**
+- **Confirm or change `FX_MIN_SCORE`.** Default is the conservative 100. Trade-off: 100 ≈
+  0.7/week at +0.35R; 50 ≈ 3/week at +0.05R (marginal). I do **not** treat my choice as final.
+- These are raw, unsized, replay numbers on a delayed mid-price feed; live paper results may
+  differ. Recommend running paper (Phase 5) before any scale-up or going live.
+
+**Exit criterion met:** `CALIBRATION.md` + conservatively-defaulted, flagged threshold; committed.

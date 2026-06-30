@@ -41,6 +41,9 @@ def _fx_open_block(symbol: str, candidate: dict[str, Any]) -> str | None:
     reason, or None if the trade is clear to open. Can only ever block."""
     if not FX_ENABLED:
         return None
+    from v2.config import FX_MIN_SCORE
+    if candidate["score"] < FX_MIN_SCORE:
+        return f"threshold:below calibrated FX_MIN_SCORE ({candidate['score']}<{FX_MIN_SCORE})"
     ok, why = fx_filters.session_ok(symbol)
     if not ok:
         return f"session:{why}"

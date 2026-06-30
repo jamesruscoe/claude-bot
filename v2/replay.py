@@ -146,12 +146,19 @@ async def run_replay() -> dict[str, Any]:
     if hasattr(source, "aclose"):
         await source.aclose()
 
+    # All pairs are scanned concurrently each week, so basket frequency is over
+    # the CALENDAR window (the typical per-symbol eval span), not the sum of
+    # per-symbol spans. Use the max per-symbol eval window as the calendar span.
+    cal_days = max((r["eval_days"] for r in per_symbol.values()), default=0)
+    calendar_weeks = cal_days / 5.0 if cal_days else 0
+
     return {
         "market": source.name,
         "per_symbol": per_symbol,
         "all_trades": all_trades,
         "rejections": all_rej,
         "total_eval_days": total_eval_days,
+        "calendar_weeks": calendar_weeks,
         "thresholds": {str(s): _agg(all_trades, s) for s in (50, 100)},
     }
 
@@ -172,7 +179,7 @@ def write_baseline(stats: dict[str, Any], path: str = "BASELINE.md") -> None:
                  "intrabar SL-first resolution (no separate simulator). Baseline trades are "
                  "recorded at size_mult=1.0 to show the **raw setup edge** before judge sizing. "
                  "FX entries are worsened by the assumed per-pair spread; R:R is post-spread.\n")
-    weeks = (stats["total_eval_days"] / 5.0) if stats["total_eval_days"] else 0
+    weeks = stats.get("calendar_weeks") or 0
 
     lines.append("## Expectancy by score threshold (whole basket)\n")
     lines.append("| Threshold | Resolved | Win rate | Avg R | Total R | Outcomes |")
@@ -186,9 +193,9 @@ def write_baseline(stats: dict[str, Any], path: str = "BASELINE.md") -> None:
     if weeks:
         n50 = stats["thresholds"]["50"]["n_resolved"]
         n100 = stats["thresholds"]["100"]["n_resolved"]
-        lines.append(f"\n_Frequency: ~{n50 / weeks:.2f} resolved ≥50 / basket-week, "
-                     f"~{n100 / weeks:.2f} dual-confluence / basket-week "
-                     f"(~{weeks:.0f} basket-weeks of history)._\n")
+        lines.append(f"\n_Basket frequency: ~{n50 / weeks:.2f} resolved ≥50 / week, "
+                     f"~{n100 / weeks:.2f} dual-confluence / week "
+                     f"(~{weeks:.0f} calendar weeks of history, whole basket scanned each week)._\n")
 
     lines.append("## Per-pair (score ≥ 50)\n")
     lines.append("| Symbol | Resolved | Win rate | Avg R | Total R |")
@@ -215,7 +222,82 @@ def write_baseline(stats: dict[str, Any], path: str = "BASELINE.md") -> None:
     log.info("wrote %s", path)
 
 
-def main() -> dict[str, Any]:
+def write_calibration(stats: dict[str, Any], path: str = "CALIBRATION.md") -> None:
+    """Frequency-vs-expectancy curve across score thresholds, with a proposed
+    threshold. The detector only emits scores 0/50/100, so the curve has two
+    actionable points (>=50, =100). Per the brief: target ~1 trade/week ONLY
+    where expectancy stays positive; otherwise pick the highest-expectancy
+    threshold and say plainly the basket can't reach 1/week profitably."""
+    from v2.config import FX_MIN_SCORE
+    weeks = stats.get("calendar_weeks") or 0
+    lines = [f"# CALIBRATION — {stats['market']}\n",
+             "Frequency vs expectancy from the walk-forward replay (raw, unsized R; live "
+             "detectors + honest intrabar resolution). The score threshold is the only "
+             "frequency lever the detector exposes (scores are 0/50/100).\n",
+             "## Threshold curve (whole basket)\n",
+             "| Threshold | Resolved | Resolved/week | Win rate | Avg R (expectancy) | Verdict |",
+             "|-----------|---------:|--------------:|---------:|-------------------:|---------|"]
+    verdicts = {}
+    for s in ("50", "100"):
+        a = stats["thresholds"][s]
+        per_wk = (a["n_resolved"] / weeks) if weeks else 0
+        exp = a["avg_r"]
+        if exp is None or a["n_resolved"] < 5:
+            verdict = "unknown (thin sample)"
+        elif exp > 0:
+            verdict = "positive"
+        else:
+            verdict = "negative — do not trade"
+        verdicts[s] = (per_wk, exp, verdict)
+        label = "≥50 (all)" if s == "50" else "=100 (dual)"
+        lines.append(f"| {label} | {a['n_resolved']} | {per_wk:.2f} | {_fmt_pct(a['win_rate'])} "
+                     f"| {_fmt_r(exp)} | {verdict} |")
+
+    p50, e50, v50 = verdicts["50"]
+    p100, e100, v100 = verdicts["100"]
+    lines.append("\n## Proposed threshold\n")
+    # "Positive" only counts a MEANINGFUL sample whose edge is clear of noise
+    # (avg R >= +0.10). +0.05R at 18% WR is within noise — not a basis to trade.
+    MARGINAL = 0.10
+    pos = {s: verdicts[s] for s in ("100", "50")
+           if verdicts[s][2] == "positive" and (verdicts[s][1] or 0) >= MARGINAL}
+    # More signals is not the goal — pick the HIGHEST-expectancy threshold, even
+    # if that means < 1/week. Only drop to a looser one if expectancy holds up.
+    if pos:
+        best = max(pos, key=lambda s: pos[s][1])
+        choice = int(best)
+        freq = verdicts[best][0]
+        alt = "≥50" if best == "100" else "—"
+        why = (f"highest robust expectancy is at ={best} ({_fmt_r(verdicts[best][1])}, "
+               f"~{freq:.1f}/week). ≥50 trades ~{p50:.1f}/week but only {_fmt_r(e50)} "
+               f"(marginal, ~breakeven WR) — frequency without a clear edge, so not chosen. "
+               f"~1/week at positive expectancy is approachable at =100; below 1/week is "
+               f"acceptable rather than loosening into noise.")
+    else:
+        choice, why = 100, ("**no threshold has clearly positive (non-marginal) expectancy** "
+                            "— defaulting to the most selective (100) and recommending "
+                            "PAPER-ONLY until the live ledger proves an edge.")
+    lines.append(f"- **FX_MIN_SCORE = {choice}** — {why}")
+    lines.append(f"- Currently set in config: `FX_MIN_SCORE = {FX_MIN_SCORE}` "
+                 f"(marked `# REVIEW: proposed by calibration`).\n")
+    lines.append("\n## Per-pair expectancy (score ≥ 50)\n")
+    lines.append("| Symbol | Resolved | Win rate | Avg R |")
+    lines.append("|--------|---------:|---------:|------:|")
+    for sym, res in stats["per_symbol"].items():
+        a = _agg(res["trades"], 50)
+        lines.append(f"| {sym} | {a['n_resolved']} | {_fmt_pct(a['win_rate'])} | {_fmt_r(a['avg_r'])} |")
+    lines.append("\n> **This threshold is a PROPOSAL for your review, not a final decision.** "
+                 "More signals is not the goal — positive measured expectancy is. The graduated "
+                 "probationary sizing (Phase 3) lets the bot accrue a real record at tiny size "
+                 "before any scale-up.\n")
+    with open(path, "w", encoding="utf-8") as f:
+        f.write("\n".join(lines))
+    log.info("wrote %s", path)
+
+
+def main(*, calibrate: bool = False) -> dict[str, Any]:
     stats = asyncio.run(run_replay())
     write_baseline(stats)
+    if calibrate:
+        write_calibration(stats)
     return stats
