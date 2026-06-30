@@ -1,5 +1,5 @@
 {
-  "scan_ts": "2026-06-29T21:16:01.987396+00:00",
+  "scan_ts": "2026-06-30T15:24:34.664658+00:00",
   "skipped": false,
   "llm": false,
   "results": [
@@ -9,55 +9,35 @@
     },
     {
       "symbol": "NVDA",
-      "candidate": false
-    },
-    {
-      "symbol": "TSLA",
       "candidate": true,
       "score": 50,
       "direction": "short",
       "setups": [
         "bos_retest"
       ],
-      "regime": "ranging",
-      "price": 379.71,
-      "atr": 16.78321,
-      "entry": 380.15,
-      "entry_low": 379.57977,
-      "entry_high": 380.72022,
-      "stop_loss": 389.11183,
-      "tp1": 362.22634,
-      "tp2": 353.26451,
+      "regime": "bullish",
+      "price": 194.97,
+      "atr": 7.22566,
+      "entry": 194.74,
+      "entry_low": 194.44789,
+      "entry_high": 195.03211,
+      "stop_loss": 198.64494,
+      "tp1": 186.93012,
+      "tp2": 183.02518,
       "rr": 2.0,
       "take": false,
       "confidence": "low",
       "size": "none",
-      "rationale": "skip \u2014 single-setup signal without a proven track record on TSLA (win rate n/a, 0 closed)",
+      "rationale": "skip \u2014 single-setup signal without a proven track record on NVDA (win rate n/a, 0 closed)",
       "decided_by": "deterministic"
     },
     {
+      "symbol": "TSLA",
+      "candidate": false
+    },
+    {
       "symbol": "USOIL",
-      "candidate": true,
-      "score": 50,
-      "direction": "short",
-      "setups": [
-        "ob_retest"
-      ],
-      "regime": "bearish",
-      "price": 70.42,
-      "atr": 4.63203,
-      "entry": 70.7,
-      "entry_low": 68.9,
-      "entry_high": 72.5,
-      "stop_loss": 74.81601,
-      "tp1": 62.46798,
-      "tp2": 58.35197,
-      "rr": 2.0,
-      "take": false,
-      "confidence": "low",
-      "size": "none",
-      "rationale": "skip \u2014 single-setup signal without a proven track record on USOIL (win rate n/a, 0 closed)",
-      "decided_by": "deterministic"
+      "candidate": false
     },
     {
       "symbol": "SMCI",
@@ -73,75 +53,15 @@
     },
     {
       "symbol": "NFLX",
-      "candidate": true,
-      "score": 50,
-      "direction": "short",
-      "setups": [
-        "bos_retest"
-      ],
-      "regime": "bearish",
-      "price": 73.81,
-      "atr": 2.46239,
-      "entry": 74.426,
-      "entry_low": 74.31436,
-      "entry_high": 74.53764,
-      "stop_loss": 75.76883,
-      "tp1": 71.74034,
-      "tp2": 70.39751,
-      "rr": 2.0,
-      "take": false,
-      "confidence": "low",
-      "size": "none",
-      "rationale": "skip \u2014 single-setup signal without a proven track record on NFLX (win rate n/a, 0 closed)",
-      "decided_by": "deterministic"
+      "candidate": false
     },
     {
       "symbol": "AMD",
-      "candidate": true,
-      "score": 50,
-      "direction": "long",
-      "setups": [
-        "ob_retest"
-      ],
-      "regime": "bullish",
-      "price": 521.58,
-      "atr": 33.12735,
-      "entry": 519.9004,
-      "entry_low": 507.3008,
-      "entry_high": 532.5,
-      "stop_loss": 490.73712,
-      "tp1": 578.22696,
-      "tp2": 607.39024,
-      "rr": 2.0,
-      "take": false,
-      "confidence": "low",
-      "size": "none",
-      "rationale": "skip \u2014 single-setup signal without a proven track record on AMD (win rate n/a, 0 closed)",
-      "decided_by": "deterministic"
+      "candidate": false
     },
     {
       "symbol": "COIN",
-      "candidate": true,
-      "score": 50,
-      "direction": "short",
-      "setups": [
-        "bos_retest"
-      ],
-      "regime": "bearish",
-      "price": 149.06,
-      "atr": 11.0268,
-      "entry": 147.88,
-      "entry_low": 147.65818,
-      "entry_high": 148.10182,
-      "stop_loss": 153.61522,
-      "tp1": 136.40956,
-      "tp2": 130.67434,
-      "rr": 2.0,
-      "take": false,
-      "confidence": "low",
-      "size": "none",
-      "rationale": "skip \u2014 single-setup signal without a proven track record on COIN (win rate n/a, 0 closed)",
-      "decided_by": "deterministic"
+      "candidate": false
     }
   ],
   "opened": [],
