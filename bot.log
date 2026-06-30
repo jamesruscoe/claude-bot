@@ -22,3 +22,8 @@
 2026-06-30 15:26:37,289 [WARNING] market_data: 429 rate-limited, waiting 1s (attempt 1)
 2026-06-30 15:26:38,363 [WARNING] market_data: 429 rate-limited, waiting 2s (attempt 2)
 2026-06-30 15:26:40,444 [WARNING] market_data: 429 rate-limited, waiting 4s (attempt 3)
+2026-06-30 19:10:50,555 [INFO] v2.store: trade opened: NVDA short @ 194.7400 (sl 198.6449 tp1 186.9301 tp2 183.0252) size=quarter x0.25
+2026-06-30 19:10:50,580 [INFO] v2.store: trade closed: AMZN short -> LOSS @ 249.6180 (-1.00R sized, -1.00R raw)
+2026-06-30 19:10:50,581 [INFO] v2.journal: journal entry written: 2026-06-30-amzn-short-9ec25b36.md
+2026-06-30 19:10:50,583 [INFO] v2.pipeline: reflected on 1 resolved trade(s)
+2026-06-30 19:10:50,588 [INFO] v2.report: wrote /home/runner/work/claude-bot/claude-bot/state/daily_report.md
