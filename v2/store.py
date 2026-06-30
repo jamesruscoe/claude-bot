@@ -86,6 +86,7 @@ CREATE TABLE IF NOT EXISTS trades (
     size         TEXT,                         -- decision size label (none|quarter|half|full)
     size_mult    REAL NOT NULL DEFAULT 1.0,    -- numeric multiplier applied to recorded R
     lots         REAL,                         -- FX position size (bookkeeping)
+    source       TEXT NOT NULL DEFAULT 'forward',  -- 'forward' (live) | 'backfill' (in-sample seed)
     opened_at    TEXT NOT NULL,
     closed_at    TEXT,
     close_price  REAL,
@@ -158,6 +159,7 @@ def _migrate(c: sqlite3.Connection) -> None:
         ("size_mult", "REAL NOT NULL DEFAULT 1.0"),
         ("lots", "REAL"),
         ("raw_r", "REAL"),
+        ("source", "TEXT NOT NULL DEFAULT 'forward'"),
     ):
         if name not in cols:
             c.execute(f"ALTER TABLE trades ADD COLUMN {name} {ddl}")
@@ -207,12 +209,15 @@ def record_decision(signal_id: str, scan_ts: str, symbol: str, decision: dict[st
 
 def open_trade(signal_id: str | None, candidate: dict[str, Any], fill: float,
                opened_at: str | None = None, *,
-               size: str = "full") -> dict[str, Any]:
+               size: str = "full", source: str = "forward") -> dict[str, Any]:
     """Open a position. `fill` is the realistic entry (see levels.realistic_fill).
 
     `size` is the judge's decision size label; it's converted to a numeric
     multiplier and stored, so recorded R is the SIZED R (audit fix — sizing was
-    previously cosmetic and never touched the ledger)."""
+    previously cosmetic and never touched the ledger).
+
+    `source` tags the row: 'forward' (live, out-of-sample) or 'backfill'
+    (in-sample seed). This is the unambiguous in-sample/forward wall."""
     tid = str(uuid.uuid4())
     opened_at = opened_at or _now()
     direction = candidate["direction"]
@@ -226,7 +231,7 @@ def open_trade(signal_id: str | None, candidate: dict[str, Any], fill: float,
         "tp1": float(candidate["tp1"]), "tp2": float(candidate["tp2"]),
         "tp1_hit": 0, "tp1_hit_at": None,
         "size": size, "size_mult": size_mult, "lots": candidate.get("lots"),
-        "opened_at": opened_at,
+        "source": source, "opened_at": opened_at,
         "closed_at": None, "close_price": None, "outcome": None,
         "pnl_r": None, "raw_r": None, "journaled": 0,
     }
@@ -234,17 +239,41 @@ def open_trade(signal_id: str | None, candidate: dict[str, Any], fill: float,
         c.execute(
             """INSERT INTO trades (id, signal_id, symbol, direction, setups, regime,
                 entry_price, stop_loss, original_sl, tp1, tp2, tp1_hit, tp1_hit_at,
-                size, size_mult, lots, opened_at, closed_at, close_price, outcome,
+                size, size_mult, lots, source, opened_at, closed_at, close_price, outcome,
                 pnl_r, raw_r, journaled)
                VALUES (:id,:signal_id,:symbol,:direction,:setups,:regime,:entry_price,
                 :stop_loss,:original_sl,:tp1,:tp2,:tp1_hit,:tp1_hit_at,:size,:size_mult,
-                :lots,:opened_at,:closed_at,:close_price,:outcome,:pnl_r,:raw_r,:journaled)""",
+                :lots,:source,:opened_at,:closed_at,:close_price,:outcome,:pnl_r,:raw_r,:journaled)""",
             row,
         )
     log.info("trade opened: %s %s @ %.4f (sl %.4f tp1 %.4f tp2 %.4f) size=%s x%.2f",
              candidate["symbol"], direction, fill, sl, candidate["tp1"], candidate["tp2"],
              size, size_mult)
     return row
+
+
+def update_trade_trailing(trade_id: str, tp1_hit: int, tp1_hit_at: str | None,
+                          stop_loss: float) -> None:
+    """Persist a TP1->trailing transition on a still-open trade."""
+    with _conn() as c:
+        c.execute("UPDATE trades SET tp1_hit=?, tp1_hit_at=?, stop_loss=? WHERE id=?",
+                  (tp1_hit, tp1_hit_at, stop_loss, trade_id))
+
+
+def update_trade_close(trade_id: str, outcome: str, close_price: float,
+                       closed_at: str, pnl_r: float, raw_r: float) -> None:
+    """Persist a resolved trade (used by backfill, which resolves each trade
+    against a per-trade EXPIRY-capped bar window)."""
+    with _conn() as c:
+        c.execute(
+            "UPDATE trades SET outcome=?, close_price=?, closed_at=?, pnl_r=?, raw_r=? WHERE id=?",
+            (outcome, close_price, closed_at, pnl_r, raw_r, trade_id))
+
+
+def trades_by_source(source: str) -> list[dict[str, Any]]:
+    with _conn() as c:
+        return [dict(r) for r in c.execute(
+            "SELECT * FROM trades WHERE source=? ORDER BY opened_at", (source,))]
 
 
 def record_rejection(scan_ts: str, symbol: str, stage: str, reason: str,
