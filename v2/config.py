@@ -144,14 +144,18 @@ FX_REGIME_MA_PERIOD = int(os.getenv("BOT_FX_REGIME_MA", "50"))
 
 # Minimum detector score to OPEN an FX trade (live gate, distinct from the
 # CANDIDATE_MIN_SCORE noise floor used for reasoning/logging).
-# REVIEW: proposed by calibration (Phase 3). The walk-forward shows the basket
-# CANNOT reach ~1 trade/week at positive expectancy on current data: score>=50
-# is negative (~14% WR, -0.20R) and only dual-confluence (=100) shows positive R
-# (+0.67R) but on a single, non-meaningful sample. Per the brief we default to
-# the highest-expectancy threshold (100, dual-confluence only) and recommend
-# PAPER-ONLY until the ledger proves an edge. Change only after reviewing
-# CALIBRATION.md.
-FX_MIN_SCORE = int(os.getenv("BOT_FX_MIN_SCORE", "100"))
+#
+# Set to 85 after the robustness review (see CALIBRATION.md). The detector emits
+# DISCRETE scores {0, 50, 100}, so any threshold in (50, 100] selects exactly the
+# dual-confluence (score==100) set: +0.35R avg over 89 resolved trades (meaningful,
+# 25% WR), and that edge HOLDS at 1.5x the assumed per-pair spread (+0.35R) — the
+# test that matters most, since the edge sits on top of assumed mid-price spreads.
+# The 85-99 band is empty today (no signal scores there), so 85 is operationally
+# identical to 100 unless the detector is later recalibrated to emit intermediate
+# scores — at which point 85 would also admit those. score>=50 stays marginal
+# (+0.05R, ~breakeven) and is deliberately excluded. STILL PAPER-ONLY — let the
+# live ledger confirm before any scale-up or going live.
+FX_MIN_SCORE = int(os.getenv("BOT_FX_MIN_SCORE", "85"))
 
 # --- Signal gating ----------------------------------------------------------
 # The deterministic engine still scores 0/50/100. We only hand candidates to

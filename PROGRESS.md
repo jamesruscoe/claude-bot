@@ -183,11 +183,14 @@ graduated judge took it at quarter size, the calibrated `FX_MIN_SCORE=100` corre
 - New code behind flags defaulting safe/off; **43 tests passing**; no hardcoded secrets
   (`ANTHROPIC_API_KEY` from env); **no live execution path**.
 
+### Threshold resolved (was the Phase 3 GATE)
+- **`FX_MIN_SCORE = 85`**, `# REVIEW` marker removed. Robustness review (re-slice + 1.5x spread, see
+  `CALIBRATION.md`): dual-confluence is +0.35R over n=89 and **holds at +0.35R under 1.5x spread**.
+  Because the detector scores discretely {50,100}, **85 ≡ 100 operationally today** (the 85–99 band is
+  empty) — it only diverges if the detector is recalibrated to emit intermediate scores. Still paper-only.
+
 ### ⚠ Awaiting your review
-1. **`FX_MIN_SCORE` threshold (Phase 3 GATE).** Default is the conservative **100** (dual-confluence,
-   +0.35R, ~0.7/week). Alternative is 50 (~3/week, +0.05R marginal). Confirm or change — see
-   `CALIBRATION.md`.
-2. **Whether to turn the Claude judge on.** Off by default. Recommend running `--batch-second-opinion`
+1. **Whether to turn the Claude judge on.** Off by default. Recommend running `--batch-second-opinion`
    for a while and reading the agreement rate before flipping `BOT_LLM=1` live.
 3. **Assumptions made** (proceeding on the brief, since `REFACTOR_PLAN.md` was absent): FX OB impulse
    calibrated to 0.8%; assumed per-pair spreads (config table); fixed-fractional risk 0.5%; honest
