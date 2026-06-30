@@ -36,6 +36,20 @@ from v2.config import (
 log = logging.getLogger(__name__)
 
 
+def _attach_fx_context(candidate: dict[str, Any]) -> None:
+    """Annotate an FX candidate with session / news / correlation context so the
+    LLM judge can weigh them. The deterministic brain ignores these keys."""
+    if not FX_ENABLED:
+        return
+    sym, direction = candidate["symbol"], candidate["direction"]
+    _, session = fx_filters.session_ok(sym)
+    _, news = news_calendar.news_blackout(sym)
+    _, corr = fx_filters.correlation_cap_ok(sym, direction, store.list_open_trades())
+    candidate["session"] = session
+    candidate["news_proximity"] = news
+    candidate["correlation"] = corr
+
+
 def _fx_open_block(symbol: str, candidate: dict[str, Any]) -> str | None:
     """FX-only open-time gates (session / news / correlation). Returns a block
     reason, or None if the trade is clear to open. Can only ever block."""
@@ -117,6 +131,7 @@ async def run_scan(*, force: bool = False) -> dict[str, Any]:
             rows.append({"symbol": symbol, "candidate": False, "reject_reason": reason})
             continue
 
+        _attach_fx_context(candidate)
         retrieval = journal.retrieve_for(candidate)
         decision = brain.judge(candidate, retrieval)
 

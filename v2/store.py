@@ -110,6 +110,17 @@ CREATE TABLE IF NOT EXISTS lessons (
     summary      TEXT NOT NULL,
     journal_file TEXT
 );
+CREATE TABLE IF NOT EXISTS second_opinions (
+    id           TEXT PRIMARY KEY,
+    signal_id    TEXT NOT NULL,
+    created_ts   TEXT NOT NULL,
+    model        TEXT,
+    take         INTEGER,
+    confidence   TEXT,
+    size         TEXT,
+    rationale    TEXT,
+    agrees       INTEGER             -- 1 if it matched the live deterministic decision
+);
 CREATE INDEX IF NOT EXISTS idx_trades_symbol ON trades(symbol);
 CREATE INDEX IF NOT EXISTS idx_trades_open ON trades(outcome);
 CREATE INDEX IF NOT EXISTS idx_signals_symbol ON signals(symbol);
@@ -444,6 +455,44 @@ def symbol_stats(symbol: str) -> dict[str, Any]:
         "total_r": round(sum(rs), 3) if rs else 0.0,
         "meaningful": decided >= 5,
     }
+
+
+def signals_since(since_ts: str) -> list[dict[str, Any]]:
+    """Signals recorded at/after `since_ts` — input to the nightly batch judge."""
+    with _conn() as c:
+        return [dict(r) for r in c.execute(
+            "SELECT * FROM signals WHERE scan_ts >= ? ORDER BY scan_ts", (since_ts,))]
+
+
+def live_decision_for(signal_id: str) -> dict[str, Any] | None:
+    with _conn() as c:
+        row = c.execute(
+            "SELECT * FROM decisions WHERE signal_id=? ORDER BY scan_ts DESC LIMIT 1",
+            (signal_id,)).fetchone()
+        return dict(row) if row else None
+
+
+def record_second_opinion(signal_id: str, verdict: dict[str, Any],
+                          agrees: bool | None = None) -> None:
+    with _conn() as c:
+        c.execute(
+            """INSERT INTO second_opinions (id, signal_id, created_ts, model, take,
+                confidence, size, rationale, agrees) VALUES (?,?,?,?,?,?,?,?,?)""",
+            (str(uuid.uuid4()), signal_id, _now(), verdict.get("source"),
+             int(bool(verdict.get("take"))), verdict.get("confidence"),
+             verdict.get("size"), verdict.get("rationale"),
+             None if agrees is None else int(agrees)),
+        )
+
+
+def second_opinion_agreement() -> dict[str, Any]:
+    """How often the offline Claude judge agreed with the live deterministic one."""
+    with _conn() as c:
+        rows = [dict(r) for r in c.execute(
+            "SELECT agrees FROM second_opinions WHERE agrees IS NOT NULL")]
+    n = len(rows)
+    agree = sum(r["agrees"] for r in rows)
+    return {"n": n, "agree": agree, "agreement_rate": (agree / n) if n else None}
 
 
 def rejection_counts(since: str | None = None) -> dict[str, int]:

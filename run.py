@@ -44,6 +44,8 @@ def main() -> None:
                         help="walk-forward replay over history → BASELINE.md (honest, sized R)")
     parser.add_argument("--calibrate", action="store_true",
                         help="replay + write CALIBRATION.md (frequency vs expectancy, proposed threshold)")
+    parser.add_argument("--batch-second-opinion", action="store_true",
+                        help="offline nightly Claude batch re-judge of the day's candidates (observational)")
     args = parser.parse_args()
 
     try:
@@ -64,6 +66,11 @@ def main() -> None:
     if args.replay or args.calibrate:
         from v2 import replay
         replay.main(calibrate=args.calibrate)
+        return
+
+    if args.batch_second_opinion:
+        from v2 import batch_judge
+        batch_judge.run_batch_second_opinion()
         return
 
     if args.resolve_only:

@@ -118,3 +118,33 @@ and selftest green. Equities path unchanged.
   differ. Recommend running paper (Phase 5) before any scale-up or going live.
 
 **Exit criterion met:** `CALIBRATION.md` + conservatively-defaulted, flagged threshold; committed.
+
+---
+
+## Phase 4 — Claude API judge ✅ (off by default)
+
+**What changed**
+- **Haiku judge** (`claude-haiku-4-5`, verified live with your `ANTHROPIC_API_KEY`). Only candidates
+  reach it — never per-bar, never the universe. Input includes the setup, session, news proximity,
+  and correlation with the open book (`pipeline._attach_fx_context`). Output is **strict JSON**
+  (`verdict` / `confidence` / `size_multiplier` / `reason`), parsed defensively
+  (`llm.parse_verdict`); on malformed output or any API error it **falls back to the deterministic
+  verdict** and logs it — a flaky model can never break a scan. Still gated behind `BOT_LLM=1`
+  (+ `BOT_LLM_PROVIDER=anthropic`); **off by default**.
+- **Cost log** (`llm.log_cost`): every call appends `{model, tokens, est_usd, batch}` to
+  `state/llm_cost.jsonl` and logs a line. Pricing table in config (Haiku $1/$5 per MTok).
+- **Offline batch second-opinion** (`v2/batch_judge.py`, `run.py --batch-second-opinion`): nightly
+  job re-judges the day's candidates via the **Message Batches API** (50% off), records each verdict
+  in a `second_opinions` table with whether it **agreed** with the live deterministic decision, and
+  reports an agreement rate. Purely **observational** — never affects live decisions. Verified the
+  live single-call judge; the batch path is wired and unit-covered (network not exercised in CI).
+- **Tests**: +9 (verdict parsing, size-multiplier buckets, JSON-fence stripping, cost math incl.
+  batch discount). 41 total, all green.
+
+**Needs review**
+- Judge stays **off**. Turn it on only once you want to compare Claude against the free brain —
+  run `--batch-second-opinion` for a while first and read the agreement rate before flipping
+  `BOT_LLM=1` live.
+
+**Exit criterion met:** judge integrated behind a flag (off by default), JSON parsing + fallback
+tested, committed.

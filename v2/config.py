@@ -48,8 +48,20 @@ GROQ_MODEL = os.getenv("BOT_GROQ_MODEL", "llama-3.3-70b-versatile")
 
 # Anthropic (paid) — only if you deliberately switch provider.
 ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY", "")
-JUDGE_MODEL = os.getenv("BOT_JUDGE_MODEL", "claude-sonnet-4-6")
+# Haiku 4.5 is the candidate judge (Phase 4) — only candidates reach it, never
+# per-bar/per-universe, so a small fast model is the right tool + cheapest.
+JUDGE_MODEL = os.getenv("BOT_JUDGE_MODEL", "claude-haiku-4-5")
 REFLECT_MODEL = os.getenv("BOT_REFLECT_MODEL", "claude-opus-4-8")
+
+# Per-MTok pricing for the cost log (USD). Source: claude-api skill, 2026-06.
+MODEL_PRICING = {
+    "claude-haiku-4-5":  {"in": 1.00, "out": 5.00},
+    "claude-sonnet-4-6": {"in": 3.00, "out": 15.00},
+    "claude-opus-4-8":   {"in": 5.00, "out": 25.00},
+}
+COST_LOG_FILE = STATE_DIR / "llm_cost.jsonl"
+# Batch API (offline nightly second-opinion) runs at 50% of standard price.
+BATCH_DISCOUNT = 0.5
 
 
 def _provider_key_present() -> bool:
