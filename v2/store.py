@@ -83,12 +83,25 @@ CREATE TABLE IF NOT EXISTS trades (
     tp2          REAL NOT NULL,
     tp1_hit      INTEGER NOT NULL DEFAULT 0,
     tp1_hit_at   TEXT,
+    size         TEXT,                         -- decision size label (none|quarter|half|full)
+    size_mult    REAL NOT NULL DEFAULT 1.0,    -- numeric multiplier applied to recorded R
+    lots         REAL,                         -- FX position size (bookkeeping)
     opened_at    TEXT NOT NULL,
     closed_at    TEXT,
     close_price  REAL,
     outcome      TEXT,
-    pnl_r        REAL,
+    pnl_r        REAL,                          -- SIZED R (raw R * size_mult) — audit fix
+    raw_r        REAL,                          -- unsized R, for diagnostics
     journaled    INTEGER NOT NULL DEFAULT 0   -- has reflection written a journal entry?
+);
+CREATE TABLE IF NOT EXISTS rejections (
+    id           TEXT PRIMARY KEY,
+    scan_ts      TEXT NOT NULL,
+    symbol       TEXT NOT NULL,
+    stage        TEXT NOT NULL,     -- detector | levels | judge
+    reason       TEXT NOT NULL,
+    score        INTEGER,
+    direction    TEXT
 );
 CREATE TABLE IF NOT EXISTS lessons (
     id           TEXT PRIMARY KEY,
@@ -115,9 +128,28 @@ def _conn() -> Iterator[sqlite3.Connection]:
         conn.close()
 
 
+# Decision size label -> numeric multiplier applied to recorded R.
+SIZE_MULT = {"none": 0.0, "quarter": 0.25, "half": 0.5, "full": 1.0}
+
+
 def init_db() -> None:
     with _conn() as c:
         c.executescript(_SCHEMA)
+        _migrate(c)
+
+
+def _migrate(c: sqlite3.Connection) -> None:
+    """Add columns introduced after the first ledgers were created. The `state`
+    branch persists old DBs, so new columns must be ALTERed in idempotently."""
+    cols = {r[1] for r in c.execute("PRAGMA table_info(trades)")}
+    for name, ddl in (
+        ("size", "TEXT"),
+        ("size_mult", "REAL NOT NULL DEFAULT 1.0"),
+        ("lots", "REAL"),
+        ("raw_r", "REAL"),
+    ):
+        if name not in cols:
+            c.execute(f"ALTER TABLE trades ADD COLUMN {name} {ddl}")
 
 
 def _now() -> str:
@@ -163,35 +195,57 @@ def record_decision(signal_id: str, scan_ts: str, symbol: str, decision: dict[st
 
 
 def open_trade(signal_id: str | None, candidate: dict[str, Any], fill: float,
-               opened_at: str | None = None) -> dict[str, Any]:
-    """Open a position. `fill` is the realistic entry (see levels.realistic_fill)."""
+               opened_at: str | None = None, *,
+               size: str = "full") -> dict[str, Any]:
+    """Open a position. `fill` is the realistic entry (see levels.realistic_fill).
+
+    `size` is the judge's decision size label; it's converted to a numeric
+    multiplier and stored, so recorded R is the SIZED R (audit fix — sizing was
+    previously cosmetic and never touched the ledger)."""
     tid = str(uuid.uuid4())
     opened_at = opened_at or _now()
     direction = candidate["direction"]
     sl = float(candidate["stop_loss"])
+    size_mult = SIZE_MULT.get(size, 1.0)
     row = {
         "id": tid, "signal_id": signal_id, "symbol": candidate["symbol"],
         "direction": direction, "setups": json.dumps(candidate.get("setups") or []),
         "regime": candidate.get("regime"), "entry_price": float(fill),
         "stop_loss": sl, "original_sl": sl,
         "tp1": float(candidate["tp1"]), "tp2": float(candidate["tp2"]),
-        "tp1_hit": 0, "tp1_hit_at": None, "opened_at": opened_at,
+        "tp1_hit": 0, "tp1_hit_at": None,
+        "size": size, "size_mult": size_mult, "lots": candidate.get("lots"),
+        "opened_at": opened_at,
         "closed_at": None, "close_price": None, "outcome": None,
-        "pnl_r": None, "journaled": 0,
+        "pnl_r": None, "raw_r": None, "journaled": 0,
     }
     with _conn() as c:
         c.execute(
             """INSERT INTO trades (id, signal_id, symbol, direction, setups, regime,
                 entry_price, stop_loss, original_sl, tp1, tp2, tp1_hit, tp1_hit_at,
-                opened_at, closed_at, close_price, outcome, pnl_r, journaled)
+                size, size_mult, lots, opened_at, closed_at, close_price, outcome,
+                pnl_r, raw_r, journaled)
                VALUES (:id,:signal_id,:symbol,:direction,:setups,:regime,:entry_price,
-                :stop_loss,:original_sl,:tp1,:tp2,:tp1_hit,:tp1_hit_at,:opened_at,
-                :closed_at,:close_price,:outcome,:pnl_r,:journaled)""",
+                :stop_loss,:original_sl,:tp1,:tp2,:tp1_hit,:tp1_hit_at,:size,:size_mult,
+                :lots,:opened_at,:closed_at,:close_price,:outcome,:pnl_r,:raw_r,:journaled)""",
             row,
         )
-    log.info("trade opened: %s %s @ %.4f (sl %.4f tp1 %.4f tp2 %.4f)",
-             candidate["symbol"], direction, fill, sl, candidate["tp1"], candidate["tp2"])
+    log.info("trade opened: %s %s @ %.4f (sl %.4f tp1 %.4f tp2 %.4f) size=%s x%.2f",
+             candidate["symbol"], direction, fill, sl, candidate["tp1"], candidate["tp2"],
+             size, size_mult)
     return row
+
+
+def record_rejection(scan_ts: str, symbol: str, stage: str, reason: str,
+                     score: int | None = None, direction: str | None = None) -> None:
+    """Persist a rejected candidate so 'why did nothing fire' is answerable from
+    the ledger (audit fix). Cheap and append-only."""
+    with _conn() as c:
+        c.execute(
+            "INSERT INTO rejections (id, scan_ts, symbol, stage, reason, score, direction)"
+            " VALUES (?,?,?,?,?,?,?)",
+            (str(uuid.uuid4()), scan_ts, symbol, stage, reason, score, direction),
+        )
 
 
 # ---------- trade resolution (ported "let winners run" from v1) -------------
@@ -214,65 +268,47 @@ def _pnl_r(entry: float, original_sl: float, close: float, direction: str) -> fl
     return (close - entry) / risk if direction == "long" else (entry - close) / risk
 
 
-def resolve_open_trades(prices: dict[str, float]) -> list[dict[str, Any]]:
-    """Adjudicate open trades against the latest price snapshot.
+def walk_trade(t: dict[str, Any], bars: list[Any], now: datetime) -> tuple[str | None, float]:
+    """HONEST resolution (audit master-bug fix). Walk OHLC bars in order and
+    decide the outcome from each bar's HIGH/LOW, not just the close.
 
-    Two-phase "let winners run": pre-TP1 a stop is a LOSS and TP2 a win; once
-    TP1 prints we trail the stop to entry and keep running, so a later reversal
-    is a 0R BREAKEVEN rather than a loss. Conservative ordering (check stop
-    before TP2) since a single snapshot can't reveal intra-bar sequence.
+    Two-phase "let winners run": before TP1, a stop is a LOSS and TP2 a win;
+    once TP1 prints we trail the stop to entry, so a later reversal is a 0R
+    BREAKEVEN. When a single bar straddles both the stop and a target we break
+    the tie SL-FIRST (the conservative assumption — a single bar can't reveal
+    intrabar sequence). Mutates `t` in place (sets `_dirty`) on the TP1->trailing
+    transition so the trailed stop persists if the trade stays open.
+
+    Returns (outcome, close_price); outcome None means the trade stays open.
+    `bars` must be the chronological bars AFTER the trade opened.
     """
-    now = datetime.now(timezone.utc)
-    closed: list[dict[str, Any]] = []
-    with _conn() as c:
-        rows = [dict(r) for r in c.execute("SELECT * FROM trades WHERE outcome IS NULL")]
-        for t in rows:
-            price = prices.get(t["symbol"])
-            outcome, close_price = _decide(t, price, now)
-            if outcome is None:
-                # may have mutated to trailing — persist tp1_hit / trailed stop
-                if t.get("_dirty"):
-                    c.execute(
-                        "UPDATE trades SET tp1_hit=?, tp1_hit_at=?, stop_loss=? WHERE id=?",
-                        (t["tp1_hit"], t["tp1_hit_at"], t["stop_loss"], t["id"]),
-                    )
-                continue
-            pnl = round(_pnl_r(t["entry_price"], t["original_sl"], close_price, t["direction"]), 3)
-            c.execute(
-                "UPDATE trades SET outcome=?, close_price=?, closed_at=?, pnl_r=? WHERE id=?",
-                (outcome, close_price, now.isoformat(), pnl, t["id"]),
-            )
-            t.update(outcome=outcome, close_price=close_price, closed_at=now.isoformat(), pnl_r=pnl)
-            closed.append(t)
-            log.info("trade closed: %s %s -> %s @ %.4f (%.2fR)",
-                     t["symbol"], t["direction"], outcome, close_price, pnl)
-    return closed
-
-
-def _decide(t: dict[str, Any], price: float | None, now: datetime) -> tuple[str | None, float]:
-    """Return (outcome, close_price). outcome None means stays open. Mutates
-    `t` in place (sets `_dirty`) on the TP1->trailing transition."""
-    direction, sl, tp1, tp2 = t["direction"], t["stop_loss"], t["tp1"], t["tp2"]
+    direction, tp1, tp2 = t["direction"], t["tp1"], t["tp2"]
+    entry = t["entry_price"]
+    sl = t["stop_loss"]
     tp1_hit = bool(t["tp1_hit"])
-    if price is not None:
+
+    for b in bars:
+        hi, lo = b.h, b.l
         if direction == "long":
-            if price <= sl:
-                return (OUTCOME_BREAKEVEN if tp1_hit else OUTCOME_LOSS,
-                        t["entry_price"] if tp1_hit else sl)
-            if price >= tp2:
+            if lo <= sl:  # SL-first tie-break
+                return (OUTCOME_BREAKEVEN, entry) if tp1_hit else (OUTCOME_LOSS, sl)
+            if hi >= tp2:
                 return OUTCOME_WIN_TP2, tp2
-            if not tp1_hit and price >= tp1:
-                t.update(tp1_hit=1, tp1_hit_at=now.isoformat(), stop_loss=t["entry_price"], _dirty=True)
-                return None, 0.0
-        else:
-            if price >= sl:
-                return (OUTCOME_BREAKEVEN if tp1_hit else OUTCOME_LOSS,
-                        t["entry_price"] if tp1_hit else sl)
-            if price <= tp2:
+            if not tp1_hit and hi >= tp1:
+                tp1_hit = True
+                sl = entry  # trail to breakeven
+                t.update(tp1_hit=1, tp1_hit_at=b.dt.isoformat(), stop_loss=entry, _dirty=True)
+        else:  # short
+            if hi >= sl:
+                return (OUTCOME_BREAKEVEN, entry) if tp1_hit else (OUTCOME_LOSS, sl)
+            if lo <= tp2:
                 return OUTCOME_WIN_TP2, tp2
-            if not tp1_hit and price <= tp1:
-                t.update(tp1_hit=1, tp1_hit_at=now.isoformat(), stop_loss=t["entry_price"], _dirty=True)
-                return None, 0.0
+            if not tp1_hit and lo <= tp1:
+                tp1_hit = True
+                sl = entry
+                t.update(tp1_hit=1, tp1_hit_at=b.dt.isoformat(), stop_loss=entry, _dirty=True)
+
+    # No level hit across the supplied bars — expire if past the holding window.
     try:
         opened = datetime.fromisoformat(str(t["opened_at"]))
         if opened.tzinfo is None:
@@ -280,8 +316,52 @@ def _decide(t: dict[str, Any], price: float | None, now: datetime) -> tuple[str 
     except ValueError:
         return None, 0.0
     if _trading_days_between(opened, now) >= cfg.EXPIRY_TRADING_DAYS:
-        return OUTCOME_EXPIRED, float(price if price is not None else t["entry_price"])
+        last_close = bars[-1].c if bars else entry
+        return OUTCOME_EXPIRED, float(last_close)
     return None, 0.0
+
+
+def resolve_open_trades(bars_by_symbol: dict[str, list[Any]], *,
+                        now: datetime | None = None) -> list[dict[str, Any]]:
+    """Adjudicate every open trade against fresh OHLC bars (intraday for FX,
+    daily for equities/replay). See walk_trade for the resolution semantics.
+
+    `bars_by_symbol` maps symbol -> chronological Bar list (each Bar exposes
+    .h/.l/.c/.dt). Bars at or before a trade's open are ignored.
+    """
+    now = now or datetime.now(timezone.utc)
+    closed: list[dict[str, Any]] = []
+    with _conn() as c:
+        rows = [dict(r) for r in c.execute("SELECT * FROM trades WHERE outcome IS NULL")]
+        for t in rows:
+            try:
+                opened = datetime.fromisoformat(str(t["opened_at"]))
+                if opened.tzinfo is None:
+                    opened = opened.replace(tzinfo=timezone.utc)
+            except ValueError:
+                opened = now
+            all_bars = bars_by_symbol.get(t["symbol"], [])
+            bars = [b for b in all_bars if b.dt > opened]
+            outcome, close_price = walk_trade(t, bars, now)
+            if outcome is None:
+                if t.get("_dirty"):
+                    c.execute(
+                        "UPDATE trades SET tp1_hit=?, tp1_hit_at=?, stop_loss=? WHERE id=?",
+                        (t["tp1_hit"], t["tp1_hit_at"], t["stop_loss"], t["id"]),
+                    )
+                continue
+            raw = round(_pnl_r(t["entry_price"], t["original_sl"], close_price, t["direction"]), 3)
+            sized = round(raw * float(t.get("size_mult") or 1.0), 3)
+            c.execute(
+                "UPDATE trades SET outcome=?, close_price=?, closed_at=?, pnl_r=?, raw_r=? WHERE id=?",
+                (outcome, close_price, now.isoformat(), sized, raw, t["id"]),
+            )
+            t.update(outcome=outcome, close_price=close_price, closed_at=now.isoformat(),
+                     pnl_r=sized, raw_r=raw)
+            closed.append(t)
+            log.info("trade closed: %s %s -> %s @ %.4f (%.2fR sized, %.2fR raw)",
+                     t["symbol"], t["direction"], outcome, close_price, sized, raw)
+    return closed
 
 
 # ---------- reads -----------------------------------------------------------
@@ -364,6 +444,18 @@ def symbol_stats(symbol: str) -> dict[str, Any]:
         "total_r": round(sum(rs), 3) if rs else 0.0,
         "meaningful": decided >= 5,
     }
+
+
+def rejection_counts(since: str | None = None) -> dict[str, int]:
+    """Reason -> count over all (or recent) rejections, for the daily report."""
+    q = "SELECT reason, COUNT(*) n FROM rejections"
+    args: list[Any] = []
+    if since:
+        q += " WHERE scan_ts >= ?"
+        args.append(since)
+    q += " GROUP BY reason ORDER BY n DESC"
+    with _conn() as c:
+        return {r["reason"]: r["n"] for r in c.execute(q, args)}
 
 
 def system_stats() -> dict[str, Any]:

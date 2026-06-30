@@ -90,3 +90,106 @@ def compute_levels(
         "atr": round(atr, 5) if atr else None,
         "sl_source": sl_source,
     }
+
+
+# --------------------------------------------------------------------------- #
+# FX: pip/spread-aware levels + lot sizing                                    #
+# --------------------------------------------------------------------------- #
+
+def _pip_value_usd_per_lot(symbol: str, pip_size: float, price: float, std_lot: int) -> float:
+    """Approximate USD value of one pip for one standard lot.
+
+    Exact for USD-quoted pairs (EURUSD…); for USD-base pairs (USDJPY…) we divide
+    by price; crosses are approximated the same way. Lots are recorded for
+    realism only — R-multiple expectancy is independent of lot size, so this
+    approximation never touches the measured edge.
+    """
+    base = symbol[:3].upper()
+    quote = symbol[3:6].upper()
+    pip_value_quote = pip_size * std_lot
+    if quote == "USD":
+        return pip_value_quote
+    if base == "USD" and price > 0:
+        return pip_value_quote / price
+    # cross (e.g. EURGBP, EURJPY): rough — good enough for paper lot bookkeeping
+    return pip_value_quote / price if price > 0 else pip_value_quote
+
+
+def compute_levels_fx(
+    direction: str,
+    zone_low: float,
+    zone_high: float,
+    *,
+    atr: float | None,
+    price: float | None,
+    symbol: str,
+    pip_size: float,
+    spread_pips: float,
+    equity: float,
+    risk_pct: float,
+    std_lot: int,
+) -> dict[str, Any] | None:
+    """FX levels in pip terms with an assumed spread baked into entry.
+
+    Mid-price feed → we never see real bid/ask, so we WORSEN the entry by the
+    full assumed spread (conservative) and compute R:R *after* that cost. Stop
+    is 0.5·ATR beyond the zone (ATR in price terms); TP1/TP2 are 2R/3R of the
+    post-spread risk. Returns None if the stop is implausibly wide.
+    """
+    if direction not in ("long", "short"):
+        return None
+    if zone_high < zone_low:
+        zone_low, zone_high = zone_high, zone_low
+
+    mid = realistic_fill(zone_low, zone_high)
+    spread_price = spread_pips * pip_size
+
+    if atr and atr > 0:
+        sl_buf = SL_ATR_MULT * atr
+        sl_source = "atr"
+    else:
+        sl_buf = mid * SL_BUFFER_PCT
+        sl_source = "pct_fallback"
+
+    # Worsen entry by the spread; place the stop beyond the zone edge.
+    if direction == "long":
+        entry = round(mid + spread_price, 5)
+        stop = round(zone_low - sl_buf, 5)
+        risk = entry - stop
+    else:
+        entry = round(mid - spread_price, 5)
+        stop = round(zone_high + sl_buf, 5)
+        risk = stop - entry
+
+    if risk <= 0:
+        return None
+    if price and price > 0 and (risk / price) > MAX_RISK_PCT:
+        return None
+
+    if direction == "long":
+        tp1 = round(entry + TP1_R_MULT * risk, 5)
+        tp2 = round(entry + TP2_R_MULT * risk, 5)
+    else:
+        tp1 = round(entry - TP1_R_MULT * risk, 5)
+        tp2 = round(entry - TP2_R_MULT * risk, 5)
+
+    risk_pips = round(risk / pip_size, 1)
+    pip_val = _pip_value_usd_per_lot(symbol, pip_size, price or mid, std_lot)
+    risk_usd = equity * risk_pct
+    lots = round(risk_usd / (risk_pips * pip_val), 3) if risk_pips > 0 and pip_val > 0 else 0.0
+
+    return {
+        "entry": entry,
+        "entry_low": round(zone_low, 5),
+        "entry_high": round(zone_high, 5),
+        "stop_loss": stop,
+        "tp1": tp1,
+        "tp2": tp2,
+        "rr": TP1_R_MULT,
+        "risk_pct": round(risk / price, 4) if price else None,
+        "risk_pips": risk_pips,
+        "spread_pips": spread_pips,
+        "lots": lots,
+        "atr": round(atr, 5) if atr else None,
+        "sl_source": sl_source,
+    }

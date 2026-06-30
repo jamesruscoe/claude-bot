@@ -8,10 +8,16 @@ targets) and its scoring-as-decision — levels come from v2.levels and the
 take/skip call comes from v2.brain.
 
 This module's job: run the detectors on a symbol's daily bars and emit a single
-`candidate` dict (or None) for the rest of the pipeline to reason about.
+`candidate` dict (or None + a rejection reason) for the rest of the pipeline to
+reason about. The rejection reason is logged so "why did nothing fire" is
+answerable from the ledger (audit fix), not just by external replay.
+
+An optional `instrument` spec switches the risk math from price-based (equities)
+to pip/spread-aware (FX) — see levels.compute_levels_fx.
 """
 from __future__ import annotations
 
+from dataclasses import dataclass
 from typing import Any
 
 import smc_detector  # salvaged v1 pure-math detectors
@@ -22,6 +28,17 @@ from v2.config import CANDIDATE_MIN_SCORE, OB_IMPULSE_OVERRIDES
 
 # Thin band half-width around a BOS level when there's no OB zone to anchor to.
 BOS_BAND_PCT = 0.0015
+
+
+@dataclass
+class Instrument:
+    """Per-symbol risk-math context. None → equities (price-based)."""
+    symbol: str
+    pip_size: float
+    spread_pips: float
+    equity: float
+    risk_pct: float
+    std_lot: int
 
 
 def _zone_from_signals(signals: dict[str, Any], direction: str) -> tuple[float, float] | None:
@@ -46,44 +63,58 @@ def _setup_names(signals: dict[str, Any]) -> list[str]:
     return names
 
 
+def _zero_score_reason(signals: dict[str, Any]) -> str:
+    """Explain a score of 0 for rejection logging."""
+    if signals.get("regime_blocked"):
+        return "regime_blocked"
+    if signals.get("ob_retest") and signals.get("bos_retest"):
+        return "conflicting_setups"
+    return "no_setup"
+
+
 def build_candidate(
     symbol: str,
     bars: list[Bar],
     *,
     live_price: float | None = None,
-) -> dict[str, Any] | None:
-    """Return a candidate dict, or None if nothing fireable on this symbol.
+    instrument: Instrument | None = None,
+) -> tuple[dict[str, Any] | None, str | None]:
+    """Return (candidate, None) on success, or (None, reason) on rejection.
 
     A returned candidate has passed: detector score >= floor, a directional
-    zone, the live-price staleness check, and the levels R:R floor.
+    zone, and the levels R:R floor. `instrument` (FX) switches the risk math to
+    pip/spread-aware levels; absent it, the original price-based levels run.
     """
     if not bars or len(bars) < 20:
-        return None
+        return None, "too_few_bars"
 
     threshold = OB_IMPULSE_OVERRIDES.get(symbol, OB_IMPULSE_THRESHOLD)
     score, direction, signals = smc_detector.score_setups(bars, impulse_threshold=threshold)
 
     price = live_price if live_price is not None else bars[-1].c
 
-    # Salvaged staleness guard: if intraday price has already left the zone, the
-    # retest is no longer in play — drop the stale signal and re-derive.
-    signals, _stale = smc_detector.invalidate_by_price(signals, price)
-    score, direction = smc_detector.score_from_signals(signals)
-
     if score < CANDIDATE_MIN_SCORE or direction is None:
-        return None
+        return None, _zero_score_reason(signals)
 
     zone = _zone_from_signals(signals, direction)
     if zone is None:
-        return None
+        return None, "no_zone"
     zone_low, zone_high = zone
 
     atr = smc_detector.atr(bars)
-    lv = levels.compute_levels(direction, zone_low, zone_high, atr=atr, price=price)
+    if instrument is not None:
+        lv = levels.compute_levels_fx(
+            direction, zone_low, zone_high, atr=atr, price=price,
+            symbol=instrument.symbol, pip_size=instrument.pip_size,
+            spread_pips=instrument.spread_pips, equity=instrument.equity,
+            risk_pct=instrument.risk_pct, std_lot=instrument.std_lot,
+        )
+    else:
+        lv = levels.compute_levels(direction, zone_low, zone_high, atr=atr, price=price)
     if lv is None:
-        return None  # failed the R:R floor
+        return None, "levels_rejected_wide_stop"
 
-    return {
+    candidate = {
         "symbol": symbol,
         "score": score,
         "direction": direction,
@@ -100,3 +131,8 @@ def build_candidate(
         "rr": lv["rr"],
         "latest_bar_dt": bars[-1].dt,
     }
+    # FX bookkeeping fields (present only with an instrument spec).
+    for k in ("risk_pips", "spread_pips", "lots"):
+        if k in lv:
+            candidate[k] = lv[k]
+    return candidate, None

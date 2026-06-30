@@ -58,6 +58,47 @@ def _provider_key_present() -> bool:
 
 LLM_ENABLED = _provider_key_present() and os.getenv("BOT_LLM", "0") == "1"
 
+# --- Market mode (NEW — defaults to equities so the existing path is unchanged)
+# "equities" keeps the original Massive/SMC behaviour bit-for-bit. "fx" routes
+# the whole pipeline through the yfinance FX adapter + pip/spread risk math.
+# Switch with BOT_MARKET=fx. Everything FX-specific is gated on this flag.
+MARKET = os.getenv("BOT_MARKET", "equities").lower()
+FX_ENABLED = MARKET == "fx"
+
+# FX basket — yfinance tickers. Majors + the two EUR crosses the brief names.
+FX_BASKET = [
+    "EURUSD=X", "GBPUSD=X", "USDJPY=X", "USDCHF=X", "AUDUSD=X",
+    "USDCAD=X", "NZDUSD=X", "EURGBP=X", "EURJPY=X",
+]
+
+# Pip size per pair. JPY-quoted pairs move in 0.01; everything else 0.0001.
+def fx_pip_size(symbol: str) -> float:
+    return 0.01 if "JPY=X" in symbol else 0.0001
+
+# Assumed CONSERVATIVE spread in pips. Yahoo serves mid prices, so we never see
+# a real bid/ask — we assume a fixed, deliberately-wide spread per pair and bake
+# it into entry + R:R. JPY crosses are wider. (OANDA practice can replace these
+# with real quotes later — see Phase 5 TODO.)
+FX_SPREAD_PIPS: dict[str, float] = {
+    "EURUSD=X": 0.6, "GBPUSD=X": 1.0, "USDCHF=X": 1.2, "AUDUSD=X": 1.0,
+    "USDCAD=X": 1.2, "NZDUSD=X": 1.4, "EURGBP=X": 1.2, "USDJPY=X": 1.0,
+    "EURJPY=X": 1.8,
+}
+FX_DEFAULT_SPREAD_PIPS = 1.5  # fallback for any pair not listed
+
+def fx_spread_pips(symbol: str) -> float:
+    return FX_SPREAD_PIPS.get(symbol, FX_DEFAULT_SPREAD_PIPS)
+
+# Fixed-fractional risk per trade and nominal paper account, for lot sizing.
+# Risk in R is independent of lots; lots are recorded for realism only.
+FX_RISK_PCT = float(os.getenv("BOT_FX_RISK_PCT", "0.005"))   # 0.5% of equity / trade
+FX_ACCOUNT_EQUITY = float(os.getenv("BOT_FX_EQUITY", "10000"))  # paper account, USD
+FX_STD_LOT_UNITS = 100_000   # 1.0 lot = 100k base units
+
+# yfinance is unofficial + delayed: cache pulls and never act on empty/old data.
+FX_CACHE_TTL_SECONDS = int(os.getenv("BOT_FX_CACHE_TTL", "900"))  # 15 min
+CACHE_DIR = STATE_DIR / "cache"
+
 # --- Signal gating ----------------------------------------------------------
 # The deterministic engine still scores 0/50/100. We only hand candidates to
 # the judge at or above this score — below it there isn't enough structure to
@@ -99,3 +140,4 @@ def ensure_state_dirs() -> None:
     STATE_DIR.mkdir(parents=True, exist_ok=True)
     JOURNAL_DIR.mkdir(parents=True, exist_ok=True)
     LESSONS_DIR.mkdir(parents=True, exist_ok=True)
+    CACHE_DIR.mkdir(parents=True, exist_ok=True)

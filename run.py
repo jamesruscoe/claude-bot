@@ -40,6 +40,8 @@ def main() -> None:
                         help="only resolve open trades, don't look for new ones")
     parser.add_argument("--llm-test", action="store_true",
                         help="send one sample judgment to the configured LLM provider to verify the key")
+    parser.add_argument("--replay", action="store_true",
+                        help="walk-forward replay over history → BASELINE.md (honest, sized R)")
     args = parser.parse_args()
 
     try:
@@ -56,6 +58,15 @@ def main() -> None:
 
     if args.llm_test:
         sys.exit(0 if _llm_test() else 1)
+
+    if args.replay:
+        from v2 import replay
+        replay.main()
+        return
+
+    if args.resolve_only:
+        asyncio.run(pipeline.resolve_only())
+        return
 
     asyncio.run(pipeline.run_scan(force=args.force))
 
