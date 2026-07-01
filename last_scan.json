@@ -1,5 +1,5 @@
 {
-  "scan_ts": "2026-06-30T21:21:55.002853+00:00",
+  "scan_ts": "2026-07-01T15:38:59.648227+00:00",
   "skipped": false,
   "llm": false,
   "market": "equities",
@@ -11,32 +11,13 @@
     },
     {
       "symbol": "NVDA",
-      "candidate": true,
-      "score": 50,
-      "direction": "short",
-      "setups": [
-        "bos_retest"
-      ],
-      "regime": "bullish",
-      "price": 194.97,
-      "atr": 7.22566,
-      "entry": 194.74,
-      "entry_low": 194.44789,
-      "entry_high": 195.03211,
-      "stop_loss": 198.64494,
-      "tp1": 186.93012,
-      "tp2": 183.02518,
-      "rr": 2.0,
-      "take": true,
-      "confidence": "low",
-      "size": "quarter",
-      "rationale": "score 50 (bos_retest); R:R 2.0; probation (0 decided) \u2014 tiny stake to learn",
-      "decided_by": "deterministic"
+      "candidate": false,
+      "reject_reason": "no_setup"
     },
     {
       "symbol": "TSLA",
       "candidate": false,
-      "reject_reason": "regime_blocked"
+      "reject_reason": "no_setup"
     },
     {
       "symbol": "USOIL",
@@ -50,8 +31,28 @@
     },
     {
       "symbol": "APLD",
-      "candidate": false,
-      "reject_reason": "no_setup"
+      "candidate": true,
+      "score": 50,
+      "direction": "short",
+      "setups": [
+        "bos_retest"
+      ],
+      "regime": "bullish",
+      "price": 37.3,
+      "atr": 3.93937,
+      "entry": 37.93,
+      "entry_low": 37.87311,
+      "entry_high": 37.9869,
+      "stop_loss": 39.95658,
+      "tp1": 33.87684,
+      "tp2": 31.85026,
+      "rr": 2.0,
+      "take": true,
+      "confidence": "low",
+      "size": "quarter",
+      "rationale": "score 50 (bos_retest); R:R 2.0; probation (0 decided) \u2014 tiny stake to learn",
+      "decided_by": "deterministic",
+      "opened": true
     },
     {
       "symbol": "AMZN",
@@ -61,12 +62,32 @@
     {
       "symbol": "NFLX",
       "candidate": false,
-      "reject_reason": "no_setup"
+      "reject_reason": "regime_blocked"
     },
     {
       "symbol": "AMD",
-      "candidate": false,
-      "reject_reason": "regime_blocked"
+      "candidate": true,
+      "score": 50,
+      "direction": "long",
+      "setups": [
+        "ob_retest"
+      ],
+      "regime": "bullish",
+      "price": 580.91,
+      "atr": 34.90205,
+      "entry": 528.94,
+      "entry_low": 507.0,
+      "entry_high": 550.88,
+      "stop_loss": 489.54897,
+      "tp1": 607.72206,
+      "tp2": 647.11309,
+      "rr": 2.0,
+      "take": true,
+      "confidence": "low",
+      "size": "quarter",
+      "rationale": "score 50 (ob_retest); R:R 2.0; probation (0 decided) \u2014 tiny stake to learn",
+      "decided_by": "deterministic",
+      "opened": true
     },
     {
       "symbol": "COIN",
@@ -74,16 +95,69 @@
       "reject_reason": "regime_blocked"
     }
   ],
-  "opened": [],
+  "opened": [
+    {
+      "id": "b99b40fa-910e-4b5f-8c50-0dd6b316f9c6",
+      "signal_id": "538a25d5-d2bb-43fe-a2d4-32e9b29202ab",
+      "symbol": "APLD",
+      "direction": "short",
+      "setups": "[\"bos_retest\"]",
+      "regime": "bullish",
+      "entry_price": 37.93,
+      "stop_loss": 39.95658,
+      "original_sl": 39.95658,
+      "tp1": 33.87684,
+      "tp2": 31.85026,
+      "tp1_hit": 0,
+      "tp1_hit_at": null,
+      "size": "quarter",
+      "size_mult": 0.25,
+      "lots": null,
+      "source": "forward",
+      "opened_at": "2026-07-01T15:38:59.648227+00:00",
+      "closed_at": null,
+      "close_price": null,
+      "outcome": null,
+      "pnl_r": null,
+      "raw_r": null,
+      "journaled": 0
+    },
+    {
+      "id": "14be71c4-6200-4f99-a6be-d75f4f79d4fb",
+      "signal_id": "ea2c8ea3-4c1e-4d48-a634-d9dcc86b029e",
+      "symbol": "AMD",
+      "direction": "long",
+      "setups": "[\"ob_retest\"]",
+      "regime": "bullish",
+      "entry_price": 528.94,
+      "stop_loss": 489.54897,
+      "original_sl": 489.54897,
+      "tp1": 607.72206,
+      "tp2": 647.11309,
+      "tp1_hit": 0,
+      "tp1_hit_at": null,
+      "size": "quarter",
+      "size_mult": 0.25,
+      "lots": null,
+      "source": "forward",
+      "opened_at": "2026-07-01T15:38:59.648227+00:00",
+      "closed_at": null,
+      "close_price": null,
+      "outcome": null,
+      "pnl_r": null,
+      "raw_r": null,
+      "journaled": 0
+    }
+  ],
   "closed": [],
   "system_stats": {
     "total_closed": 1,
-    "open": 1,
+    "open": 3,
     "win_rate": 0.0,
     "total_r": -1.0
   },
   "rejections": {
     "no_setup": 6,
-    "regime_blocked": 3
+    "regime_blocked": 2
   }
 }

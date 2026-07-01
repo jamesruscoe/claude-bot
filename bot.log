@@ -29,3 +29,6 @@
 2026-06-30 19:10:50,588 [INFO] v2.report: wrote /home/runner/work/claude-bot/claude-bot/state/daily_report.md
 2026-06-30 21:22:56,572 [INFO] v2.pipeline: skip open NVDA short — already in an open position
 2026-06-30 21:22:56,602 [INFO] v2.report: wrote /home/runner/work/claude-bot/claude-bot/state/daily_report.md
+2026-07-01 15:40:01,569 [INFO] v2.store: trade opened: APLD short @ 37.9300 (sl 39.9566 tp1 33.8768 tp2 31.8503) size=quarter x0.25
+2026-07-01 15:40:01,580 [INFO] v2.store: trade opened: AMD long @ 528.9400 (sl 489.5490 tp1 607.7221 tp2 647.1131) size=quarter x0.25
+2026-07-01 15:40:01,589 [INFO] v2.report: wrote /home/runner/work/claude-bot/claude-bot/state/daily_report.md
