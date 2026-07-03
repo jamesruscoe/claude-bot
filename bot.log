@@ -49,3 +49,4 @@
 2026-07-02 20:52:37,423 [INFO] v2.pipeline: skip open COIN short — already in an open position
 2026-07-02 20:52:37,431 [INFO] v2.report: wrote /home/runner/work/claude-bot/claude-bot/state/daily_report.md
 2026-07-03 15:07:18,000 [INFO] v2.pipeline: market closed — 2026-07-03 is a market holiday (exchange calendar). Skipping scan.
+2026-07-03 20:51:20,617 [INFO] v2.pipeline: market closed — 2026-07-03 is a market holiday (exchange calendar). Skipping scan.
