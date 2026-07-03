@@ -18,3 +18,7 @@
 2026-07-02 22:36:23,539 [INFO] v2.pipeline: skip open NZDUSD=X — below calibrated FX_MIN_SCORE (50<85)
 2026-07-02 22:36:23,550 [INFO] v2.report: wrote /home/runner/work/claude-bot/claude-bot/state/daily_report.md
 2026-07-02 22:36:23,792 [INFO] v2.report: wrote /home/runner/work/claude-bot/claude-bot/state/daily_report.md
+2026-07-03 22:32:33,597 [INFO] v2.datasource: data source: FX (yfinance), 9 pairs
+2026-07-03 22:32:34,330 [INFO] v2.pipeline: skip open NZDUSD=X — below calibrated FX_MIN_SCORE (50<85)
+2026-07-03 22:32:34,341 [INFO] v2.report: wrote /home/runner/work/claude-bot/claude-bot/state/daily_report.md
+2026-07-03 22:32:34,628 [INFO] v2.report: wrote /home/runner/work/claude-bot/claude-bot/state/daily_report.md
