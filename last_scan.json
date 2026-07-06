@@ -1,75 +1,9 @@
 {
-  "scan_ts": "2026-07-03T22:32:33.597946+00:00",
+  "scan_ts": "2026-07-06T22:44:47.997543+00:00",
   "skipped": false,
   "llm": false,
   "market": "fx",
-  "results": [
-    {
-      "symbol": "EURUSD=X",
-      "candidate": false,
-      "reject_reason": "no_setup"
-    },
-    {
-      "symbol": "GBPUSD=X",
-      "candidate": false,
-      "reject_reason": "no_setup"
-    },
-    {
-      "symbol": "USDJPY=X",
-      "candidate": false,
-      "reject_reason": "no_setup"
-    },
-    {
-      "symbol": "USDCHF=X",
-      "candidate": false,
-      "reject_reason": "no_setup"
-    },
-    {
-      "symbol": "AUDUSD=X",
-      "candidate": false,
-      "reject_reason": "no_setup"
-    },
-    {
-      "symbol": "USDCAD=X",
-      "candidate": false,
-      "reject_reason": "no_setup"
-    },
-    {
-      "symbol": "NZDUSD=X",
-      "candidate": true,
-      "score": 50,
-      "direction": "short",
-      "setups": [
-        "bos_retest"
-      ],
-      "regime": "bearish",
-      "price": 0.56808,
-      "atr": 0.00508,
-      "entry": 0.56863,
-      "entry_low": 0.56792,
-      "entry_high": 0.56962,
-      "stop_loss": 0.57216,
-      "tp1": 0.56157,
-      "tp2": 0.55804,
-      "rr": 2.0,
-      "take": true,
-      "confidence": "low",
-      "size": "quarter",
-      "rationale": "score 50 (bos_retest); R:R 2.0; probation (0 decided) \u2014 tiny stake to learn",
-      "decided_by": "deterministic",
-      "fx_blocked": "below calibrated FX_MIN_SCORE (50<85)"
-    },
-    {
-      "symbol": "EURGBP=X",
-      "candidate": false,
-      "reject_reason": "no_setup"
-    },
-    {
-      "symbol": "EURJPY=X",
-      "candidate": false,
-      "reject_reason": "no_setup"
-    }
-  ],
+  "results": [],
   "opened": [],
   "closed": [],
   "system_stats": {
@@ -79,7 +13,6 @@
     "total_r": 0.0
   },
   "rejections": {
-    "no_setup": 8,
-    "below calibrated FX_MIN_SCORE (50<85)": 1
+    "stale_feed": 9
   }
 }
