@@ -61,3 +61,10 @@
 2026-07-06 21:20:11,520 [INFO] v2.store: trade opened: APLD short @ 35.6800 (sl 37.6555 tp1 31.7290 tp2 29.7534) size=quarter x0.25
 2026-07-06 21:20:11,532 [INFO] v2.pipeline: skip open AMD long — already in an open position
 2026-07-06 21:20:11,542 [INFO] v2.report: wrote /home/runner/work/claude-bot/claude-bot/state/daily_report.md
+2026-07-07 15:43:25,599 [INFO] v2.store: trade opened: USOIL short @ 68.5600 (sl 70.5605 tp1 64.5590 tp2 62.5586) size=quarter x0.25
+2026-07-07 15:43:25,615 [INFO] v2.store: trade closed: NFLX short -> LOSS @ 76.4555 (-0.25R sized, -1.00R raw)
+2026-07-07 15:43:25,616 [INFO] v2.store: trade closed: COIN short -> LOSS @ 155.4498 (-0.25R sized, -1.00R raw)
+2026-07-07 15:43:25,619 [INFO] v2.journal: journal entry written: 2026-07-07-nflx-short-c193d1df.md
+2026-07-07 15:43:25,621 [INFO] v2.journal: journal entry written: 2026-07-07-coin-short-b3cf0a60.md
+2026-07-07 15:43:25,622 [INFO] v2.pipeline: reflected on 2 resolved trade(s)
+2026-07-07 15:43:25,628 [INFO] v2.report: wrote /home/runner/work/claude-bot/claude-bot/state/daily_report.md
