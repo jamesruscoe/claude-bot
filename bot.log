@@ -70,3 +70,10 @@
 2026-07-07 15:43:25,628 [INFO] v2.report: wrote /home/runner/work/claude-bot/claude-bot/state/daily_report.md
 2026-07-07 21:14:37,192 [INFO] v2.pipeline: skip open USOIL short — already in an open position
 2026-07-07 21:14:37,217 [INFO] v2.report: wrote /home/runner/work/claude-bot/claude-bot/state/daily_report.md
+2026-07-08 15:18:25,649 [INFO] v2.pipeline: skip open AMD long — already in an open position
+2026-07-08 15:18:25,653 [INFO] v2.store: trade closed: ARM long -> LOSS @ 309.9498 (-0.25R sized, -1.00R raw)
+2026-07-08 15:18:25,655 [INFO] v2.store: trade closed: USOIL short -> LOSS @ 70.5605 (-0.25R sized, -1.00R raw)
+2026-07-08 15:18:25,657 [INFO] v2.journal: journal entry written: 2026-07-08-arm-long-753d514a.md
+2026-07-08 15:18:25,659 [INFO] v2.journal: journal entry written: 2026-07-08-usoil-short-76f3e9a9.md
+2026-07-08 15:18:25,661 [INFO] v2.pipeline: reflected on 2 resolved trade(s)
+2026-07-08 15:18:25,666 [INFO] v2.report: wrote /home/runner/work/claude-bot/claude-bot/state/daily_report.md
