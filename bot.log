@@ -82,3 +82,6 @@
 2026-07-09 15:55:45,206 [INFO] v2.store: trade opened: ARM short @ 303.6700 (sl 320.4381 tp1 270.1339 tp2 253.3658) size=quarter x0.25
 2026-07-09 15:55:45,216 [INFO] v2.store: trade opened: TSLA short @ 405.2500 (sl 429.7974 tp1 356.1552 tp2 331.6077) size=quarter x0.25
 2026-07-09 15:55:45,246 [INFO] v2.report: wrote /home/runner/work/claude-bot/claude-bot/state/daily_report.md
+2026-07-09 21:10:53,289 [INFO] v2.pipeline: skip open ARM short — already in an open position
+2026-07-09 21:10:53,299 [INFO] v2.pipeline: skip open TSLA short — already in an open position
+2026-07-09 21:10:53,329 [INFO] v2.report: wrote /home/runner/work/claude-bot/claude-bot/state/daily_report.md
