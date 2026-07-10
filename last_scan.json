@@ -1,37 +1,18 @@
 {
-  "scan_ts": "2026-07-09T21:09:50.469927+00:00",
+  "scan_ts": "2026-07-10T15:30:02.787736+00:00",
   "skipped": false,
   "llm": false,
   "market": "equities",
   "results": [
     {
       "symbol": "ARM",
-      "candidate": true,
-      "score": 50,
-      "direction": "short",
-      "setups": [
-        "bos_retest"
-      ],
-      "regime": "bullish",
-      "price": 300.24,
-      "atr": 32.62511,
-      "entry": 303.67,
-      "entry_low": 303.2145,
-      "entry_high": 304.12551,
-      "stop_loss": 320.43806,
-      "tp1": 270.13388,
-      "tp2": 253.36582,
-      "rr": 2.0,
-      "take": true,
-      "confidence": "low",
-      "size": "quarter",
-      "rationale": "score 50 (bos_retest); R:R 2.0; probation (1 decided) \u2014 tiny stake to learn",
-      "decided_by": "deterministic"
+      "candidate": false,
+      "reject_reason": "no_setup"
     },
     {
       "symbol": "NVDA",
       "candidate": false,
-      "reject_reason": "no_setup"
+      "reject_reason": "regime_blocked"
     },
     {
       "symbol": "TSLA",
@@ -42,14 +23,14 @@
         "ob_retest"
       ],
       "regime": "bullish",
-      "price": 394.06,
-      "atr": 19.59484,
+      "price": 406.55,
+      "atr": 19.40927,
       "entry": 405.25,
       "entry_low": 390.5,
       "entry_high": 420.0,
-      "stop_loss": 429.79742,
-      "tp1": 356.15516,
-      "tp2": 331.60774,
+      "stop_loss": 429.70464,
+      "tp1": 356.34072,
+      "tp2": 331.88608,
       "rr": 2.0,
       "take": true,
       "confidence": "low",
@@ -59,18 +40,38 @@
     },
     {
       "symbol": "USOIL",
-      "candidate": false,
-      "reject_reason": "no_setup"
+      "candidate": true,
+      "score": 50,
+      "direction": "short",
+      "setups": [
+        "ob_retest"
+      ],
+      "regime": "bearish",
+      "price": 71.38,
+      "atr": 3.88882,
+      "entry": 73.915,
+      "entry_low": 71.75,
+      "entry_high": 76.08,
+      "stop_loss": 78.02441,
+      "tp1": 65.69618,
+      "tp2": 61.58677,
+      "rr": 2.0,
+      "take": true,
+      "confidence": "low",
+      "size": "quarter",
+      "rationale": "score 50 (ob_retest); R:R 2.0; probation (1 decided) \u2014 tiny stake to learn",
+      "decided_by": "deterministic",
+      "opened": true
     },
     {
       "symbol": "SMCI",
       "candidate": false,
-      "reject_reason": "levels_rejected_wide_stop"
+      "reject_reason": "no_setup"
     },
     {
       "symbol": "APLD",
       "candidate": false,
-      "reject_reason": "levels_rejected_wide_stop"
+      "reject_reason": "regime_blocked"
     },
     {
       "symbol": "AMZN",
@@ -85,24 +86,97 @@
     {
       "symbol": "AMD",
       "candidate": false,
-      "reject_reason": "no_setup"
+      "reject_reason": "regime_blocked"
     },
     {
       "symbol": "COIN",
-      "candidate": false,
-      "reject_reason": "no_setup"
+      "candidate": true,
+      "score": 50,
+      "direction": "short",
+      "setups": [
+        "ob_retest"
+      ],
+      "regime": "bearish",
+      "price": 158.44,
+      "atr": 10.58024,
+      "entry": 165.885,
+      "entry_low": 160.1,
+      "entry_high": 171.67,
+      "stop_loss": 176.96012,
+      "tp1": 143.73476,
+      "tp2": 132.65964,
+      "rr": 2.0,
+      "take": true,
+      "confidence": "low",
+      "size": "quarter",
+      "rationale": "score 50 (ob_retest); R:R 2.0; probation (1 decided) \u2014 tiny stake to learn",
+      "decided_by": "deterministic",
+      "opened": true
     }
   ],
-  "opened": [],
+  "opened": [
+    {
+      "id": "672b46a7-ea5d-4498-b807-d644b208cb22",
+      "signal_id": "dba11a9e-1ca3-48c2-b857-d3991baf32ab",
+      "symbol": "USOIL",
+      "direction": "short",
+      "setups": "[\"ob_retest\"]",
+      "regime": "bearish",
+      "entry_price": 73.915,
+      "stop_loss": 78.02441,
+      "original_sl": 78.02441,
+      "tp1": 65.69618,
+      "tp2": 61.58677,
+      "tp1_hit": 0,
+      "tp1_hit_at": null,
+      "size": "quarter",
+      "size_mult": 0.25,
+      "lots": null,
+      "source": "forward",
+      "opened_at": "2026-07-10T15:30:02.787736+00:00",
+      "closed_at": null,
+      "close_price": null,
+      "outcome": null,
+      "pnl_r": null,
+      "raw_r": null,
+      "journaled": 0
+    },
+    {
+      "id": "bade1551-cf23-4c5e-9ab9-69cbfa58eb9f",
+      "signal_id": "0741bdcc-300b-44c7-835d-fe3361c0c571",
+      "symbol": "COIN",
+      "direction": "short",
+      "setups": "[\"ob_retest\"]",
+      "regime": "bearish",
+      "entry_price": 165.885,
+      "stop_loss": 176.96012,
+      "original_sl": 176.96012,
+      "tp1": 143.73476,
+      "tp2": 132.65964,
+      "tp1_hit": 0,
+      "tp1_hit_at": null,
+      "size": "quarter",
+      "size_mult": 0.25,
+      "lots": null,
+      "source": "forward",
+      "opened_at": "2026-07-10T15:30:02.787736+00:00",
+      "closed_at": null,
+      "close_price": null,
+      "outcome": null,
+      "pnl_r": null,
+      "raw_r": null,
+      "journaled": 0
+    }
+  ],
   "closed": [],
   "system_stats": {
     "total_closed": 7,
-    "open": 5,
+    "open": 7,
     "win_rate": 0.14285714285714285,
     "total_r": -1.5
   },
   "rejections": {
-    "no_setup": 6,
-    "levels_rejected_wide_stop": 2
+    "no_setup": 4,
+    "regime_blocked": 3
   }
 }
