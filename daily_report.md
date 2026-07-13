@@ -1,4 +1,4 @@
-# Daily report — 2026-07-10T22:31:43+00:00
+# Daily report — 2026-07-13T22:26:39+00:00
 
 Market: **fx** · judge: deterministic · paper only
 
@@ -9,8 +9,8 @@ Market: **fx** · judge: deterministic · paper only
 - 0 open · 0 closed · win rate n/a · total +0.00R
 
 ## Rejections by reason (all-time)
+- stale_feed: 54
 - no_setup: 48
-- stale_feed: 45
 - below calibrated FX_MIN_SCORE (50<85): 6
 
 > Paper only. Live bid/ask via an OANDA practice account is a documented TODO (see ARCHITECTURE.md / PROGRESS.md) — fills here use yfinance mid + assumed spread.
