@@ -109,3 +109,10 @@
 2026-07-13 20:48:34,514 [INFO] v2.journal: journal entry written: 2026-07-13-usoil-short-672b46a7.md
 2026-07-13 20:48:34,516 [INFO] v2.pipeline: reflected on 1 resolved trade(s)
 2026-07-13 20:48:34,521 [INFO] v2.report: wrote /home/runner/work/claude-bot/claude-bot/state/daily_report.md
+2026-07-14 14:47:24,269 [INFO] v2.pipeline: skip open NFLX short — already in an open position
+2026-07-14 14:47:24,275 [INFO] v2.pipeline: skip open AMD long — already in an open position
+2026-07-14 14:47:24,281 [INFO] v2.pipeline: skip open COIN short — already in an open position
+2026-07-14 14:47:24,283 [INFO] v2.store: trade closed: APLD short -> WIN_TP2 @ 29.7534 (0.75R sized, 3.00R raw)
+2026-07-14 14:47:24,285 [INFO] v2.journal: journal entry written: 2026-07-14-apld-short-8b1140a0.md
+2026-07-14 14:47:24,287 [INFO] v2.pipeline: reflected on 1 resolved trade(s)
+2026-07-14 14:47:24,292 [INFO] v2.report: wrote /home/runner/work/claude-bot/claude-bot/state/daily_report.md
