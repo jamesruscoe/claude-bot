@@ -1,5 +1,5 @@
 {
-  "scan_ts": "2026-07-14T14:46:05.322336+00:00",
+  "scan_ts": "2026-07-14T20:48:25.872251+00:00",
   "skipped": false,
   "llm": false,
   "market": "equities",
@@ -113,34 +113,7 @@
     }
   ],
   "opened": [],
-  "closed": [
-    {
-      "id": "8b1140a0-16ed-4f0b-8607-d823b67357ab",
-      "signal_id": "d847690d-467f-4c2d-8537-c7d76afad140",
-      "symbol": "APLD",
-      "direction": "short",
-      "setups": "[\"bos_retest\"]",
-      "regime": "bullish",
-      "entry_price": 35.68,
-      "stop_loss": 35.68,
-      "original_sl": 37.65552,
-      "tp1": 31.72896,
-      "tp2": 29.75344,
-      "tp1_hit": 1,
-      "tp1_hit_at": "2026-07-07T04:00:00+00:00",
-      "opened_at": "2026-07-06T21:19:09.885688+00:00",
-      "closed_at": "2026-07-14T14:47:24.282011+00:00",
-      "close_price": 29.75344,
-      "outcome": "WIN_TP2",
-      "pnl_r": 0.75,
-      "journaled": 0,
-      "size": "quarter",
-      "size_mult": 0.25,
-      "lots": null,
-      "raw_r": 3.0,
-      "source": "forward"
-    }
-  ],
+  "closed": [],
   "system_stats": {
     "total_closed": 10,
     "open": 5,
