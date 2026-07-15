@@ -106,3 +106,15 @@
 2026-07-14 22:29:12,025 [INFO] v2.pipeline: skip EURJPY=X — freshest bar is 14d old (> 4d) — stale feed
 2026-07-14 22:29:12,030 [INFO] v2.report: wrote /home/runner/work/claude-bot/claude-bot/state/daily_report.md
 2026-07-14 22:29:12,311 [INFO] v2.report: wrote /home/runner/work/claude-bot/claude-bot/state/daily_report.md
+2026-07-15 22:28:36,912 [INFO] v2.datasource: data source: FX (yfinance), 9 pairs
+2026-07-15 22:28:37,814 [INFO] v2.pipeline: skip EURUSD=X — freshest bar is 15d old (> 4d) — stale feed
+2026-07-15 22:28:37,818 [INFO] v2.pipeline: skip GBPUSD=X — freshest bar is 15d old (> 4d) — stale feed
+2026-07-15 22:28:37,820 [INFO] v2.pipeline: skip USDJPY=X — freshest bar is 15d old (> 4d) — stale feed
+2026-07-15 22:28:37,821 [INFO] v2.pipeline: skip USDCHF=X — freshest bar is 15d old (> 4d) — stale feed
+2026-07-15 22:28:37,822 [INFO] v2.pipeline: skip AUDUSD=X — freshest bar is 15d old (> 4d) — stale feed
+2026-07-15 22:28:37,823 [INFO] v2.pipeline: skip USDCAD=X — freshest bar is 15d old (> 4d) — stale feed
+2026-07-15 22:28:37,824 [INFO] v2.pipeline: skip NZDUSD=X — freshest bar is 15d old (> 4d) — stale feed
+2026-07-15 22:28:37,826 [INFO] v2.pipeline: skip EURGBP=X — freshest bar is 15d old (> 4d) — stale feed
+2026-07-15 22:28:37,827 [INFO] v2.pipeline: skip EURJPY=X — freshest bar is 15d old (> 4d) — stale feed
+2026-07-15 22:28:37,832 [INFO] v2.report: wrote /home/runner/work/claude-bot/claude-bot/state/daily_report.md
+2026-07-15 22:28:38,138 [INFO] v2.report: wrote /home/runner/work/claude-bot/claude-bot/state/daily_report.md
