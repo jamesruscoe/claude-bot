@@ -126,3 +126,6 @@
 2026-07-15 14:46:11,481 [INFO] v2.journal: journal entry written: 2026-07-15-amd-long-14be71c4.md
 2026-07-15 14:46:11,487 [INFO] v2.pipeline: reflected on 1 resolved trade(s)
 2026-07-15 14:46:11,492 [INFO] v2.report: wrote /home/runner/work/claude-bot/claude-bot/state/daily_report.md
+2026-07-15 20:49:22,601 [INFO] v2.pipeline: skip open TSLA short — already in an open position
+2026-07-15 20:49:22,628 [INFO] v2.pipeline: skip open COIN short — already in an open position
+2026-07-15 20:49:22,636 [INFO] v2.report: wrote /home/runner/work/claude-bot/claude-bot/state/daily_report.md
