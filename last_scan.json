@@ -1,5 +1,5 @@
 {
-  "scan_ts": "2026-07-15T20:48:20.171463+00:00",
+  "scan_ts": "2026-07-16T14:57:22.500822+00:00",
   "skipped": false,
   "llm": false,
   "market": "equities",
@@ -23,14 +23,14 @@
         "ob_retest"
       ],
       "regime": "ranging",
-      "price": 396.18,
-      "atr": 17.79754,
+      "price": 394.46,
+      "atr": 17.66411,
       "entry": 399.36155,
       "entry_low": 390.8631,
       "entry_high": 407.86,
-      "stop_loss": 416.75877,
-      "tp1": 364.56711,
-      "tp2": 347.16989,
+      "stop_loss": 416.69205,
+      "tp1": 364.70055,
+      "tp2": 347.37005,
       "rr": 2.0,
       "take": true,
       "confidence": "low",
@@ -46,17 +46,17 @@
     {
       "symbol": "SMCI",
       "candidate": false,
-      "reject_reason": "levels_rejected_wide_stop"
+      "reject_reason": "no_setup"
     },
     {
       "symbol": "APLD",
       "candidate": false,
-      "reject_reason": "levels_rejected_wide_stop"
+      "reject_reason": "no_setup"
     },
     {
       "symbol": "AMZN",
       "candidate": false,
-      "reject_reason": "regime_blocked"
+      "reject_reason": "no_setup"
     },
     {
       "symbol": "NFLX",
@@ -66,31 +66,12 @@
     {
       "symbol": "AMD",
       "candidate": false,
-      "reject_reason": "no_setup"
+      "reject_reason": "regime_blocked"
     },
     {
       "symbol": "COIN",
-      "candidate": true,
-      "score": 50,
-      "direction": "short",
-      "setups": [
-        "ob_retest"
-      ],
-      "regime": "bearish",
-      "price": 161.5,
-      "atr": 9.89313,
-      "entry": 157.91995,
-      "entry_low": 154.78,
-      "entry_high": 161.0599,
-      "stop_loss": 166.00646,
-      "tp1": 141.74693,
-      "tp2": 133.66042,
-      "rr": 2.0,
-      "take": true,
-      "confidence": "low",
-      "size": "quarter",
-      "rationale": "score 50 (ob_retest); R:R 2.0; probation (1 decided) \u2014 tiny stake to learn",
-      "decided_by": "deterministic"
+      "candidate": false,
+      "reject_reason": "regime_blocked"
     }
   ],
   "opened": [],
@@ -102,8 +83,7 @@
     "total_r": -1.128
   },
   "rejections": {
-    "no_setup": 5,
-    "levels_rejected_wide_stop": 2,
-    "regime_blocked": 1
+    "no_setup": 7,
+    "regime_blocked": 2
   }
 }
