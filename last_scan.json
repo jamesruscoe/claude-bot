@@ -1,5 +1,5 @@
 {
-  "scan_ts": "2026-07-16T20:43:39.200580+00:00",
+  "scan_ts": "2026-07-17T14:39:32.672091+00:00",
   "skipped": false,
   "llm": false,
   "market": "equities",
@@ -16,27 +16,8 @@
     },
     {
       "symbol": "TSLA",
-      "candidate": true,
-      "score": 50,
-      "direction": "short",
-      "setups": [
-        "ob_retest"
-      ],
-      "regime": "ranging",
-      "price": 394.46,
-      "atr": 17.66411,
-      "entry": 399.36155,
-      "entry_low": 390.8631,
-      "entry_high": 407.86,
-      "stop_loss": 416.69205,
-      "tp1": 364.70055,
-      "tp2": 347.37005,
-      "rr": 2.0,
-      "take": true,
-      "confidence": "low",
-      "size": "quarter",
-      "rationale": "score 50 (ob_retest); R:R 2.0; probation (0 decided) \u2014 tiny stake to learn",
-      "decided_by": "deterministic"
+      "candidate": false,
+      "reject_reason": "no_setup"
     },
     {
       "symbol": "USOIL",
@@ -56,7 +37,7 @@
     {
       "symbol": "AMZN",
       "candidate": false,
-      "reject_reason": "no_setup"
+      "reject_reason": "regime_blocked"
     },
     {
       "symbol": "NFLX",
@@ -66,7 +47,7 @@
     {
       "symbol": "AMD",
       "candidate": false,
-      "reject_reason": "regime_blocked"
+      "reject_reason": "no_setup"
     },
     {
       "symbol": "COIN",
@@ -83,7 +64,7 @@
     "total_r": -1.128
   },
   "rejections": {
-    "no_setup": 7,
+    "no_setup": 8,
     "regime_blocked": 2
   }
 }
