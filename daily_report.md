@@ -1,4 +1,4 @@
-# Daily report — 2026-07-17T22:14:01+00:00
+# Daily report — 2026-07-20T22:30:25+00:00
 
 Market: **fx** · judge: deterministic · paper only
 
@@ -9,7 +9,7 @@ Market: **fx** · judge: deterministic · paper only
 - 0 open · 0 closed · win rate n/a · total +0.00R
 
 ## Rejections by reason (all-time)
-- stale_feed: 90
+- stale_feed: 99
 - no_setup: 48
 - below calibrated FX_MIN_SCORE (50<85): 6
 
