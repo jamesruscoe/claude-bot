@@ -1,10 +1,10 @@
 # Multi-pattern FX detector — scope
 
-Status: **proposal / not built. Scope only — no code, no threshold changes, judge
-off.** The 2021–2026 daily holdout stays **unread** and the registered criterion
-stays **locked** (see `OANDA_ADAPTER_SCOPE.md`). This document leads with the
-architecture and the statistics, because — exactly as with the OANDA work — the
-risk here is not writing the detectors, it is fooling ourselves with them.
+Status: **decisions LOCKED 2026-07-21 (§8); P0 accounting plumbing in build.** No
+threshold changes, judge off. The 2021–2026 daily holdout stays **unread** and the
+registered criterion stays **locked** (see `OANDA_ADAPTER_SCOPE.md`). This document
+leads with the architecture and the statistics, because — exactly as with the OANDA
+work — the risk here is not writing the detectors, it is fooling ourselves with them.
 
 ## 0. The goal, and the trap it walks straight into
 
@@ -76,6 +76,14 @@ alongside as a sanity bound, never as a second target system.
 
 Default parameter values below are **starting points for TRAIN calibration**, not
 tuned results.
+
+**Entry style — LOCKED globally, a priori: breakout-close for every pattern.** Entry
+is the bar-close that confirms the pattern (neckline/level break), never a
+wait-for-retest. This is chosen on principle (simpler, fewer missed entries, no
+waiting for a retest that never comes), applied uniformly, and is **not** a per-
+pattern fork tuned on TRAIN — six in-sample entry forks would be best-of-N by another
+name (the retest-window arm already burned this project once). Forward data may later
+show it's wrong; until then, one rule for all.
 
 ### 2.1 SMC Order-Block retest — EXISTING, UNCHANGED
 Kept exactly as `detect_ob_retest`. Becomes simply "one registered pattern" in the
@@ -207,19 +215,36 @@ bound `LB_p`. Tiers:
 | `n_p ≥ 150` and `LB_p > 0` | `proven`, scales with `LB_p` | full graduated |
 | `n_p ≥ 150` and `LB_p ≤ 0` | `not positive` | → candidate for auto-disable |
 
+`N_CONF_MIN` is **LOCKED at 30**, and `provisional` must not be read as "working":
+at `n = 30` the standard error of the mean is ≈ `1.7/√30 ≈ 0.31R`, i.e. the whole
+plausible-edge range is wider than any edge we'd expect. **Provisional means
+"barely more than unproven, at small size" — not validated.** Real validation is
+`n ≥ 150` on *forward* data.
+
 Hard rules:
 - **Confidence is never a function of shape quality.** A textbook H&S with 4 trades
   is `unproven`, not "high" — because `n=4`. This is the single most important line
   in the document: it is what stops a pretty new pattern from masquerading as a
   proven one.
-- **Confidence is seeded from OUT-OF-SAMPLE (forward) trades.** In-sample TRAIN
-  expectancy may inform a prior, but it **cannot alone grant `proven`** (that would
-  be laundering an in-sample fit into a confidence score). Consequence: at launch
-  **every new pattern is `unproven` and trades at probation size**, earning
-  confidence only as its forward record grows. That is the honest cold-start, and it
-  reuses the graduated probationary sizing already in `brain.py` — no new machine.
+- **Confidence is FORWARD-ONLY. No TRAIN-seeded prior. LOCKED.** Patterns are
+  *calibrated* on train, so their train expectancy is in-sample and inflated by
+  construction; importing it into confidence would import exactly that inflation into
+  the number the email shows you. **Train sets geometry; forward sets confidence —
+  kept strictly separate.** Consequence: at launch **every new pattern is `unproven`
+  and trades at probation size**, earning confidence only as its forward record
+  grows. Honest cold-start; reuses the graduated probationary sizing in `brain.py`.
 - A pattern that reaches `n ≥ 150` with `LB_p ≤ 0` is flagged for disable: this is
   the "drop what doesn't work" half of requirement 1, made automatic.
+- **PAPER vs REAL MONEY — the load-bearing caveat.** Dropping `FX_MIN_SCORE` as the
+  gate in favour of binary-validity + confidence-based *sizing* moves protection from
+  "don't take it" to "take it tiny." That is defensible **for paper evidence-
+  gathering only** — a tiny-size loser from an unproven pattern still teaches us
+  something, which is the whole point of turning them on. **For real money,
+  `unproven` means DO NOT TRADE IT AT ALL** (probation size = 0, not "small"). This
+  must be explicit in code and in the email, because the first alert from a brand-new
+  pattern will otherwise look exactly like a proven one with a smaller number
+  attached. `FX_MIN_SCORE` has been the main thing keeping junk out; we are only
+  relaxing that for paper.
 
 ### 3.5 Correlation cap across the wider signal stream (requirement)
 More patterns ⇒ more simultaneous signals ⇒ concentration risk. Mitigations, all on
@@ -232,8 +257,12 @@ the **open-trade stream regardless of which pattern generated each**:
   the same pair+direction because two patterns fired; collapse to **one** trade with
   a confluence tag (§4.3). Mirrors the existing "already in this symbol+direction"
   dedup.
-- **New total-open cap `FX_MAX_OPEN`** (default generous, e.g. 8) to bound portfolio
-  exposure as frequency rises. A cap only ever blocks, so it is safe-by-default.
+- **New total-open cap `FX_MAX_OPEN = 5`** (LOCKED) to bound portfolio exposure as
+  frequency rises, **plus a per-pattern sub-cap `FX_MAX_PER_PATTERN = 2`** (LOCKED):
+  six patterns can cluster hard in a trending regime — three all firing long-USD is
+  one bet wearing three tickets, which the per-currency cap only partly catches, and
+  the sub-cap stops any single detector flooding the ledger and skewing the aggregate.
+  Caps only ever block, so both are safe-by-default.
 
 ### 3.6 Email states the pattern and its confidence (requirement)
 Extends the FX alert just shipped (PR #8). Subject:
@@ -285,15 +314,21 @@ here**):
    per-pattern power further. The holdout can honestly answer **one** pre-registered
    question — a portfolio composite, or one top pattern — **not six**.
 
-**Honest resolution (this is the spine of the plan):** per-pattern validation comes
-from **forward accumulation**, not the holdout. Each pattern starts `unproven`,
-trades at probation size, and earns confidence from its *own forward* expectancy as
-`n_p` grows (§3.4). The one-shot daily holdout is reserved for at most a **single**
-pre-registered decision — a portfolio-level test of "does the multi-pattern stream,
-as one system, clear the bar" — if we choose to spend it at all. This is the only
-framing that satisfies requirement 1 (per-pattern keep/drop) without pretending to a
-statistical power the data doesn't contain. It also means the safe thing and the
-honest thing coincide: turn patterns on at probation, let the ledger sort them out.
+**Honest resolution (this is the spine of the plan) — LOCKED:** per-pattern
+validation comes from **forward accumulation**, not the holdout. Each pattern starts
+`unproven`, trades at probation size, and earns confidence from its *own forward*
+expectancy as `n_p` grows (§3.4).
+
+**Do NOT spend the holdout now — and NOT on a portfolio composite.** A composite of
+six freshly-fit patterns could pass on one strong pattern carrying five duds, and you
+would have no way to tell which — you would have burned your only clean out-of-sample
+resource to learn nothing separable. Instead, a **two-stage design**: let forward
+accumulation **nominate** a single candidate (a pattern that looks genuinely positive
+on its own forward record), *then* spend the holdout on that **one** pre-registered
+question. Forward data and holdout data are independent, so selecting the candidate on
+forward performance does **not** contaminate the holdout — this is a legitimate
+two-stage test, and it keeps the asset intact until there is something worth spending
+it on. Until then the holdout stays unread and the criterion stays locked.
 
 ## 5. Calibration & out-of-sample discipline (requirement 3)
 
@@ -316,30 +351,32 @@ weaker because there are more patterns; it gets **more** important:
 
 ## 6. Phased plan, with gates
 
-- **P0 — plumbing, no new pattern enabled.** Detector interface (§1 invariant),
-  `pattern` ledger column + `trades_by_pattern` + `--pattern-report`, per-pattern
-  config registry, confidence/`unproven` engine, email fields, dedup/attribution
-  (§3.7), `FX_MAX_OPEN`. Acceptance: re-express existing OB/BOS as registered
-  patterns and reproduce today's numbers **bit-for-bit** (proves the refactor is
-  behaviour-preserving). All new patterns still OFF.
-- **P1 — implement + TRAIN-calibrate each pattern, one at a time.** Pre-register
-  parameters, then measure per-pattern TRAIN frequency + expectancy net of measured
-  spread via the replay harness. *Gate 1 (per pattern, in-sample screen):* keep a
-  pattern only if TRAIN expectancy is non-negative net of spread **and** frequency is
-  material; otherwise shelve it. This is screening, **not** validation.
-- **P2 — power & holdout-budget decision (no holdout access).** Using measured TRAIN
-  frequencies, compute each pattern's expected holdout `n` and decide the **single**
-  question the one-shot holdout will answer (portfolio composite vs one top pattern),
-  with the multiple-comparison correction fixed in advance. Decide, in writing, which
-  patterns can only be judged forward.
-- **P3 — (optional) one-shot holdout evaluation.** Evaluate the single pre-registered
-  question **once**. No iterating after. If spent, the holdout is then burned for
-  everything.
-- **P4 — forward paper, patterns at probation.** Enabled patterns trade at probation
-  size; per-pattern confidence grows from forward expectancy; `not positive` patterns
-  auto-flag for disable; `proven` patterns scale up. This is the real per-pattern
-  verdict engine, and it runs for free on the cron that is already accumulating
-  un-selected forward trades.
+- **P0 — accounting plumbing, no behaviour change, no new pattern.** `pattern` ledger
+  column (existing OB/BOS trades tagged from their `setups`) + `trades_by_pattern` +
+  `--pattern-report`; per-pattern config registry; forward-only confidence/`unproven`
+  engine; email fields (pattern + confidence); the `FX_MAX_OPEN` / `FX_MAX_PER_PATTERN`
+  caps (inert while only OB/BOS runs). Confidence is *reported*, not yet wired to
+  sizing (that activates when patterns turn on). Acceptance: existing numbers
+  reproduce **bit-for-bit** (selftest + suite green), because nothing in the
+  decision/size/detector path changes. The `PatternSetup` detector-protocol refactor
+  is deferred to the start of P1, where it is actually needed.
+- **P1 — implement + TRAIN-calibrate each pattern, one at a time.** Introduce the
+  `PatternSetup` protocol + registry dispatch; then per pattern: pre-register
+  parameters, measure TRAIN frequency + expectancy net of measured spread via the
+  replay harness. *Gate 1 (per pattern, in-sample screen):* keep a pattern only if
+  TRAIN expectancy is non-negative net of spread **and** frequency is material;
+  otherwise shelve. Screening, **not** validation.
+- **P2 — forward accumulation (no holdout access).** Enabled patterns trade at
+  probation size on the live cron; per-pattern confidence grows from *forward*
+  expectancy; `not positive` patterns auto-flag for disable; `proven` patterns scale
+  up. This is the real per-pattern verdict engine, and it runs for free on the cron
+  already accumulating un-selected forward trades. **The holdout is not spent here.**
+- **P3 — (only when forward nominates a candidate) single holdout evaluation.** When
+  forward accumulation surfaces one pattern that looks genuinely positive on its own
+  out-of-sample record, spend the holdout on **that one** pre-registered question,
+  **once**. Selection-on-forward does not contaminate the holdout (independent data).
+  No portfolio composite, no six-way look, no iterating after. Until a candidate is
+  nominated, the holdout stays unread.
 
 ## 7. Non-goals / explicit guards
 
@@ -354,18 +391,23 @@ weaker because there are more patterns; it gets **more** important:
 - Not a route to "restore +0.35R." If the honest per-pattern ledger says a family
   has no edge, it gets disabled. Dropping losers is a feature, not a failure.
 
-## 8. Open questions (for you, before P0)
+## 8. Decisions — LOCKED 2026-07-21
 
-1. `N_CONF_MIN` (the `unproven → provisional` boundary): 30? And do we allow any
-   TRAIN-seeded prior into confidence, or forward-only (stricter, my lean)?
-2. The single question the one-shot holdout answers in P2/P3: portfolio composite, or
-   the highest-frequency single pattern? Or **don't spend it** and rely entirely on
-   forward accumulation?
-3. `FX_MAX_OPEN` value, and whether the correlation cap needs a per-*pattern* sub-cap
-   on top of the per-currency one.
-4. Entry style per pattern: breakout-close (simpler, my default) vs breakout-then-
-   retest (better fills, fewer trades) — a per-pattern calibration choice, decided on
-   TRAIN.
+All four resolved before P0; recorded here so they are not silently revisited.
+
+1. **`N_CONF_MIN = 30`, confidence FORWARD-ONLY** (no train-seeded prior). Train sets
+   geometry; forward sets confidence. `provisional` at n=30 is explicitly *not*
+   validation (SE ≈ 0.31R) — see §3.4.
+2. **Do NOT spend the holdout now, and not on a portfolio composite.** Two-stage:
+   forward accumulation nominates a single candidate, then the holdout answers that
+   one pre-registered question (independent data ⇒ no contamination) — see §4, §6-P3.
+3. **`FX_MAX_OPEN = 5`, `FX_MAX_PER_PATTERN = 2`** — see §3.5.
+4. **Entry = breakout-close for every pattern, chosen a priori**, not tuned per
+   pattern on TRAIN — see §2.
+
+A fifth, standing decision (the load-bearing caveat, §3.4): relaxing `FX_MIN_SCORE` to
+binary-validity + confidence-based *sizing* is **for paper only**. For real money,
+`unproven` = do not trade (size 0).
 
 ---
 
