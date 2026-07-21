@@ -54,6 +54,8 @@ def main() -> None:
                         help="OANDA scope Phase A: data-integrity pass + ONE train-only Gate 1 baseline (needs BOT_MARKET=fx_oanda)")
     parser.add_argument("--oanda-holdout-power", action="store_true",
                         help="OANDA: count EXPECTED dual-confluence trades in the holdout (sample-size only, NO outcomes — does not burn the holdout)")
+    parser.add_argument("--pattern-calibrate", choices=["range_breakout"], default=None,
+                        help="TRAIN-only Gate 1 in-sample screen for a pattern at its PRE-REGISTERED params (needs BOT_MARKET=fx_oanda)")
     args = parser.parse_args()
 
     try:
@@ -89,6 +91,11 @@ def main() -> None:
     if args.oanda_holdout_power:
         from v2 import oanda_baseline
         oanda_baseline.holdout_power_main()
+        return
+
+    if args.pattern_calibrate:
+        from v2 import pattern_calibrate
+        pattern_calibrate.main(args.pattern_calibrate)
         return
 
     if args.report:

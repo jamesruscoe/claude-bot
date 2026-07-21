@@ -73,4 +73,19 @@ is seen. If the screen fails, it fails — we do not re-open the parameters to r
 
 ## Result (filled in AFTER the single measurement)
 
-_Appended by `python run.py --pattern-calibrate range_breakout`._
+_Measured once at the pre-registered parameters — 17.0 yr of TRAIN (OANDA daily, pre-2021-01-01), net of measured bid/ask, honest intrabar resolution. Holdout untouched._
+
+| Metric | Value |
+|--------|------:|
+| Resolved trades (n) | 141 |
+| Frequency | ~8.3/yr (basket) |
+| Win rate | 20% |
+| Mean R (net measured spread) | -0.184R |
+| Total R | -26.00 |
+| One-sided 95% bootstrap lower bound | -0.390R |
+| Two-sided 95% CI | [-0.433, +0.085] R |
+
+### Gate 1 verdict
+
+**SHELVE — fails Gate 1.** TRAIN mean -0.184R is NEGATIVE net of measured spread. Per the pre-registration we do NOT re-open the parameters to rescue it.
+
