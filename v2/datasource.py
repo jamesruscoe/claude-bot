@@ -144,19 +144,31 @@ class FXSource:
         path = self._cache_path(symbol, interval)
         if not path.exists():
             return None
-        if (time.time() - path.stat().st_mtime) > ttl:
-            return None
         try:
             raw = json.loads(path.read_text(encoding="utf-8"))
-            return [Bar(**b) for b in raw]
-        except (ValueError, TypeError, OSError):
+        except (ValueError, OSError):
+            return None
+        # TTL is keyed on the fetch time recorded INSIDE the file, never the
+        # file's mtime: when CI restores state from the `state-fx` branch, git
+        # sets every checked-out file's mtime to "now", which made an mtime-based
+        # TTL look permanently fresh and froze the bars indefinitely. A legacy
+        # bare-list cache has no fetch time -> treat as expired and refetch.
+        if not isinstance(raw, dict) or "fetched_at" not in raw:
+            return None
+        if (time.time() - float(raw["fetched_at"])) > ttl:
+            return None
+        try:
+            return [Bar(**b) for b in raw.get("bars", [])]
+        except (TypeError, ValueError):
             return None
 
     def _write_cache(self, symbol: str, interval: str, bars: list[Bar]) -> None:
         cfg.ensure_state_dirs()
         try:
             self._cache_path(symbol, interval).write_text(
-                json.dumps([b.__dict__ for b in bars]), encoding="utf-8")
+                json.dumps({"fetched_at": time.time(),
+                            "bars": [b.__dict__ for b in bars]}),
+                encoding="utf-8")
         except OSError as e:
             log.debug("cache write failed for %s: %s", symbol, e)
 

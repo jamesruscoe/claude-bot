@@ -60,6 +60,12 @@ jobs:
             git clean -fdx >/dev/null 2>&1 || true
           fi
           mkdir -p state/journal state/lessons
+          # Start every run cacheless: the data cache is an ephemeral local
+          # speed-up, NOT durable state. Persisting it froze the bars because
+          # git checkout resets file mtimes (see datasource cache TTL). Removing
+          # it here guarantees a fresh fetch even for a state branch that still
+          # carries the old committed cache.
+          rm -rf state/cache state/ff_calendar.json || true
 
       - name: Run FX paper scan
         id: scan
@@ -84,6 +90,11 @@ jobs:
         if: always()
         run: |
           cd state
+          # Never persist the ephemeral cache — restoring it resets mtimes and
+          # (pre-fix) defeated the TTL, freezing bars. Ignore it going forward
+          # and untrack any historical copies committed by earlier runs.
+          printf 'cache/\nff_calendar.json\n' > .gitignore
+          git rm -r --cached --quiet --ignore-unmatch cache ff_calendar.json || true
           git add -A
           if git diff --cached --quiet; then
             echo "no state changes to commit"
