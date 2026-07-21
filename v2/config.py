@@ -116,6 +116,17 @@ FX_STD_LOT_UNITS = 100_000   # 1.0 lot = 100k base units
 FX_CACHE_TTL_SECONDS = int(os.getenv("BOT_FX_CACHE_TTL", "900"))  # 15 min
 CACHE_DIR = STATE_DIR / "cache"
 
+# --- Range-breakout pattern — PRE-REGISTERED parameters (PATTERN_RANGE_BREAKOUT.md)
+# These are chosen A PRIORI with reasoning and FROZEN before any TRAIN measurement,
+# so "calibrate on TRAIN" cannot quietly become a sweep across their product. All
+# ATR-scaled (scale-free across pairs). Env overrides exist for later phases, but
+# the pre-registered defaults are the ones the Gate-1 screen is run at. Do not tune.
+FX_RANGE_LOOKBACK = int(os.getenv("BOT_FX_RANGE_LOOKBACK", "40"))       # bars to form the range (~8wk daily)
+FX_RANGE_MIN_TOUCHES = int(os.getenv("BOT_FX_RANGE_MIN_TOUCHES", "2"))  # swing touches per boundary (2 = definitional min)
+FX_RANGE_EQ_ATR = float(os.getenv("BOT_FX_RANGE_EQ_ATR", "0.5"))        # "same level" cluster tol (also enforces flatness)
+FX_RANGE_MAX_ATR = float(os.getenv("BOT_FX_RANGE_MAX_ATR", "4.0"))      # max range width R-S (contained consolidation)
+FX_RANGE_BRK_ATR = float(os.getenv("BOT_FX_RANGE_BRK_ATR", "0.25"))     # close beyond boundary to confirm a breakout
+
 # --- OANDA v20 practice adapter (real bid/ask candles; DATA ONLY) -----------
 # See OANDA_ADAPTER_SCOPE.md. Practice environment only, Bearer-token auth, and
 # ONLY the candles/pricing data endpoints are ever touched — no orders, trades,
