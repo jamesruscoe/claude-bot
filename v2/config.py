@@ -137,6 +137,27 @@ OANDA_INSTRUMENTS = {
     "NZDUSD=X": "NZD_USD", "EURGBP=X": "EUR_GBP", "EURJPY=X": "EUR_JPY",
 }
 
+# --- FX email alerting (reuses the existing dawidd6 mail ACTION in the workflow;
+#     Python only FORMATS the alert + decides when to fire — it never sends) ----
+# The scan writes a subject line + a phone-readable body to these files in the
+# workspace root (NOT under STATE_DIR, so they are never persisted to the state
+# branch). scan-fx.yml reads them and fires the same Gmail SMTP action the
+# equities workflow uses. Absent files => no email.
+ALERT_SUBJECT_FILE = ROOT_DIR / "fx_alert_subject.txt"
+ALERT_BODY_FILE = ROOT_DIR / "fx_alert_body.txt"
+# Feed-health backstop state (consecutive zero-DETECTION scans). Lives in
+# STATE_DIR so the streak survives across runs on the state-fx branch.
+ALERT_HEALTH_FILE = STATE_DIR / "alert_health.json"
+# Fire the "feed looks suspiciously quiet" alert after this many CONSECUTIVE
+# scans that detected zero setups. Keyed on DETECTIONS (any OB/BOS candidate),
+# NOT opened trades: opens are rare (~18/yr) so a zero-OPEN streak is normal,
+# but a zero-DETECTION streak across the whole 9-pair basket is the signature of
+# a frozen/stale feed (the silent stale-cache episode ran 17 such scans). Default
+# 8 ≈ 1.5 trading weeks — well before 17, but tolerant of a genuinely quiet run.
+# A truly dead feed (every pair rejected for a feed reason) alerts IMMEDIATELY,
+# separately from this counter. Raise if the live ledger shows quiet streaks.
+FX_HEALTH_ZERO_RUNS = int(os.getenv("BOT_FX_HEALTH_ZERO_RUNS", "8"))
+
 # --- Out-of-sample discipline (LOCKED — chosen trade-blind, pre-data) --------
 # TRAIN / HOLDOUT split boundary. Fixed as a calendar date BEFORE any OANDA data
 # was pulled, so it cannot have been nudged to flatter a trade count (that would

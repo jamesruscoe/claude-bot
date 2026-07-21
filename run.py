@@ -54,6 +54,8 @@ def main() -> None:
                         help="OANDA scope Phase A: data-integrity pass + ONE train-only Gate 1 baseline (needs BOT_MARKET=fx_oanda)")
     parser.add_argument("--oanda-holdout-power", action="store_true",
                         help="OANDA: count EXPECTED dual-confluence trades in the holdout (sample-size only, NO outcomes — does not burn the holdout)")
+    parser.add_argument("--email-test", action="store_true",
+                        help="write a test FX alert so the workflow's mail step can verify delivery (no scan, no trade)")
     args = parser.parse_args()
 
     try:
@@ -89,6 +91,13 @@ def main() -> None:
     if args.oanda_holdout_power:
         from v2 import oanda_baseline
         oanda_baseline.holdout_power_main()
+        return
+
+    if args.email_test:
+        from v2 import alerts
+        alerts.write_test_alert()
+        print(f"Test alert written to {alerts.cfg.ALERT_SUBJECT_FILE.name} / "
+              f"{alerts.cfg.ALERT_BODY_FILE.name}. In CI the mail step sends it.")
         return
 
     if args.report:
