@@ -1,5 +1,5 @@
 {
-  "scan_ts": "2026-07-21T15:00:52.446057+00:00",
+  "scan_ts": "2026-07-21T20:56:56.574717+00:00",
   "skipped": false,
   "llm": false,
   "market": "equities",
@@ -31,8 +31,7 @@
       "confidence": "low",
       "size": "quarter",
       "rationale": "score 50 (ob_retest); R:R 2.0; probation (1 decided) \u2014 tiny stake to learn",
-      "decided_by": "deterministic",
-      "opened": true
+      "decided_by": "deterministic"
     },
     {
       "symbol": "TSLA",
@@ -76,8 +75,7 @@
       "confidence": "low",
       "size": "quarter",
       "rationale": "score 50 (ob_retest); R:R 2.0; probation (1 decided) \u2014 tiny stake to learn",
-      "decided_by": "deterministic",
-      "opened": true
+      "decided_by": "deterministic"
     },
     {
       "symbol": "NFLX",
@@ -114,60 +112,7 @@
       "decided_by": "deterministic"
     }
   ],
-  "opened": [
-    {
-      "id": "ba70e2bf-89d8-4587-965a-ede7e35a2382",
-      "signal_id": "862b4ee4-4258-4841-ac0c-1446650dfce4",
-      "symbol": "NVDA",
-      "direction": "short",
-      "setups": "[\"ob_retest\"]",
-      "regime": "ranging",
-      "entry_price": 209.925,
-      "stop_loss": 217.47784,
-      "original_sl": 217.47784,
-      "tp1": 194.81932,
-      "tp2": 187.26648,
-      "tp1_hit": 0,
-      "tp1_hit_at": null,
-      "size": "quarter",
-      "size_mult": 0.25,
-      "lots": null,
-      "source": "forward",
-      "opened_at": "2026-07-21T15:00:52.446057+00:00",
-      "closed_at": null,
-      "close_price": null,
-      "outcome": null,
-      "pnl_r": null,
-      "raw_r": null,
-      "journaled": 0
-    },
-    {
-      "id": "2076469f-1ace-4b32-98de-6911c8fe002a",
-      "signal_id": "11cdd194-d58f-450e-b870-18fdcb9dcf43",
-      "symbol": "AMZN",
-      "direction": "short",
-      "setups": "[\"ob_retest\"]",
-      "regime": "ranging",
-      "entry_price": 253.115,
-      "stop_loss": 260.20705,
-      "original_sl": 260.20705,
-      "tp1": 238.9309,
-      "tp2": 231.83885,
-      "tp1_hit": 0,
-      "tp1_hit_at": null,
-      "size": "quarter",
-      "size_mult": 0.25,
-      "lots": null,
-      "source": "forward",
-      "opened_at": "2026-07-21T15:00:52.446057+00:00",
-      "closed_at": null,
-      "close_price": null,
-      "outcome": null,
-      "pnl_r": null,
-      "raw_r": null,
-      "journaled": 0
-    }
-  ],
+  "opened": [],
   "closed": [],
   "system_stats": {
     "total_closed": 13,
