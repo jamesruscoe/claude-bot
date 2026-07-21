@@ -55,13 +55,22 @@ def _parse_events(raw: list[dict]) -> list[dict]:
 
 
 def _load_cached() -> list[dict] | None:
+    # TTL keyed on the fetch time stored inside the file, not mtime — a
+    # branch-restored cache has its mtime reset to "now" by git checkout, which
+    # would freeze the calendar (same bug as the bar cache). Legacy bare-list
+    # files have no fetch time -> treated as stale so the feed refreshes.
     p = _cache_path()
-    if p.exists() and (time.time() - p.stat().st_mtime) < _CACHE_TTL:
-        try:
-            return _parse_events(json.loads(p.read_text(encoding="utf-8")))
-        except (ValueError, OSError):
-            return None
-    return None
+    if not p.exists():
+        return None
+    try:
+        raw = json.loads(p.read_text(encoding="utf-8"))
+    except (ValueError, OSError):
+        return None
+    if not isinstance(raw, dict) or "fetched_at" not in raw:
+        return None
+    if (time.time() - float(raw["fetched_at"])) >= _CACHE_TTL:
+        return None
+    return _parse_events(raw.get("raw", []))
 
 
 def fetch_high_impact_events() -> list[dict] | None:
@@ -75,7 +84,8 @@ def fetch_high_impact_events() -> list[dict] | None:
         resp = httpx.get(cfg.FF_CALENDAR_URL, timeout=10.0)
         resp.raise_for_status()
         raw = resp.json()
-        _cache_path().write_text(json.dumps(raw), encoding="utf-8")
+        _cache_path().write_text(
+            json.dumps({"fetched_at": time.time(), "raw": raw}), encoding="utf-8")
         return _parse_events(raw)
     except Exception as e:  # noqa: BLE001 — any failure => fail open
         log.warning("news calendar unavailable (%s) — failing open (no block)", e)
