@@ -1,9 +1,55 @@
 {
-  "scan_ts": "2026-07-20T22:30:24.419649+00:00",
+  "scan_ts": "2026-07-21T17:15:52.188477+00:00",
   "skipped": false,
   "llm": false,
   "market": "fx",
-  "results": [],
+  "results": [
+    {
+      "symbol": "EURUSD=X",
+      "candidate": false,
+      "reject_reason": "no_setup"
+    },
+    {
+      "symbol": "GBPUSD=X",
+      "candidate": false,
+      "reject_reason": "no_setup"
+    },
+    {
+      "symbol": "USDJPY=X",
+      "candidate": false,
+      "reject_reason": "no_setup"
+    },
+    {
+      "symbol": "USDCHF=X",
+      "candidate": false,
+      "reject_reason": "no_setup"
+    },
+    {
+      "symbol": "AUDUSD=X",
+      "candidate": false,
+      "reject_reason": "no_setup"
+    },
+    {
+      "symbol": "USDCAD=X",
+      "candidate": false,
+      "reject_reason": "no_setup"
+    },
+    {
+      "symbol": "NZDUSD=X",
+      "candidate": false,
+      "reject_reason": "no_setup"
+    },
+    {
+      "symbol": "EURGBP=X",
+      "candidate": false,
+      "reject_reason": "no_setup"
+    },
+    {
+      "symbol": "EURJPY=X",
+      "candidate": false,
+      "reject_reason": "no_setup"
+    }
+  ],
   "opened": [],
   "closed": [],
   "system_stats": {
@@ -13,6 +59,6 @@
     "total_r": 0.0
   },
   "rejections": {
-    "stale_feed": 9
+    "no_setup": 9
   }
 }
