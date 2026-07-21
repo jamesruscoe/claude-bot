@@ -17,6 +17,10 @@ on:
         description: "Scan even if the market is closed"
         type: boolean
         default: false
+      test_email:
+        description: "Send a test alert email (verify delivery; no scan/trade)"
+        type: boolean
+        default: false
 
 concurrency:
   group: fx-paper-scan
@@ -81,10 +85,22 @@ jobs:
           PYTHONIOENCODING: utf-8
         run: |
           set -o pipefail
-          FORCE_FLAG=""
-          if [ "${{ github.event.inputs.force }}" = "true" ]; then FORCE_FLAG="--force"; fi
-          python run.py $FORCE_FLAG 2>&1 | tee scan_output.txt
-          python run.py --report > /dev/null 2>&1 || true
+          if [ "${{ github.event.inputs.test_email }}" = "true" ]; then
+            python run.py --email-test 2>&1 | tee scan_output.txt
+          else
+            FORCE_FLAG=""
+            if [ "${{ github.event.inputs.force }}" = "true" ]; then FORCE_FLAG="--force"; fi
+            python run.py $FORCE_FLAG 2>&1 | tee scan_output.txt
+            python run.py --report > /dev/null 2>&1 || true
+          fi
+          # The scan (or --email-test) writes these when an alert should fire; the
+          # mail step below reads them. Absent/empty => no email.
+          if [ -s fx_alert_body.txt ]; then
+            echo "alert=true" >> "$GITHUB_OUTPUT"
+            echo "alert_subject=$(head -1 fx_alert_subject.txt)" >> "$GITHUB_OUTPUT"
+          else
+            echo "alert=false" >> "$GITHUB_OUTPUT"
+          fi
 
       - name: Persist state branch
         if: always()
@@ -102,6 +118,25 @@ jobs:
             git commit -m "state-fx: paper scan $(date -u +%FT%TZ)"
             git push origin HEAD:state-fx
           fi
+
+      # Reuses the SAME Gmail action + secrets as the equities workflow. Runs
+      # AFTER state is persisted, and continue-on-error so a mail failure can
+      # never fail the run or lose the recorded paper trade (fail-open).
+      - name: Email FX alert
+        if: steps.scan.outputs.alert == 'true'
+        continue-on-error: true
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: smtp.gmail.com
+          server_port: 465
+          secure: true
+          username: ${{ secrets.GMAIL_USERNAME }}
+          password: ${{ secrets.GMAIL_PASSWORD }}
+          from: FX Paper Bot <${{ secrets.GMAIL_USERNAME }}>
+          to: ${{ secrets.EMAIL_TO }}
+          subject: "${{ steps.scan.outputs.alert_subject }}"
+          body: file://fx_alert_body.txt
+          convert_markdown: false
 
       - name: Upload report + log
         if: always()

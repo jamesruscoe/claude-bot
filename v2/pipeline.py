@@ -109,8 +109,11 @@ async def run_scan(*, force: bool = False) -> dict[str, Any]:
 
     if not bars_by_symbol:
         log.warning("no data for any symbol — aborting scan (never act on an empty feed)")
-        return {"scan_ts": scan_ts, "skipped": True, "reason": "no data",
+        skip = {"scan_ts": scan_ts, "skipped": True, "reason": "no data",
                 "candidates": [], "opened": [], "closed": []}
+        from v2 import alerts  # a dead feed is a feed-health alert, not silence
+        alerts.evaluate_and_write(skip)
+        return skip
 
     prices = {s: b[-1].c for s, b in bars_by_symbol.items()}
 
@@ -257,6 +260,11 @@ def _emit(payload: dict[str, Any]) -> None:
         # CI marker — the workflow greps this to decide whether to email.
         print(f"TAKE TRADE: {t['symbol']} {t['direction'].upper()} "
               f"@ {t['entry_price']} sl {t['stop_loss']} tp1 {t['tp1']} tp2 {t['tp2']}")
+
+    # FX-only: format a rich signal / feed-health alert for the workflow's mail
+    # step. Internally FX-gated and fail-open — never breaks a scan or the ledger.
+    from v2 import alerts
+    alerts.evaluate_and_write(payload)
 
 
 def render_summary(payload: dict[str, Any]) -> str:
