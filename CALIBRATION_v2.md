@@ -14,9 +14,12 @@ fell to **+0.17R (n=76)** from **+0.35R (n=89)**. Under 1.5× spread it drops to
 **+0.11R**. The ≥50 bucket went slightly negative (−0.01R). This is stated
 plainly — the small cadence change is **not** a win.
 
-The ablation below shows the combined number hides two opposite effects: **c2c
-is harmful**, **vol-scaling alone is a large improvement**, and the **retest
-window is roughly neutral**.
+The ablation below decomposes it, and two follow-up experiments (c2c confound
+test + ATR-multiplier sweep) then overturn the naive read: **the c2c drop is the
+*correct* measurement exposing that much of the o2c edge was the degenerate-open
+artifact**, and **vol-scaling's apparent gain is selection on a shrinking sample,
+not a plateau**. Net: do not adopt these; the real fix is real OHLC (OANDA) + a
+second setup type. See "Follow-up experiments" and "Verdict" below.
 
 ## Ablation — one change at a time (dual-confluence, 1.0× spread)
 
@@ -28,10 +31,10 @@ window is roughly neutral**.
 | **4) + close-to-close impulse only** (win=1, flat) | 91 | 20% | **+0.07** | 0.69 |
 | 5) **ALL THREE** (as implemented) | 76 | 25% | **+0.17** | 0.58 |
 
-- **Close-to-close (#3 fix) is net-negative** — +0.35R → +0.07R. It is *not* the
-  no-op I expected: shifting the impulse window by one bar changes which OBs /
-  directions get detected, and the resulting entries are worse. **Recommend not
-  adopting c2c.**
+- **Close-to-close (#3 fix) is net-negative** — +0.35R → +0.07R. My first guess
+  (a window-width confound) was **wrong** — see the confound test below. The
+  degradation is the price reference itself, and that is the important finding,
+  not a reason to switch c2c off.
 - **Vol-scaled impulse (#2 fix) is the real improvement** — +0.35R → **+0.70R**
   and win rate 25% → 39%, by being *more* selective (higher effective threshold
   on hot pairs). But frequency **halves** (0.68 → 0.29/week ≈ one dual-confluence
@@ -95,15 +98,61 @@ _(≥50 before: 404, 3.07/wk, 18%, +0.05R. After: 402, 3.05/wk, 18%, −0.01R.)_
 
 _(For reference, vol-scale-only dual at 1.0× was +0.70R — that config's spread stress was not run in this pass; re-run before relying on it.)_
 
-## Verdict — WEAKENED as implemented
+## Follow-up experiments (the two traps)
 
-The three changes **as combined weakened** the measured edge: dual-confluence
-+0.35R → **+0.17R** (and +0.11R at 1.5× spread). Reported plainly, not dressed
-up as a frequency result.
+### 1. The c2c "confound" — tested and REFUTED
 
-But the ablation says the combination is the wrong package: **drop close-to-close
-(net-negative), keep vol-scaling (which alone lifts dual expectancy to +0.70R at
-lower frequency), and treat the retest window as optional (neutral).** That is a
-finding, not a change — no threshold moved, nothing was auto-adopted. Suggested
-next step (your call): re-run this calibration with **vol-scale only** (and its
-own 1.5× spread stress) before deciding whether to keep any of these.
+Hypothesis: c2c anchors at `close[start-1]`, one bar earlier than o2c's
+`open[start]`, so c2c may have widened the impulse window rather than changed the
+price reference. Isolated by exposing `impulse_max_len` (dual, flat 0.8%, win=1):
+
+| Config | n | win% | avg R |
+|--------|--:|-----:|------:|
+| A) o2c, max_len=3 (baseline) | 89 | 25% | +0.35 |
+| B) o2c, max_len=4 (widen window +1, same price ref) | 100 | 28% | **+0.44** |
+| C) c2c, max_len=3 (as implemented) | 91 | 20% | +0.07 |
+| D) c2c, max_len=2 (window-held to match o2c's span) | 74 | 19% | +0.10 |
+
+**Refuted.** Widening o2c's window *helps* (+0.35 → +0.44); holding the window
+fixed and switching only o2c→c2c *still collapses* the edge (+0.35 → +0.10). The
+degradation is the **close-to-close price reference**, not the extra bar.
+
+Implication (the point I had backwards): c2c is the *more correct* measurement —
+Yahoo's opens are degenerate, so o2c is the artifact. That ~2/3 of the
+dual-confluence edge evaporates under the faithful measurement means **much of
+the +0.35R was the artifact, not a market inefficiency.** The fix is not
+`BOT_FX_IMPULSE_C2C=0` (that re-embeds the artifact) — it's real OHLC.
+
+### 2. Vol-scale ATR-multiplier sweep — no plateau
+
+| multiplier | n | win% | avg R | /week |
+|-----------:|--:|-----:|------:|------:|
+| 1.25× | 69 | 32% | +0.49 | 0.52 |
+| 1.50× | 38 | 39% | +0.70 | 0.29 |
+| 1.75× | 15 | 50% | +0.98 | 0.11 |
+
+Monotonic — expectancy rises **only as the sample shrinks** (to n=15). That is the
+signature of selecting a smaller, higher-variance tail, **not** a stable edge. No
+plateau at meaningful n. The +0.70R at 1.5× was best-of-N inflation.
+
+## Verdict — do not adopt; the edge is weaker than o2c implied
+
+- **As combined, the three changes weakened the edge** (+0.35R → +0.17R; +0.11R
+  at 1.5× spread). Stated plainly.
+- **The most faithful measurement (c2c) puts dual-confluence at ~+0.10R**, not
+  +0.35R. A large part of the backtested edge was the degenerate-open artifact.
+- **Vol-scaling's +0.70R does not survive scrutiny** — it's a monotonic
+  frequency/quality tradeoff on tiny samples (n=15–69), consistent with
+  selection on noise.
+- **Retest window** is roughly neutral-to-slightly-helpful; not a lever.
+
+No threshold changed, nothing auto-adopted, all knobs left at their branch
+defaults for inspection. **Recommendation: stop tuning the OB/BOS detector on
+Yahoo daily data** — it has degenerate opens (breaks the impulse test), small
+in-sample samples (n≈15–90), and we're now several forks deep into best-of-N
+selection. The two real moves are the ones already on the roadmap:
+1. **Real OHLC from OANDA practice** — settles the c2c question with data that
+   isn't broken, and gives honest impulses. This is the prerequisite for
+   trusting any of the above.
+2. **A second setup type** for frequency — vol-scaling even in its best case runs
+   ~0.29 trades/week (one per ~3.5 weeks); it fixes quality, not frequency.

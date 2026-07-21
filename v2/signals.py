@@ -106,14 +106,15 @@ def build_candidate(
         threshold = cfg.fx_impulse_threshold(atr, price)
         retest_window = cfg.FX_RETEST_WINDOW_BARS
         impulse_c2c = cfg.FX_IMPULSE_C2C
+        impulse_max_len = cfg.FX_IMPULSE_MAX_LEN
     else:
         threshold = (impulse_threshold if impulse_threshold is not None
                      else OB_IMPULSE_OVERRIDES.get(symbol, OB_IMPULSE_THRESHOLD))
-        retest_window, impulse_c2c = 1, False
+        retest_window, impulse_c2c, impulse_max_len = 1, False, 3
 
     score, direction, signals = smc_detector.score_setups(
         bars, impulse_threshold=threshold, retest_window=retest_window,
-        impulse_c2c=impulse_c2c)
+        impulse_c2c=impulse_c2c, impulse_max_len=impulse_max_len)
 
     if score < CANDIDATE_MIN_SCORE or direction is None:
         return None, _zero_score_reason(signals)

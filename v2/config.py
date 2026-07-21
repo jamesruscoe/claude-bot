@@ -123,6 +123,9 @@ CACHE_DIR = STATE_DIR / "cache"
 FX_RETEST_WINDOW_BARS = int(os.getenv("BOT_FX_RETEST_WINDOW", "3"))
 FX_IMPULSE_ATR_MULT = float(os.getenv("BOT_FX_IMPULSE_ATR_MULT", "1.5"))
 FX_IMPULSE_C2C = os.getenv("BOT_FX_IMPULSE_C2C", "1") == "1"
+# Impulse window length in bars. Exposed so the c2c/window confound can be
+# tested holding one lever fixed (c2c anchors one bar earlier than o2c).
+FX_IMPULSE_MAX_LEN = int(os.getenv("BOT_FX_IMPULSE_MAX_LEN", "3"))
 # Fallback flat impulse threshold when ATR isn't available yet (cold start).
 FX_OB_IMPULSE_THRESHOLD = float(os.getenv("BOT_FX_OB_IMPULSE", "0.008"))  # 0.8%
 

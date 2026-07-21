@@ -54,13 +54,17 @@ def detect_ob_retest(
     impulse_threshold: float = OB_IMPULSE_THRESHOLD,
     retest_window: int = 1,
     impulse_c2c: bool = False,
+    impulse_max_len: int = 3,
     diag: dict | None = None,
 ) -> OBRetest | None:
     """`retest_window` (default 1) = how many recent bars the first retest of the
     OB zone may fall within (1 = must be the current bar; equities behaviour).
     `impulse_c2c` measures the impulse close-to-close instead of open-to-close
-    (Yahoo FX daily opens are degenerate). `diag`, if given, is populated with
-    the failure stage for rejection logging."""
+    (Yahoo FX daily opens are degenerate). `impulse_max_len` bounds the impulse
+    window length in bars (default 3). NB: c2c anchors at close[start-1], one bar
+    earlier than o2c's open[start], so an o2c run at max_len N spans the same
+    price range as a c2c run at max_len N-1 — keep this in mind when comparing.
+    `diag`, if given, is populated with the failure stage for rejection logging."""
     n = len(bars)
     if n < 6:
         return None
@@ -71,7 +75,7 @@ def detect_ob_retest(
     earliest_end = max(2, n - 1 - OB_LOOKBACK_BARS)
     found = None
     for end_idx in range(n - 2, earliest_end - 1, -1):
-        for length in (1, 2, 3):
+        for length in range(1, impulse_max_len + 1):
             start_idx = end_idx - length + 1
             if start_idx < 1:
                 continue
@@ -382,6 +386,7 @@ def score_setups(
     impulse_threshold: float = OB_IMPULSE_THRESHOLD,
     retest_window: int = 1,
     impulse_c2c: bool = False,
+    impulse_max_len: int = 3,
 ) -> tuple[int, str | None, dict[str, Any]]:
     """Return (score, direction, signals_dict).
 
@@ -396,7 +401,8 @@ def score_setups(
     """
     diag: dict[str, str] = {}
     ob = detect_ob_retest(bars, impulse_threshold=impulse_threshold,
-                          retest_window=retest_window, impulse_c2c=impulse_c2c, diag=diag)
+                          retest_window=retest_window, impulse_c2c=impulse_c2c,
+                          impulse_max_len=impulse_max_len, diag=diag)
     bos = detect_bos_retest(bars, retest_window=retest_window, diag=diag)
 
     signals: dict[str, Any] = {"ob_retest": None, "bos_retest": None,
