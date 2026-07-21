@@ -18,11 +18,13 @@ import logging
 from datetime import datetime, timezone
 from typing import Any
 
-from v2 import brain, datasource, fx_filters, journal, news_calendar, signals, store
+from v2 import brain, confidence, datasource, fx_filters, journal, news_calendar, signals, store
 from v2.calendar_gate import bars_are_fresh, is_trading_day
 from v2.config import (
     FX_ACCOUNT_EQUITY,
     FX_ENABLED,
+    FX_MAX_OPEN,
+    FX_MAX_PER_PATTERN,
     FX_OB_IMPULSE_THRESHOLD,
     FX_RISK_PCT,
     FX_STD_LOT_UNITS,
@@ -34,6 +36,17 @@ from v2.config import (
 )
 
 log = logging.getLogger(__name__)
+
+# Fixed priority for attributing a multi-setup candidate to ONE primary pattern
+# (PATTERN_SCOPE §3.7). Confluence setups are preserved in the trade's `setups`.
+PATTERN_PRIORITY = ["ob_retest", "bos_retest"]
+
+
+def _primary_pattern(setups: list[str] | None) -> str:
+    for p in PATTERN_PRIORITY:
+        if setups and p in setups:
+            return p
+    return "ob_retest"  # sensible default; keeps old rows/tags stable
 
 
 def _attach_fx_context(candidate: dict[str, Any]) -> None:
@@ -109,13 +122,25 @@ async def run_scan(*, force: bool = False) -> dict[str, Any]:
 
     if not bars_by_symbol:
         log.warning("no data for any symbol — aborting scan (never act on an empty feed)")
-        return {"scan_ts": scan_ts, "skipped": True, "reason": "no data",
+        skip = {"scan_ts": scan_ts, "skipped": True, "reason": "no data",
                 "candidates": [], "opened": [], "closed": []}
+        from v2 import alerts  # a dead feed is a feed-health alert, not silence
+        alerts.evaluate_and_write(skip)
+        return skip
 
     prices = {s: b[-1].c for s, b in bars_by_symbol.items()}
 
     rows: list[dict[str, Any]] = []
     opened: list[dict[str, Any]] = []
+    # Exposure-cap state for the wider (multi-pattern) stream. Counts trades open
+    # BEFORE this scan and grows as we open more within it. FX-only; caps only
+    # block, so they're inert while OB/BOS is the only pattern (correlation cap +
+    # dedup already keep concurrency well under these limits).
+    _existing_open = store.list_open_trades() if FX_ENABLED else []
+    open_total = len(_existing_open)
+    open_by_pattern: dict[str, int] = {}
+    for _t in _existing_open:
+        open_by_pattern[_t["pattern"]] = open_by_pattern.get(_t["pattern"], 0) + 1
     for symbol, bars in bars_by_symbol.items():
         fresh = bars_are_fresh(bars[-1].dt)
         if not fresh and not force:
@@ -138,10 +163,11 @@ async def run_scan(*, force: bool = False) -> dict[str, Any]:
         sig_id = store.record_signal(scan_ts, candidate)
         store.record_decision(sig_id, scan_ts, symbol, decision)
 
+        pattern = _primary_pattern(candidate.get("setups"))
         row = {"symbol": symbol, "candidate": True, **_public(candidate), **{
             "take": decision["take"], "confidence": decision["confidence"],
             "size": decision["size"], "rationale": decision["rationale"],
-            "decided_by": decision["source"]}}
+            "decided_by": decision["source"], "pattern": pattern}}
 
         if not decision["take"]:
             store.record_rejection(scan_ts, symbol, "judge", "judge_skip",
@@ -154,12 +180,25 @@ async def run_scan(*, force: bool = False) -> dict[str, Any]:
             store.record_rejection(scan_ts, symbol, f"fx_{stage}", why,
                                    candidate["score"], candidate["direction"])
             row["fx_blocked"] = why
+        elif FX_ENABLED and open_total >= FX_MAX_OPEN:
+            store.record_rejection(scan_ts, symbol, "fx_exposure",
+                                   f"max_open:{open_total}>={FX_MAX_OPEN}",
+                                   candidate["score"], candidate["direction"])
+            row["fx_blocked"] = f"max_open:{FX_MAX_OPEN}"
+        elif FX_ENABLED and open_by_pattern.get(pattern, 0) >= FX_MAX_PER_PATTERN:
+            store.record_rejection(scan_ts, symbol, "fx_exposure",
+                                   f"max_per_pattern:{pattern}>={FX_MAX_PER_PATTERN}",
+                                   candidate["score"], candidate["direction"])
+            row["fx_blocked"] = f"max_per_pattern:{pattern}"
         else:
             fill = candidate["entry"]
             trade = store.open_trade(sig_id, candidate, fill, opened_at=scan_ts,
-                                     size=decision["size"])
+                                     size=decision["size"], pattern=pattern)
+            open_total += 1
+            open_by_pattern[pattern] = open_by_pattern.get(pattern, 0) + 1
             opened.append(trade)
             row["opened"] = True
+            row["pattern_confidence"] = confidence.label(pattern)
         rows.append(row)
 
     closed = await _resolve(source, bars_by_symbol)
@@ -257,6 +296,11 @@ def _emit(payload: dict[str, Any]) -> None:
         # CI marker — the workflow greps this to decide whether to email.
         print(f"TAKE TRADE: {t['symbol']} {t['direction'].upper()} "
               f"@ {t['entry_price']} sl {t['stop_loss']} tp1 {t['tp1']} tp2 {t['tp2']}")
+
+    # FX-only: format a rich signal / feed-health alert for the workflow's mail
+    # step. Internally FX-gated and fail-open — never breaks a scan or the ledger.
+    from v2 import alerts
+    alerts.evaluate_and_write(payload)
 
 
 def render_summary(payload: dict[str, Any]) -> str:

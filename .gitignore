@@ -28,6 +28,10 @@ charts/
 state/
 scan_output.txt
 
+# FX alert files — written per-scan for the workflow's mail step, never committed
+fx_alert_subject.txt
+fx_alert_body.txt
+
 # Claude Code session state
 .claude/
 

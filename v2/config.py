@@ -127,6 +127,39 @@ FX_RANGE_EQ_ATR = float(os.getenv("BOT_FX_RANGE_EQ_ATR", "0.5"))        # "same 
 FX_RANGE_MAX_ATR = float(os.getenv("BOT_FX_RANGE_MAX_ATR", "4.0"))      # max range width R-S (contained consolidation)
 FX_RANGE_BRK_ATR = float(os.getenv("BOT_FX_RANGE_BRK_ATR", "0.25"))     # close beyond boundary to confirm a breakout
 
+# --- Multi-pattern detector (PATTERN_SCOPE.md; P0 = accounting only) ---------
+# Per-pattern enable registry. Existing SMC (ob/bos) default ON — behaviour is
+# unchanged. Every NEW pattern defaults OFF (safe/off standing rule); they are
+# implemented + TRAIN-calibrated one at a time in later phases. Each is
+# overridable by env: BOT_FX_PATTERN_<UPPER>=0/1.
+_FX_PATTERN_DEFAULTS = {
+    "ob_retest": True, "bos_retest": True,      # existing SMC — unchanged
+    "double_top": False, "double_bottom": False,
+    "hns": False, "inv_hns": False,
+    "triangle_asc": False, "triangle_desc": False, "triangle_sym": False,
+    "range_breakout": False,
+}
+FX_PATTERNS = {
+    name: os.getenv(f"BOT_FX_PATTERN_{name.upper()}", "1" if on else "0") == "1"
+    for name, on in _FX_PATTERN_DEFAULTS.items()
+}
+
+def fx_pattern_enabled(pattern: str) -> bool:
+    return FX_PATTERNS.get(pattern, False)
+
+# Portfolio exposure caps for the wider signal stream (LOCKED, PATTERN_SCOPE §3.5).
+# Caps only ever BLOCK, so both are safe-by-default and inert while only OB/BOS runs.
+FX_MAX_OPEN = int(os.getenv("BOT_FX_MAX_OPEN", "5"))              # total concurrent open trades
+FX_MAX_PER_PATTERN = int(os.getenv("BOT_FX_MAX_PER_PATTERN", "2"))  # concurrent open per pattern
+
+# Per-pattern confidence (PATTERN_SCOPE §3.4). Confidence is FORWARD-ONLY and
+# derived from that pattern's own measured expectancy + sample size — never shape.
+# Below N_CONF_MIN resolved FORWARD trades a pattern is 'unproven'. NOTE: at n=30
+# the SE of mean R is ~0.31R, so 'provisional' is barely more than unproven, not
+# validation — real validation is n>=150 forward. Real money: unproven => size 0.
+FX_CONF_MIN_N = int(os.getenv("BOT_FX_CONF_MIN_N", "30"))    # unproven -> provisional
+FX_CONF_PROVEN_N = int(os.getenv("BOT_FX_CONF_PROVEN_N", "150"))  # provisional -> proven (== registered n)
+
 # --- OANDA v20 practice adapter (real bid/ask candles; DATA ONLY) -----------
 # See OANDA_ADAPTER_SCOPE.md. Practice environment only, Bearer-token auth, and
 # ONLY the candles/pricing data endpoints are ever touched — no orders, trades,
@@ -147,6 +180,27 @@ OANDA_INSTRUMENTS = {
     "USDCHF=X": "USD_CHF", "AUDUSD=X": "AUD_USD", "USDCAD=X": "USD_CAD",
     "NZDUSD=X": "NZD_USD", "EURGBP=X": "EUR_GBP", "EURJPY=X": "EUR_JPY",
 }
+
+# --- FX email alerting (reuses the existing dawidd6 mail ACTION in the workflow;
+#     Python only FORMATS the alert + decides when to fire — it never sends) ----
+# The scan writes a subject line + a phone-readable body to these files in the
+# workspace root (NOT under STATE_DIR, so they are never persisted to the state
+# branch). scan-fx.yml reads them and fires the same Gmail SMTP action the
+# equities workflow uses. Absent files => no email.
+ALERT_SUBJECT_FILE = ROOT_DIR / "fx_alert_subject.txt"
+ALERT_BODY_FILE = ROOT_DIR / "fx_alert_body.txt"
+# Feed-health backstop state (consecutive zero-DETECTION scans). Lives in
+# STATE_DIR so the streak survives across runs on the state-fx branch.
+ALERT_HEALTH_FILE = STATE_DIR / "alert_health.json"
+# Fire the "feed looks suspiciously quiet" alert after this many CONSECUTIVE
+# scans that detected zero setups. Keyed on DETECTIONS (any OB/BOS candidate),
+# NOT opened trades: opens are rare (~18/yr) so a zero-OPEN streak is normal,
+# but a zero-DETECTION streak across the whole 9-pair basket is the signature of
+# a frozen/stale feed (the silent stale-cache episode ran 17 such scans). Default
+# 8 ≈ 1.5 trading weeks — well before 17, but tolerant of a genuinely quiet run.
+# A truly dead feed (every pair rejected for a feed reason) alerts IMMEDIATELY,
+# separately from this counter. Raise if the live ledger shows quiet streaks.
+FX_HEALTH_ZERO_RUNS = int(os.getenv("BOT_FX_HEALTH_ZERO_RUNS", "8"))
 
 # --- Out-of-sample discipline (LOCKED — chosen trade-blind, pre-data) --------
 # TRAIN / HOLDOUT split boundary. Fixed as a calendar date BEFORE any OANDA data

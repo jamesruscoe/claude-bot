@@ -54,6 +54,10 @@ def main() -> None:
                         help="OANDA scope Phase A: data-integrity pass + ONE train-only Gate 1 baseline (needs BOT_MARKET=fx_oanda)")
     parser.add_argument("--oanda-holdout-power", action="store_true",
                         help="OANDA: count EXPECTED dual-confluence trades in the holdout (sample-size only, NO outcomes — does not burn the holdout)")
+    parser.add_argument("--email-test", action="store_true",
+                        help="write a test FX alert so the workflow's mail step can verify delivery (no scan, no trade)")
+    parser.add_argument("--pattern-report", action="store_true",
+                        help="print per-pattern expectancy + confidence (forward/out-of-sample only)")
     parser.add_argument("--pattern-calibrate", choices=["range_breakout"], default=None,
                         help="TRAIN-only Gate 1 in-sample screen for a pattern at its PRE-REGISTERED params (needs BOT_MARKET=fx_oanda)")
     args = parser.parse_args()
@@ -91,6 +95,19 @@ def main() -> None:
     if args.oanda_holdout_power:
         from v2 import oanda_baseline
         oanda_baseline.holdout_power_main()
+        return
+
+    if args.email_test:
+        from v2 import alerts
+        alerts.write_test_alert()
+        print(f"Test alert written to {alerts.cfg.ALERT_SUBJECT_FILE.name} / "
+              f"{alerts.cfg.ALERT_BODY_FILE.name}. In CI the mail step sends it.")
+        return
+
+    if args.pattern_report:
+        from v2 import confidence, store
+        store.init_db()
+        print(confidence.pattern_report_text())
         return
 
     if args.pattern_calibrate:
