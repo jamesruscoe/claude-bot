@@ -58,6 +58,8 @@ def main() -> None:
                         help="write a test FX alert so the workflow's mail step can verify delivery (no scan, no trade)")
     parser.add_argument("--pattern-report", action="store_true",
                         help="print per-pattern expectancy + confidence (forward/out-of-sample only)")
+    parser.add_argument("--pattern-calibrate", choices=["range_breakout"], default=None,
+                        help="TRAIN-only Gate 1 in-sample screen for a pattern at its PRE-REGISTERED params (needs BOT_MARKET=fx_oanda)")
     args = parser.parse_args()
 
     try:
@@ -106,6 +108,11 @@ def main() -> None:
         from v2 import confidence, store
         store.init_db()
         print(confidence.pattern_report_text())
+        return
+
+    if args.pattern_calibrate:
+        from v2 import pattern_calibrate
+        pattern_calibrate.main(args.pattern_calibrate)
         return
 
     if args.report:
