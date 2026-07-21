@@ -52,6 +52,8 @@ def main() -> None:
                         help="in-sample seed: walk-forward replay the last 30 days into a SEPARATE backfill ledger")
     parser.add_argument("--oanda-phase-a", action="store_true",
                         help="OANDA scope Phase A: data-integrity pass + ONE train-only Gate 1 baseline (needs BOT_MARKET=fx_oanda)")
+    parser.add_argument("--oanda-holdout-power", action="store_true",
+                        help="OANDA: count EXPECTED dual-confluence trades in the holdout (sample-size only, NO outcomes — does not burn the holdout)")
     args = parser.parse_args()
 
     try:
@@ -82,6 +84,11 @@ def main() -> None:
     if args.oanda_phase_a:
         from v2 import oanda_baseline
         print(oanda_baseline.main())
+        return
+
+    if args.oanda_holdout_power:
+        from v2 import oanda_baseline
+        oanda_baseline.holdout_power_main()
         return
 
     if args.report:
