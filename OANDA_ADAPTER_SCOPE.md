@@ -22,11 +22,14 @@ to accepting whichever of these three outcomes the clean data returns:
 
 | Outcome on clean data | Action |
 |---|---|
-| **Real edge** (positive net of real spread, meaningful n) | Proceed carefully — small size, long forward paper test. |
-| **Marginal** (near zero, within noise) | Tiny size, long forward test, or shelve. Do **not** talk yourself into it. |
-| **No edge** | Stop. Time spent, **no money lost** — a win relative to the alternative. |
+| **Real edge** — registered n reached, one-sided lower CI bound > 0 | Proceed carefully — small size, long forward paper test. |
+| **Marginal** — registered n reached, but CI straddles 0 | Tiny size, long forward test, or shelve. Do **not** talk yourself into it. |
+| **No edge** — registered n reached, point estimate ≤ 0 | Stop. Time spent, **no money lost** — a win relative to the alternative. |
+| **Insufficient n to decide** — cannot reach registered n in obtainable data | **Stop and reconsider granularity.** Do NOT file this as "marginal" and do NOT loosen the bar — too few trades to ever prove itself *is* the finding. |
 
-If you are not willing to accept outcome 3 before looking, do not run the test.
+If you are not willing to accept outcomes 3 **and 4** before looking, do not run
+the test. Given ~0.68 dual-confluence trades/week, **outcome 4 is the one to
+weight most heavily** — the power math in §1 shows why.
 
 ## 1. Prime directive: the out-of-sample guard (build this FIRST)
 
@@ -43,10 +46,37 @@ The protocol, non-negotiable:
    ~70%) and a **LOCKED HOLDOUT** (most recent ~30%, a fixed date range). Write
    the split boundary into config as a constant. The holdout is not opened,
    plotted, aggregated, or peeked at during any tuning.
-2. **Pre-register the acceptance criterion** before fitting anything — the exact
-   metric, the minimum sample (e.g. **n ≥ 100 resolved trades**), and the bar
-   (e.g. positive expectancy **net of real bid/ask** with the CI not straddling
-   zero). Written down, dated, in this repo, before results exist.
+2. **Pre-register the acceptance criterion — and know its statistical power
+   before you write it down.** The outcome distribution is roughly −1R / +3R at
+   ~25% win rate, so **SD ≈ 1.7R per trade**, and the standard error of the mean
+   is 1.7/√n:
+
+   | n | SE(mean R) | two-sided 95% needs | one-sided 95% needs |
+   |---:|---:|---:|---:|
+   | 100 | 0.17 | +0.34R | +0.28R |
+   | 150 | 0.14 | +0.28R | +0.23R |
+   | 250 | 0.11 | +0.21R | +0.18R |
+
+   The obvious-looking bar (n≥100, two-sided CI clears zero) demands a measured
+   **+0.34R — the exact size of the artifact we just debunked.** It can only ever
+   return "no edge" for a genuinely real-but-modest signal: a true +0.15R edge
+   fails it at n=100 even if it exists. That is not a reason to lower the bar; it
+   is a reason to choose it *knowingly*.
+
+   **Registered criterion (proposed):** mean R **net of measured bid/ask**, on
+   **resolved dual-confluence trades**, **n ≥ 150**, **one-sided 95% bootstrap CI
+   lower bound > 0** (bar ≈ +0.23R). One-sided is defensible — we only care
+   whether it clears zero, not by how much it might be below.
+
+   **Power caveat — weight this heavily.** At 0.68 dual-confluence/week, n=150 is
+   ~4.25 years of *holdout* calendar time. OANDA's ~15–20yr daily history can
+   *just* fund that for the majors, but a 70/30 split then leaves train lopsided,
+   and **forward paper to n=150 is ~4+ years.** Daily granularity is therefore
+   borderline-underpowered by construction. If the obtainable sample can't
+   distinguish a real modest edge from noise, the finding is **"this strategy
+   cannot prove itself at daily granularity"** (outcome 4) — and *that*, not
+   novelty, is the real argument for intraday: **more trades is the only route to
+   statistical power.**
 3. **Fit only on TRAIN.** Every choice — impulse threshold, retest window,
    `FX_MIN_SCORE`, any new setup — is selected on train data only.
 4. **Freeze.** Commit the frozen parameters.
@@ -61,10 +91,12 @@ The protocol, non-negotiable:
 
 **Reject-on-sight signatures** (write these on the wall): expectancy that rises
 as n falls; a result that only appears at one exact parameter value; any number
-you found by trying more than a handful of configurations. The wider-o2c-window
-**+0.44R** result from the last pass is precisely this trap — it is the biggest
-number on the page, it is still built on the degenerate open, and it must not be
-chased.
+you found by trying more than a handful of configurations; **and — the one that
+will be most tempting at Gate 2 — the criterion (metric, n, or bar) being revised
+after a result is seen.** Preventing that last move is the entire reason this
+document is written before the data exists. The wider-o2c-window **+0.44R** result
+from the last pass is the first trap — biggest number on the page, still built on
+the degenerate open, not to be chased.
 
 ## 2. What the adapter is (technically)
 
@@ -84,6 +116,12 @@ A new `DataSource` implementation behind the **existing interface**
 - **Real opens + real intraday.** Daily candles with true opens (the c2c-vs-o2c
   question **dissolves** — you measure real moves). Intraday granularities (H1,
   M1) give honest intrabar resolution to replace the yfinance intraday path.
+- **History depth.** v20 serves **max 5,000 candles per request**, paginated via
+  `from`/`to`; practice accounts get the **same history as live**. Daily for the
+  majors goes back ~15–20 years, so D1 across the basket is *not* data-constrained
+  (well beyond yfinance) — a paginating fetch loop is all that's needed. Intraday
+  (H1/M1) is where pagination volume actually matters. Confirm the per-pair depth
+  empirically in Phase A rather than trusting these numbers.
 - **Instrument mapping:** OANDA uses `EUR_USD`-style symbols; add a mapping
   alongside the existing basket. The `DataSource` methods (`symbols`,
   `fetch_daily`, `resolution_bars`, `pip_size`, `spread_pips`) map cleanly; make
@@ -128,11 +166,22 @@ comparison.
 
 ## 5. Open questions (for you, before Phase A)
 
-1. Provision an OANDA practice account + API token? (free.)
-2. How much history does OANDA practice serve per instrument/granularity? (sets
-   whether the 70/30 split has enough n for the registered threshold.)
-3. Agree the **pre-registered acceptance criterion** now: metric, minimum n, and
-   the exact bar — in writing, before any fit.
+1. ~~Provision an OANDA practice account + API token?~~ **Resolved:** signup is
+   free and near-instant; the token comes from the account-management page. No
+   decision needed — just create it and put the token in env.
+2. ~~How much history?~~ **Resolved (confirm empirically in Phase A):** v20 max
+   5,000 candles/request, paginated; practice = live history; D1 for the majors
+   ~15–20 years — not data-constrained. Caveat: reaching **n ≥ 150** dual-
+   confluence trades in a *locked holdout* still costs ~4+ years of holdout
+   calendar time at 0.68/week, which a 70/30 split of even 15–20 years funds only
+   awkwardly. This is the power tension in §1, not a data-availability problem.
+3. **Confirm the pre-registered acceptance criterion** (§1.2): mean R net of
+   measured bid/ask, resolved dual-confluence trades, **n ≥ 150**, one-sided 95%
+   bootstrap CI lower bound > 0. Agree it — or amend it — **now, in writing,
+   before any fit.** After this line is committed it does not move (see the
+   reject-on-sight list). If you'd rather trade the daily-granularity power
+   problem for more trades, say so now and Phase A targets intraday from the
+   start.
 
 ---
 
