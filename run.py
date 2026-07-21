@@ -56,6 +56,8 @@ def main() -> None:
                         help="OANDA: count EXPECTED dual-confluence trades in the holdout (sample-size only, NO outcomes — does not burn the holdout)")
     parser.add_argument("--email-test", action="store_true",
                         help="write a test FX alert so the workflow's mail step can verify delivery (no scan, no trade)")
+    parser.add_argument("--pattern-report", action="store_true",
+                        help="print per-pattern expectancy + confidence (forward/out-of-sample only)")
     args = parser.parse_args()
 
     try:
@@ -98,6 +100,12 @@ def main() -> None:
         alerts.write_test_alert()
         print(f"Test alert written to {alerts.cfg.ALERT_SUBJECT_FILE.name} / "
               f"{alerts.cfg.ALERT_BODY_FILE.name}. In CI the mail step sends it.")
+        return
+
+    if args.pattern_report:
+        from v2 import confidence, store
+        store.init_db()
+        print(confidence.pattern_report_text())
         return
 
     if args.report:

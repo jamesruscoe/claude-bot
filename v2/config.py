@@ -116,6 +116,39 @@ FX_STD_LOT_UNITS = 100_000   # 1.0 lot = 100k base units
 FX_CACHE_TTL_SECONDS = int(os.getenv("BOT_FX_CACHE_TTL", "900"))  # 15 min
 CACHE_DIR = STATE_DIR / "cache"
 
+# --- Multi-pattern detector (PATTERN_SCOPE.md; P0 = accounting only) ---------
+# Per-pattern enable registry. Existing SMC (ob/bos) default ON — behaviour is
+# unchanged. Every NEW pattern defaults OFF (safe/off standing rule); they are
+# implemented + TRAIN-calibrated one at a time in later phases. Each is
+# overridable by env: BOT_FX_PATTERN_<UPPER>=0/1.
+_FX_PATTERN_DEFAULTS = {
+    "ob_retest": True, "bos_retest": True,      # existing SMC — unchanged
+    "double_top": False, "double_bottom": False,
+    "hns": False, "inv_hns": False,
+    "triangle_asc": False, "triangle_desc": False, "triangle_sym": False,
+    "range_breakout": False,
+}
+FX_PATTERNS = {
+    name: os.getenv(f"BOT_FX_PATTERN_{name.upper()}", "1" if on else "0") == "1"
+    for name, on in _FX_PATTERN_DEFAULTS.items()
+}
+
+def fx_pattern_enabled(pattern: str) -> bool:
+    return FX_PATTERNS.get(pattern, False)
+
+# Portfolio exposure caps for the wider signal stream (LOCKED, PATTERN_SCOPE §3.5).
+# Caps only ever BLOCK, so both are safe-by-default and inert while only OB/BOS runs.
+FX_MAX_OPEN = int(os.getenv("BOT_FX_MAX_OPEN", "5"))              # total concurrent open trades
+FX_MAX_PER_PATTERN = int(os.getenv("BOT_FX_MAX_PER_PATTERN", "2"))  # concurrent open per pattern
+
+# Per-pattern confidence (PATTERN_SCOPE §3.4). Confidence is FORWARD-ONLY and
+# derived from that pattern's own measured expectancy + sample size — never shape.
+# Below N_CONF_MIN resolved FORWARD trades a pattern is 'unproven'. NOTE: at n=30
+# the SE of mean R is ~0.31R, so 'provisional' is barely more than unproven, not
+# validation — real validation is n>=150 forward. Real money: unproven => size 0.
+FX_CONF_MIN_N = int(os.getenv("BOT_FX_CONF_MIN_N", "30"))    # unproven -> provisional
+FX_CONF_PROVEN_N = int(os.getenv("BOT_FX_CONF_PROVEN_N", "150"))  # provisional -> proven (== registered n)
+
 # --- OANDA v20 practice adapter (real bid/ask candles; DATA ONLY) -----------
 # See OANDA_ADAPTER_SCOPE.md. Practice environment only, Bearer-token auth, and
 # ONLY the candles/pricing data endpoints are ever touched — no orders, trades,

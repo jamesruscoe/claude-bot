@@ -57,15 +57,27 @@ def _signal_block(row: dict[str, Any]) -> str:
     score = row.get("score")
     rr = row.get("rr")
     size = row.get("size")
-    return "\n".join([
-        f"{sym}  {direction}",
+    lines = [f"{sym}  {direction}"]
+    # Which pattern fired + its forward-only confidence (PATTERN_SCOPE §3.6).
+    if row.get("pattern"):
+        conf = row.get("pattern_confidence")
+        lines.append(f"pattern: {row['pattern']}"
+                     + (f"  ·  confidence: {conf}" if conf else ""))
+    lines += [
         f"score {score} · R:R {rr} · size {size}",
         "",
         f"entry  {_fmt_px(row.get('entry'))}",
         f"stop   {_fmt_px(row.get('stop_loss'))}",
         f"TP1    {_fmt_px(row.get('tp1'))}",
         f"TP2    {_fmt_px(row.get('tp2'))}",
-    ])
+    ]
+    return "\n".join(lines)
+
+
+def _conf_tier(row: dict[str, Any]) -> str:
+    """Leading tier word of the confidence label, for the subject line."""
+    conf = row.get("pattern_confidence") or ""
+    return conf.split()[0] if conf else ""
 
 
 def build_signal_alert(opened_rows: list[dict[str, Any]]) -> tuple[str, str] | None:
@@ -75,6 +87,9 @@ def build_signal_alert(opened_rows: list[dict[str, Any]]) -> tuple[str, str] | N
     first = opened_rows[0]
     subj = (f"FX SIGNAL: {_sym(first['symbol'])} "
             f"{str(first.get('direction') or '').upper()} @ {_fmt_px(first.get('entry'))}")
+    if first.get("pattern"):
+        tier = _conf_tier(first)
+        subj += f" [{first['pattern']}" + (f" · {tier}" if tier else "") + "]"
     if len(opened_rows) > 1:
         subj += f" (+{len(opened_rows) - 1} more)"
     body = "FX SIGNAL\n\n" + "\n\n---\n\n".join(_signal_block(r) for r in opened_rows)

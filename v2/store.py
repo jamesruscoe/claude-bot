@@ -87,6 +87,7 @@ CREATE TABLE IF NOT EXISTS trades (
     size_mult    REAL NOT NULL DEFAULT 1.0,    -- numeric multiplier applied to recorded R
     lots         REAL,                         -- FX position size (bookkeeping)
     source       TEXT NOT NULL DEFAULT 'forward',  -- 'forward' (live) | 'backfill' (in-sample seed)
+    pattern      TEXT NOT NULL DEFAULT 'ob_retest', -- which pattern family produced this trade (PATTERN_SCOPE.md)
     opened_at    TEXT NOT NULL,
     closed_at    TEXT,
     close_price  REAL,
@@ -160,6 +161,7 @@ def _migrate(c: sqlite3.Connection) -> None:
         ("lots", "REAL"),
         ("raw_r", "REAL"),
         ("source", "TEXT NOT NULL DEFAULT 'forward'"),
+        ("pattern", "TEXT NOT NULL DEFAULT 'ob_retest'"),
     ):
         if name not in cols:
             c.execute(f"ALTER TABLE trades ADD COLUMN {name} {ddl}")
@@ -209,7 +211,8 @@ def record_decision(signal_id: str, scan_ts: str, symbol: str, decision: dict[st
 
 def open_trade(signal_id: str | None, candidate: dict[str, Any], fill: float,
                opened_at: str | None = None, *,
-               size: str = "full", source: str = "forward") -> dict[str, Any]:
+               size: str = "full", source: str = "forward",
+               pattern: str = "ob_retest") -> dict[str, Any]:
     """Open a position. `fill` is the realistic entry (see levels.realistic_fill).
 
     `size` is the judge's decision size label; it's converted to a numeric
@@ -217,7 +220,11 @@ def open_trade(signal_id: str | None, candidate: dict[str, Any], fill: float,
     previously cosmetic and never touched the ledger).
 
     `source` tags the row: 'forward' (live, out-of-sample) or 'backfill'
-    (in-sample seed). This is the unambiguous in-sample/forward wall."""
+    (in-sample seed). This is the unambiguous in-sample/forward wall.
+
+    `pattern` tags which pattern family produced the trade, so expectancy is
+    reportable PER PATTERN (PATTERN_SCOPE.md). Defaults to 'ob_retest' so existing
+    callers and old rows keep a sensible tag."""
     tid = str(uuid.uuid4())
     opened_at = opened_at or _now()
     direction = candidate["direction"]
@@ -231,7 +238,7 @@ def open_trade(signal_id: str | None, candidate: dict[str, Any], fill: float,
         "tp1": float(candidate["tp1"]), "tp2": float(candidate["tp2"]),
         "tp1_hit": 0, "tp1_hit_at": None,
         "size": size, "size_mult": size_mult, "lots": candidate.get("lots"),
-        "source": source, "opened_at": opened_at,
+        "source": source, "pattern": pattern, "opened_at": opened_at,
         "closed_at": None, "close_price": None, "outcome": None,
         "pnl_r": None, "raw_r": None, "journaled": 0,
     }
@@ -239,11 +246,11 @@ def open_trade(signal_id: str | None, candidate: dict[str, Any], fill: float,
         c.execute(
             """INSERT INTO trades (id, signal_id, symbol, direction, setups, regime,
                 entry_price, stop_loss, original_sl, tp1, tp2, tp1_hit, tp1_hit_at,
-                size, size_mult, lots, source, opened_at, closed_at, close_price, outcome,
+                size, size_mult, lots, source, pattern, opened_at, closed_at, close_price, outcome,
                 pnl_r, raw_r, journaled)
                VALUES (:id,:signal_id,:symbol,:direction,:setups,:regime,:entry_price,
                 :stop_loss,:original_sl,:tp1,:tp2,:tp1_hit,:tp1_hit_at,:size,:size_mult,
-                :lots,:source,:opened_at,:closed_at,:close_price,:outcome,:pnl_r,:raw_r,:journaled)""",
+                :lots,:source,:pattern,:opened_at,:closed_at,:close_price,:outcome,:pnl_r,:raw_r,:journaled)""",
             row,
         )
     log.info("trade opened: %s %s @ %.4f (sl %.4f tp1 %.4f tp2 %.4f) size=%s x%.2f",
@@ -274,6 +281,25 @@ def trades_by_source(source: str) -> list[dict[str, Any]]:
     with _conn() as c:
         return [dict(r) for r in c.execute(
             "SELECT * FROM trades WHERE source=? ORDER BY opened_at", (source,))]
+
+
+def trades_by_pattern(pattern: str, *, source: str | None = None) -> list[dict[str, Any]]:
+    """All trades tagged with `pattern`, optionally restricted to a `source`
+    (e.g. 'forward' for the out-of-sample confidence engine)."""
+    q = "SELECT * FROM trades WHERE pattern=?"
+    args: list[Any] = [pattern]
+    if source is not None:
+        q += " AND source=?"
+        args.append(source)
+    q += " ORDER BY opened_at"
+    with _conn() as c:
+        return [dict(r) for r in c.execute(q, args)]
+
+
+def distinct_patterns() -> list[str]:
+    with _conn() as c:
+        return [r[0] for r in c.execute(
+            "SELECT DISTINCT pattern FROM trades ORDER BY pattern")]
 
 
 def record_rejection(scan_ts: str, symbol: str, stage: str, reason: str,
