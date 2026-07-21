@@ -57,7 +57,6 @@ def replay_symbol(symbol: str, bars: list[Bar]) -> dict[str, Any]:
     """Walk one symbol. Returns trades (resolved + still-open) and rejection
     reason counts."""
     inst = _instrument(symbol)
-    impulse = cfg.FX_OB_IMPULSE_THRESHOLD if cfg.FX_ENABLED else None
     trades: list[dict[str, Any]] = []
     rejections: dict[str, int] = {}
     open_dirs: dict[str, int] = {}  # direction -> index of bar it resolves by (dedup)
@@ -68,8 +67,7 @@ def replay_symbol(symbol: str, bars: list[Bar]) -> dict[str, Any]:
     for i in range(start, n):
         window = bars[: i + 1]
         cand, reason = signals.build_candidate(
-            symbol, window, live_price=window[-1].c, instrument=inst,
-            impulse_threshold=impulse)
+            symbol, window, live_price=window[-1].c, instrument=inst)
         if cand is None:
             rejections[reason or "unknown"] = rejections.get(reason or "unknown", 0) + 1
             continue

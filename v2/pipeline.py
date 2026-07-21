@@ -23,7 +23,6 @@ from v2.calendar_gate import bars_are_fresh, is_trading_day
 from v2.config import (
     FX_ACCOUNT_EQUITY,
     FX_ENABLED,
-    FX_OB_IMPULSE_THRESHOLD,
     FX_RISK_PCT,
     FX_STD_LOT_UNITS,
     LLM_ENABLED,
@@ -124,8 +123,7 @@ async def run_scan(*, force: bool = False) -> dict[str, Any]:
             continue
 
         candidate, reason = signals.build_candidate(
-            symbol, bars, live_price=prices[symbol], instrument=_instrument_for(symbol),
-            impulse_threshold=FX_OB_IMPULSE_THRESHOLD if FX_ENABLED else None)
+            symbol, bars, live_price=prices[symbol], instrument=_instrument_for(symbol))
         if candidate is None:
             store.record_rejection(scan_ts, symbol, "detector", reason or "unknown")
             rows.append({"symbol": symbol, "candidate": False, "reject_reason": reason})
