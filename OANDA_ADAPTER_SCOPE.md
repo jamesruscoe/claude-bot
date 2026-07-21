@@ -18,7 +18,7 @@ not "the edge is smaller than we thought"; it is:
 OANDA is **not a fix that restores +0.35R.** It will not make the strategy
 profitable. It is one thing only: **the instrument that lets us find out whether
 there is anything there at all, on data whose opens are real.** Pre-commit, now,
-to accepting whichever of these three outcomes the clean data returns:
+to accepting whichever of these four outcomes the clean data returns:
 
 | Outcome on clean data | Action |
 |---|---|
@@ -28,8 +28,10 @@ to accepting whichever of these three outcomes the clean data returns:
 | **Insufficient n to decide** — cannot reach registered n in obtainable data | **Stop and reconsider granularity.** Do NOT file this as "marginal" and do NOT loosen the bar — too few trades to ever prove itself *is* the finding. |
 
 If you are not willing to accept outcomes 3 **and 4** before looking, do not run
-the test. Given ~0.68 dual-confluence trades/week, **outcome 4 is the one to
-weight most heavily** — the power math in §1 shows why.
+the test. Note the power asymmetry (§1): the daily **holdout** (Phase C) can
+reach the registered n and is a cheap, legitimate kill-shot; it is **forward
+validation** that daily cannot power — and that is what earns intraday *later*,
+after a pass, not now.
 
 ## 1. Prime directive: the out-of-sample guard (build this FIRST)
 
@@ -45,7 +47,10 @@ The protocol, non-negotiable:
 1. **Split by time, up front.** Partition available history into **TRAIN** (older
    ~70%) and a **LOCKED HOLDOUT** (most recent ~30%, a fixed date range). Write
    the split boundary into config as a constant. The holdout is not opened,
-   plotted, aggregated, or peeked at during any tuning.
+   plotted, aggregated, or peeked at during any tuning. **Fix the boundary as a
+   calendar date chosen *before* pulling the data — never after seeing how many
+   trades land on each side.** "Nudge it to 72/28 and the holdout gives n=151" is
+   the same p-hacking the pre-registration exists to stop.
 2. **Pre-register the acceptance criterion — and know its statistical power
    before you write it down.** The outcome distribution is roughly −1R / +3R at
    ~25% win rate, so **SD ≈ 1.7R per trade**, and the standard error of the mean
@@ -63,20 +68,24 @@ The protocol, non-negotiable:
    fails it at n=100 even if it exists. That is not a reason to lower the bar; it
    is a reason to choose it *knowingly*.
 
-   **Registered criterion (proposed):** mean R **net of measured bid/ask**, on
-   **resolved dual-confluence trades**, **n ≥ 150**, **one-sided 95% bootstrap CI
-   lower bound > 0** (bar ≈ +0.23R). One-sided is defensible — we only care
-   whether it clears zero, not by how much it might be below.
+   **Registered criterion — LOCKED 2026-07-21:** mean R **net of measured
+   bid/ask**, on **resolved dual-confluence trades**, **n ≥ 150**, **one-sided 95%
+   bootstrap CI lower bound > 0** (bar ≈ +0.23R). One-sided is defensible — we
+   only care whether it clears zero, not by how much it might be below. This line
+   does not move after Gate 2 (see the reject-on-sight list).
 
-   **Power caveat — weight this heavily.** At 0.68 dual-confluence/week, n=150 is
-   ~4.25 years of *holdout* calendar time. OANDA's ~15–20yr daily history can
-   *just* fund that for the majors, but a 70/30 split then leaves train lopsided,
-   and **forward paper to n=150 is ~4+ years.** Daily granularity is therefore
-   borderline-underpowered by construction. If the obtainable sample can't
-   distinguish a real modest edge from noise, the finding is **"this strategy
-   cannot prove itself at daily granularity"** (outcome 4) — and *that*, not
-   novelty, is the real argument for intraday: **more trades is the only route to
-   statistical power.**
+   **Power caveat — and its asymmetry across phases (this changes the work
+   order).** 15–20 years of daily majors at ~0.68 trades/week is ~500–700 total
+   dual-confluence trades, so a 30% holdout is **~150–200**: the registered n=150
+   is **reachable at daily granularity.** That makes the holdout (Phase C) a
+   cheap, decisive **screen** — if the strategy can't clear the bar on 15+ years
+   of clean daily data, there is nothing to take intraday. What daily *cannot*
+   power is **forward** validation: paper to n=150 is 4+ years, not a real option.
+   So the power problem bites only *after* a passing holdout, and that is exactly
+   when intraday earns its cost — to forward-validate something that already
+   survived one honest out-of-sample test, not as a fishing expedition. (If the
+   holdout itself comes in under 150 — e.g. a thinner basket — that is outcome 4:
+   stop and reconsider granularity, do not loosen the bar.)
 3. **Fit only on TRAIN.** Every choice — impulse threshold, retest window,
    `FX_MIN_SCORE`, any new setup — is selected on train data only.
 4. **Freeze.** Commit the frozen parameters.
@@ -139,6 +148,23 @@ trading scoped); `BOT_MARKET=fx_oanda` (or a source flag) to select it; a
 `TRAIN_HOLDOUT_BOUNDARY` date constant. Keep the yfinance FX source too, for
 comparison.
 
+### Two caveats of the 15–20-year window (write these before Phase A)
+
+Using deep history to fund the holdout buys power but introduces two things to
+interpret honestly at Gate 2 — decide how you'll read them *now*, not after:
+
+- **Regime risk.** A train set of, say, 2008–2020 and a holdout of 2020–2026 span
+  very different FX regimes (ZIRP, the 2022 dollar surge, divergent central-bank
+  cycles). A failed holdout could mean "no edge" **or** "an edge that doesn't
+  survive a regime change" — different implications. Note it up front so it's a
+  reading of the result, not an excuse reached for afterward. (Do not respond by
+  re-splitting to a friendlier regime — that's criterion revision.)
+- **Old-data quality.** Confirm OANDA's early history is **real quoted candles**,
+  not backfilled or reconstructed series. We were just burned once trusting the
+  shape of a bar; check the far end of the range (spreads, gaps, weekend handling,
+  suspicious flatness) before building any verdict on it. If the oldest years look
+  synthetic, shorten the window rather than trust them.
+
 ## 3. Phased plan, with gates
 
 - **Phase A — adapter + split, no tuning.** Implement the data adapter (candles,
@@ -148,11 +174,18 @@ comparison.
   clean data has already answered the question.
 - **Phase B — minimal, pre-registered fit on TRAIN.** A **small, written-down**
   parameter set only (not an open-ended sweep). No holdout access.
-- **Phase C — evaluate once on HOLDOUT.** Frozen params. Single number. Report it
-  as-is against the pre-registered criterion. *Gate 2:* the three outcomes in §0.
-- **Phase D — forward paper (only if C survives).** Frozen params, judge off, run
-  the existing paper harness on the OANDA source until n reaches the registered
-  threshold. This is the decision-grade evidence.
+- **Phase C — the daily-holdout screen (evaluate ONCE).** Frozen params, a single
+  evaluation on the locked holdout against the registered criterion. This is a
+  cheap kill-shot, and it is where the work most likely ends. *Gate 2* — the four
+  outcomes in §0: **Fails or Insufficient-n → stop, you have your answer**; only
+  **Passes** proceeds. Everything up to here is daily; no intraday pipeline is
+  built to reach this verdict.
+- **Phase D — intraday + forward paper (ONLY if C passes).** A passing daily
+  holdout is what *earns* the intraday adapter — build it then, not before, to get
+  forward-validation power in a realistic timeframe (daily forward paper to n=150
+  is 4+ years). Forward paper, frozen params, judge off, until n reaches the
+  registered threshold. Decision-grade evidence — validating a hypothesis that has
+  already survived one honest out-of-sample test, rather than a fishing expedition.
 
 ## 4. Non-goals / explicit guards
 
@@ -175,13 +208,13 @@ comparison.
    confluence trades in a *locked holdout* still costs ~4+ years of holdout
    calendar time at 0.68/week, which a 70/30 split of even 15–20 years funds only
    awkwardly. This is the power tension in §1, not a data-availability problem.
-3. **Confirm the pre-registered acceptance criterion** (§1.2): mean R net of
-   measured bid/ask, resolved dual-confluence trades, **n ≥ 150**, one-sided 95%
-   bootstrap CI lower bound > 0. Agree it — or amend it — **now, in writing,
-   before any fit.** After this line is committed it does not move (see the
-   reject-on-sight list). If you'd rather trade the daily-granularity power
-   problem for more trades, say so now and Phase A targets intraday from the
-   start.
+3. ~~Confirm the criterion / daily-vs-intraday ordering.~~ **Resolved &
+   registered (2026-07-21):** mean R net of measured bid/ask, resolved dual-
+   confluence, **n ≥ 150, one-sided 95% bootstrap CI lower bound > 0.** Locked —
+   does not move after Gate 2. Ordering decided: **stay daily through Phase C**
+   (the holdout screen); the intraday adapter is built only if that screen passes
+   (§3). Nothing else is blocking — create the practice token and Phase A can
+   start (adapter, split, one honest train baseline, Gate 1).
 
 ---
 
