@@ -142,3 +142,7 @@
 2026-07-20 15:09:26,751 [INFO] v2.pipeline: reflected on 2 resolved trade(s)
 2026-07-20 15:09:26,757 [INFO] v2.report: wrote /home/runner/work/claude-bot/claude-bot/state/daily_report.md
 2026-07-20 21:00:06,809 [INFO] v2.report: wrote /home/runner/work/claude-bot/claude-bot/state/daily_report.md
+2026-07-21 15:01:55,004 [INFO] v2.store: trade opened: NVDA short @ 209.9250 (sl 217.4778 tp1 194.8193 tp2 187.2665) size=quarter x0.25
+2026-07-21 15:01:55,026 [INFO] v2.store: trade opened: AMZN short @ 253.1150 (sl 260.2070 tp1 238.9309 tp2 231.8389) size=quarter x0.25
+2026-07-21 15:01:55,036 [INFO] v2.pipeline: skip open COIN short — already in an open position
+2026-07-21 15:01:55,043 [INFO] v2.report: wrote /home/runner/work/claude-bot/claude-bot/state/daily_report.md
