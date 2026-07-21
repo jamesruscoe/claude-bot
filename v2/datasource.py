@@ -228,6 +228,10 @@ class FXSource:
 
 def get_data_source() -> DataSource:
     """Return the configured data source. Equities is the default (safe) path."""
+    if cfg.FX_OANDA:
+        from v2.oanda_source import OANDASource
+        log.info("data source: FX (OANDA v20 practice), %d pairs", len(cfg.FX_BASKET))
+        return OANDASource()
     if cfg.FX_ENABLED:
         log.info("data source: FX (yfinance), %d pairs", len(cfg.FX_BASKET))
         return FXSource()

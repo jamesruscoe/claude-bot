@@ -50,6 +50,8 @@ def main() -> None:
                         help="print/write the daily paper-trading report from the latest scan + ledger")
     parser.add_argument("--backfill", action="store_true",
                         help="in-sample seed: walk-forward replay the last 30 days into a SEPARATE backfill ledger")
+    parser.add_argument("--oanda-phase-a", action="store_true",
+                        help="OANDA scope Phase A: data-integrity pass + ONE train-only Gate 1 baseline (needs BOT_MARKET=fx_oanda)")
     args = parser.parse_args()
 
     try:
@@ -75,6 +77,11 @@ def main() -> None:
     if args.backfill:
         from v2 import backfill
         backfill.main()
+        return
+
+    if args.oanda_phase_a:
+        from v2 import oanda_baseline
+        print(oanda_baseline.main())
         return
 
     if args.report:

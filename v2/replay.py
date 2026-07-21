@@ -29,12 +29,13 @@ _WIN = {store.OUTCOME_WIN_TP2}
 _LOSS = {store.OUTCOME_LOSS}
 
 
-def _instrument(symbol: str) -> signals.Instrument | None:
+def _instrument(symbol: str, spread_pips: float | None = None) -> signals.Instrument | None:
     if not cfg.FX_ENABLED:
         return None
     return signals.Instrument(
         symbol=symbol, pip_size=cfg.fx_pip_size(symbol),
-        spread_pips=cfg.fx_spread_pips(symbol),
+        spread_pips=(spread_pips if spread_pips is not None
+                     else cfg.fx_spread_pips(symbol)),
         equity=cfg.FX_ACCOUNT_EQUITY, risk_pct=cfg.FX_RISK_PCT,
         std_lot=cfg.FX_STD_LOT_UNITS,
     )
@@ -53,10 +54,12 @@ def _resolve_forward(trade: dict[str, Any], forward: list[Bar]) -> tuple[str | N
     return outcome, close_price
 
 
-def replay_symbol(symbol: str, bars: list[Bar]) -> dict[str, Any]:
+def replay_symbol(symbol: str, bars: list[Bar],
+                  *, spread_pips: float | None = None) -> dict[str, Any]:
     """Walk one symbol. Returns trades (resolved + still-open) and rejection
-    reason counts."""
-    inst = _instrument(symbol)
+    reason counts. `spread_pips` overrides the assumed per-pair constant with a
+    measured spread (OANDA baseline) — entry/R:R are then net of real cost."""
+    inst = _instrument(symbol, spread_pips)
     impulse = cfg.FX_OB_IMPULSE_THRESHOLD if cfg.FX_ENABLED else None
     trades: list[dict[str, Any]] = []
     rejections: dict[str, int] = {}
