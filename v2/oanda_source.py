@@ -119,7 +119,8 @@ class OANDASource:
         return self._client
 
     async def _get_candles_page(self, instrument: str, *, granularity: str,
-                                start: str, count: int) -> list[dict]:
+                                start: str, count: int,
+                                include_first: bool = False) -> list[dict]:
         """One candles request. DATA endpoint only: /v3/instruments/{i}/candles."""
         client = self._get_client()
         params = {
@@ -127,7 +128,9 @@ class OANDASource:
             "price": "BAM",          # bid, ask, mid OHLC per candle
             "from": start,
             "count": count,
-            "includeFirst": "false",  # `start` is the last bar we already have
+            # Only the very first request keeps its `from` candle; later pages set
+            # `start` to the last bar we already have, so exclude it to avoid a dup.
+            "includeFirst": "true" if include_first else "false",
             "smooth": "false",
         }
         last_exc: Exception | None = None
@@ -157,20 +160,22 @@ class OANDASource:
         cursor = start_iso
         out: list[dict] = []
         seen_times: set[str] = set()
-        for _page in range(200):  # 200*5000 daily bars is centuries — safety only
+        for page_i in range(200):  # 200*5000 daily bars is centuries — safety only
             page = await self._get_candles_page(
                 instrument, granularity=granularity, start=cursor,
-                count=cfg.OANDA_MAX_CANDLES)
+                count=cfg.OANDA_MAX_CANDLES, include_first=(page_i == 0))
             complete = [c for c in page if c.get("complete")]
             fresh = [c for c in complete if c["time"] not in seen_times]
+            # Terminate ONLY when a page yields no NEW candles — never on
+            # len(page) < cap, which is unreliable (includeFirst drops one, so a
+            # full-history first page returns cap-1 and would stop prematurely,
+            # truncating the pull at ~5000 bars).
             if not fresh:
                 break
             for c in fresh:
                 seen_times.add(c["time"])
             out += fresh
             cursor = fresh[-1]["time"]
-            if len(page) < cfg.OANDA_MAX_CANDLES:
-                break  # reached the present
         return out
 
     # ---- caching -------------------------------------------------------- #

@@ -127,7 +127,8 @@ def gate1_for_symbol(source: OANDASource, symbol: str, train_bars: list[Bar]) ->
     window as the (honest) cost. Returns the resolved trades."""
     stats = source.measured_spread_stats(symbol, train_bars)
     spread = stats["median"] if stats else cfg.fx_spread_pips(symbol)
-    res = replay.replay_symbol(symbol, train_bars, spread_pips=spread)
+    res = replay.replay_symbol(symbol, train_bars, spread_pips=spread,
+                               max_lookback=cfg.FX_LIVE_DAILY_LOOKBACK)
     return {"symbol": symbol, "spread_used": spread, "trades": res["trades"],
             "rejections": res["rejections"]}
 
@@ -280,6 +281,13 @@ def write_report(data: dict[str, Any], path: str = "OANDA_PHASE_A.md") -> str:
         lines.append(f"| {i['symbol']} | {fo['median_pct']:.4f}% | {fs_med} |")
 
     lines.append("\n### Measured spread vs assumed table (pips)\n")
+    lines.append("Spread is measured at each daily candle's CLOSE (21:00 UTC). Verified "
+                 "empirically that the close is a structurally TIGHT moment (~1.5 pips on "
+                 "EUR_USD today, matching the H1 intraday spread) — it is the daily *open* "
+                 "that rollover-spikes to 7-10 pips, and that is NOT used. So the medians "
+                 "below are honest; the wider tail (p90) is real historical/Friday-close "
+                 "widening, not a clamp. The charge is real, if slightly conservative vs "
+                 "modern spreads.\n")
     lines.append("| Pair | Measured median | Measured p90 | Assumed (old table) |")
     lines.append("|------|----------------:|-------------:|--------------------:|")
     for i in integ:
@@ -288,10 +296,14 @@ def write_report(data: dict[str, Any], path: str = "OANDA_PHASE_A.md") -> str:
         p90 = f"{s['p90']:.2f}" if s else "n/a"
         lines.append(f"| {i['symbol']} | {med} | {p90} | {i['assumed_spread']:.2f} |")
 
-    lines.append("\n> Modelling note: entry is worsened by the full measured spread and "
-                 "R:R is post-spread (existing honest machinery); resolution walks daily "
-                 "high/low. Daily granularity is deliberate for Phase A–C (scope §1); "
-                 "intraday resolution is Phase D, only if the holdout passes.\n")
+    lines.append(f"\n> Modelling notes: (1) the detectors see a trailing "
+                 f"{cfg.FX_LIVE_DAILY_LOOKBACK}-bar (~3yr) window per decision — the SAME "
+                 "span the live bot fetches (period=\"3y\") — so this is faithful to "
+                 "production, not the full 15-20yr history. (2) Entry is worsened by the "
+                 "full measured spread and R:R is post-spread (existing honest machinery); "
+                 "resolution walks daily high/low. Daily granularity is deliberate for "
+                 "Phase A-C (scope §1); intraday resolution is Phase D, only if the holdout "
+                 "passes.\n")
 
     text = "\n".join(lines)
     with open(path, "w", encoding="utf-8") as f:

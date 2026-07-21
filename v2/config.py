@@ -146,6 +146,14 @@ OANDA_INSTRUMENTS = {
 # peeked at during Phase A/B). Do NOT move this after seeing any result.
 TRAIN_HOLDOUT_BOUNDARY = "2021-01-01"
 
+# Trailing daily bars the detectors see per decision in the OANDA replay. The
+# LIVE bot fetches period="3y" (~780 daily bars), so on OANDA's 15-20yr history
+# the walk MUST cap the detector window to the same span — otherwise the
+# detectors would run on inputs the deployed strategy never sees (a fidelity
+# bug), and the walk would be O(n^2). This is faithfulness to production, NOT a
+# tuned parameter. ~3 trading years to match FXSource period="3y".
+FX_LIVE_DAILY_LOOKBACK = 780
+
 # Registered acceptance criterion — LOCKED 2026-07-21, does NOT move after Gate 2:
 #   mean R NET of measured bid/ask, on RESOLVED DUAL-CONFLUENCE trades (score==100),
 #   n >= 150, one-sided 95% bootstrap CI lower bound > 0  (bar ~ +0.23R).

@@ -90,27 +90,25 @@ class TestPagination(unittest.TestCase):
         base = datetime(2018, 1, 1, tzinfo=timezone.utc)
         all_candles = [_candle(base + timedelta(days=i), 1.10 + i * 0.0005, 1.0, pip)
                        for i in range(30)]
-        # A full page (== cap) forces a second request; the overlap-by-1 exercises
-        # de-dup. Shrink the cap so 20 candles is a "full" page.
+        # Two data pages (overlap by 1 -> exercises de-dup) then an empty page,
+        # which is the ONLY terminator now (never len(page) < cap).
         pages = [all_candles[:20], all_candles[19:]]
-        calls = {"n": 0}
+        calls = {"n": 0, "first_flags": []}
 
-        async def fake_page(instrument, *, granularity, start, count):
+        async def fake_page(instrument, *, granularity, start, count, include_first=False):
             i = calls["n"]
             calls["n"] += 1
+            calls["first_flags"].append(include_first)
             return pages[i] if i < len(pages) else []
 
         src._get_candles_page = fake_page          # type: ignore[assignment]
         src._read_cache = lambda *a, **k: None      # type: ignore[assignment]
         src._write_cache = lambda *a, **k: None     # type: ignore[assignment]
-        orig_cap = cfg.OANDA_MAX_CANDLES
-        cfg.OANDA_MAX_CANDLES = 20
-        try:
-            bars = asyncio.run(src.fetch_daily("EURUSD=X"))
-        finally:
-            cfg.OANDA_MAX_CANDLES = orig_cap
+        bars = asyncio.run(src.fetch_daily("EURUSD=X"))
         self.assertEqual(len(bars), 30)             # 20 + 11 - 1 overlap deduped
-        self.assertEqual(calls["n"], 2)             # exactly two pages requested
+        self.assertEqual(calls["n"], 3)             # 2 data pages + 1 empty terminator
+        self.assertEqual(calls["first_flags"][0], True)   # includeFirst only on page 1
+        self.assertEqual(calls["first_flags"][1:], [False, False])
         self.assertTrue(all(bars[i].t < bars[i + 1].t for i in range(len(bars) - 1)))
 
     def test_fetch_daily_unmapped_symbol(self):

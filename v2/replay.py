@@ -55,10 +55,15 @@ def _resolve_forward(trade: dict[str, Any], forward: list[Bar]) -> tuple[str | N
 
 
 def replay_symbol(symbol: str, bars: list[Bar],
-                  *, spread_pips: float | None = None) -> dict[str, Any]:
+                  *, spread_pips: float | None = None,
+                  max_lookback: int | None = None) -> dict[str, Any]:
     """Walk one symbol. Returns trades (resolved + still-open) and rejection
     reason counts. `spread_pips` overrides the assumed per-pair constant with a
-    measured spread (OANDA baseline) — entry/R:R are then net of real cost."""
+    measured spread (OANDA baseline) — entry/R:R are then net of real cost.
+    `max_lookback` caps the trailing detector window per decision so a very long
+    history (OANDA 15-20yr) feeds the detectors the SAME span the live bot sees
+    (period="3y") — faithfulness to production, and it keeps the walk linear.
+    None = full growing prefix (unchanged; fine for the ~3yr yfinance feed)."""
     inst = _instrument(symbol, spread_pips)
     impulse = cfg.FX_OB_IMPULSE_THRESHOLD if cfg.FX_ENABLED else None
     trades: list[dict[str, Any]] = []
@@ -69,7 +74,8 @@ def replay_symbol(symbol: str, bars: list[Bar],
     start = max(BACKTEST_WARMUP_BARS, 20)
     eval_days = max(0, n - start)
     for i in range(start, n):
-        window = bars[: i + 1]
+        lo = 0 if max_lookback is None else max(0, i + 1 - max_lookback)
+        window = bars[lo: i + 1]
         cand, reason = signals.build_candidate(
             symbol, window, live_price=window[-1].c, instrument=inst,
             impulse_threshold=impulse)
@@ -90,7 +96,14 @@ def replay_symbol(symbol: str, bars: list[Bar],
             "tp1_hit": 0, "tp1_hit_at": None,
             "opened_at": bars[i].dt.isoformat(), "_opened_dt": bars[i].dt,
         }
-        outcome, close_price = _resolve_forward(trade, bars[i + 1:])
+        # Cap the forward slice to the expiry window. Resolution only ever uses
+        # bars within EXPIRY_TRADING_DAYS trading days (bar #k is >= k trading
+        # days ahead), so any bar past ~3x that is filtered out regardless — the
+        # cap is a no-op on the result but turns _resolve_forward's O(forward)
+        # scan (with a day-by-day _trading_days_between per bar) from O(n^2) into
+        # O(1) on deep OANDA history.
+        fwd_cap = cfg.EXPIRY_TRADING_DAYS * 3 + 5
+        outcome, close_price = _resolve_forward(trade, bars[i + 1: i + 1 + fwd_cap])
         if outcome is not None:
             trade["outcome"] = outcome
             trade["raw_r"] = round(store._pnl_r(
