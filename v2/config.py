@@ -73,9 +73,14 @@ LLM_ENABLED = _provider_key_present() and os.getenv("BOT_LLM", "0") == "1"
 # --- Market mode (NEW — defaults to equities so the existing path is unchanged)
 # "equities" keeps the original Massive/SMC behaviour bit-for-bit. "fx" routes
 # the whole pipeline through the yfinance FX adapter + pip/spread risk math.
-# Switch with BOT_MARKET=fx. Everything FX-specific is gated on this flag.
+# "fx_oanda" swaps that feed for the OANDA v20 practice adapter (real bid/ask
+# candles) while keeping every downstream strategy/risk path identical.
+# Switch with BOT_MARKET=fx (or fx_oanda). Everything FX-specific is gated on
+# FX_ENABLED, which is true for BOTH fx feeds so the pip/spread math routes the
+# same way; FX_OANDA additionally selects the real-quote source.
 MARKET = os.getenv("BOT_MARKET", "equities").lower()
-FX_ENABLED = MARKET == "fx"
+FX_ENABLED = MARKET in ("fx", "fx_oanda")
+FX_OANDA = MARKET == "fx_oanda"
 
 # FX basket — yfinance tickers. Majors + the two EUR crosses the brief names.
 FX_BASKET = [
@@ -110,6 +115,48 @@ FX_STD_LOT_UNITS = 100_000   # 1.0 lot = 100k base units
 # yfinance is unofficial + delayed: cache pulls and never act on empty/old data.
 FX_CACHE_TTL_SECONDS = int(os.getenv("BOT_FX_CACHE_TTL", "900"))  # 15 min
 CACHE_DIR = STATE_DIR / "cache"
+
+# --- OANDA v20 practice adapter (real bid/ask candles; DATA ONLY) -----------
+# See OANDA_ADAPTER_SCOPE.md. Practice environment only, Bearer-token auth, and
+# ONLY the candles/pricing data endpoints are ever touched — no orders, trades,
+# or positions endpoint is imported or wired anywhere. Secrets come from env and
+# are never committed. The account id is not needed for the candles endpoint
+# (kept only for optional current-pricing calls); do not scope a live token.
+from datetime import datetime, timezone  # noqa: E402  (local to the OANDA block)
+
+OANDA_API_TOKEN = os.getenv("OANDA_API_TOKEN", "")
+OANDA_ACCOUNT_ID = os.getenv("OANDA_ACCOUNT_ID", "")
+OANDA_HOST = os.getenv("BOT_OANDA_HOST", "api-fxpractice.oanda.com")  # PRACTICE ONLY
+OANDA_MAX_CANDLES = 5000          # v20 hard cap per request; paginate via from/to
+OANDA_CANDLE_START = os.getenv("BOT_OANDA_START", "2004-01-01")  # earliest pull attempt
+
+# Yahoo-style basket symbol -> OANDA v20 instrument name.
+OANDA_INSTRUMENTS = {
+    "EURUSD=X": "EUR_USD", "GBPUSD=X": "GBP_USD", "USDJPY=X": "USD_JPY",
+    "USDCHF=X": "USD_CHF", "AUDUSD=X": "AUD_USD", "USDCAD=X": "USD_CAD",
+    "NZDUSD=X": "NZD_USD", "EURGBP=X": "EUR_GBP", "EURJPY=X": "EUR_JPY",
+}
+
+# --- Out-of-sample discipline (LOCKED — chosen trade-blind, pre-data) --------
+# TRAIN / HOLDOUT split boundary. Fixed as a calendar date BEFORE any OANDA data
+# was pulled, so it cannot have been nudged to flatter a trade count (that would
+# be the p-hacking the pre-registration exists to prevent — see scope §1).
+# TRAIN  = daily bars strictly before this date (older ~70%, tuning is allowed).
+# HOLDOUT = bars on/after it (most recent ~30%, evaluated ONCE in Phase C, never
+# peeked at during Phase A/B). Do NOT move this after seeing any result.
+TRAIN_HOLDOUT_BOUNDARY = "2021-01-01"
+
+# Registered acceptance criterion — LOCKED 2026-07-21, does NOT move after Gate 2:
+#   mean R NET of measured bid/ask, on RESOLVED DUAL-CONFLUENCE trades (score==100),
+#   n >= 150, one-sided 95% bootstrap CI lower bound > 0  (bar ~ +0.23R).
+# Revising the metric, n, or bar after a result is seen is reject-on-sight.
+FX_REGISTERED_MIN_N = 150
+
+
+def train_holdout_boundary() -> datetime:
+    """The split boundary as a tz-aware (UTC) datetime for comparing to Bar.dt."""
+    y, m, d = (int(x) for x in TRAIN_HOLDOUT_BOUNDARY.split("-"))
+    return datetime(y, m, d, tzinfo=timezone.utc)
 
 # --- FX strategy filters (Phase 2; all FX-only, gated on FX_ENABLED) --------
 # Detector calibration: FX daily ranges are <1%, so the equities 3% OB impulse
