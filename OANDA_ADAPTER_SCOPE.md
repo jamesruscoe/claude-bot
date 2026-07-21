@@ -1,8 +1,27 @@
 # OANDA practice adapter — scope
 
-Status: **proposal / not built.** This document scopes a real-OHLC data adapter.
-It deliberately leads with methodology, not code, because the risk here is not
-technical — it's statistical.
+> **HOLDOUT UNREAD as of 2026-07-21. Registered criterion LOCKED. Do NOT fit on
+> the holdout.** The 2021-01-01+ holdout has never been opened, plotted, or
+> resolved — only its setup *count* was measured (a sample-size question, not a
+> result). It is a genuinely uncontaminated out-of-sample set. If anyone (incl.
+> future-you) returns to this: the pre-registration in §1 still stands, the
+> criterion does not move, and the holdout stays virgin until a *powered* test
+> exists to spend it on. Looking at it casually destroys the one asset here.
+
+**Status (2026-07-21): Phase A built and run; STOPPED at Outcome-A by choice.**
+Findings on the record — Gate 1 (train, real data): +0.412R net of measured
+spread, one-sided 95% lower bound +0.277R (in-sample, NOT evidence of an edge).
+Integrity pass: **real opens confirmed** (the Yahoo artifact was a data problem
+OANDA resolves). Power check: the daily holdout funds only **~97** dual-confluence
+trades < the registered **150** → **Outcome 4** (insufficient n), found *before*
+any result. Conclusion: **a plausible edge we cannot validate at the granularity
+we can afford to test.** Daily's track (Phase B fit / Phase C screen) is therefore
+closed — no daily holdout can check a fit or reach n≥150. See `OANDA_PHASE_A.md`
+and `OANDA_HOLDOUT_POWER.md`. Phase D (intraday) would be a *different* strategy on
+a much weaker prior, not a continuation — deliberately not pursued.
+
+This document scopes a real-OHLC data adapter. It deliberately leads with
+methodology, not code, because the risk here is not technical — it's statistical.
 
 ## 0. Why this exists, and what it is NOT
 
