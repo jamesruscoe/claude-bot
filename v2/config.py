@@ -112,10 +112,29 @@ FX_CACHE_TTL_SECONDS = int(os.getenv("BOT_FX_CACHE_TTL", "900"))  # 15 min
 CACHE_DIR = STATE_DIR / "cache"
 
 # --- FX strategy filters (Phase 2; all FX-only, gated on FX_ENABLED) --------
-# Detector calibration: FX daily ranges are <1%, so the equities 3% OB impulse
-# almost never fires. Calibrate the impulse threshold for FX. (Phase 3 tunes the
-# score threshold against measured expectancy — this just makes OB fireable.)
+# Detector calibration for FX (all FX-only; equities detector is unchanged).
+#  - Retest window: fire when the first retest of the OB zone / BOS level falls
+#    within the last k bars, not only on the exact current bar. Daily FX rarely
+#    prints a first-touch retest on the scan day, so k=1 (equities) starved it.
+#  - Vol-scaled impulse: replace the flat 0.8% with k x the pair's ATR% so tight
+#    pairs (EURGBP/USDCAD/JPY) can fire and hot pairs (NZD/AUD) stay selective.
+#  - Close-to-close impulse: Yahoo FX daily opens are degenerate (open ~= close),
+#    so measure the impulse close-to-close.
+FX_RETEST_WINDOW_BARS = int(os.getenv("BOT_FX_RETEST_WINDOW", "3"))
+FX_IMPULSE_ATR_MULT = float(os.getenv("BOT_FX_IMPULSE_ATR_MULT", "1.5"))
+FX_IMPULSE_C2C = os.getenv("BOT_FX_IMPULSE_C2C", "1") == "1"
+# Impulse window length in bars. Exposed so the c2c/window confound can be
+# tested holding one lever fixed (c2c anchors one bar earlier than o2c).
+FX_IMPULSE_MAX_LEN = int(os.getenv("BOT_FX_IMPULSE_MAX_LEN", "3"))
+# Fallback flat impulse threshold when ATR isn't available yet (cold start).
 FX_OB_IMPULSE_THRESHOLD = float(os.getenv("BOT_FX_OB_IMPULSE", "0.008"))  # 0.8%
+
+
+def fx_impulse_threshold(atr: float | None, price: float | None) -> float:
+    """Vol-scaled OB impulse threshold for FX: FX_IMPULSE_ATR_MULT x ATR%."""
+    if atr and price and price > 0:
+        return FX_IMPULSE_ATR_MULT * (atr / price)
+    return FX_OB_IMPULSE_THRESHOLD
 
 # Session filter (UTC hours). "off" = no restriction (safe default, behaviour
 # unchanged). "overlap" = London/NY overlap only. "skip_asia" = block thin Asia

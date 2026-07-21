@@ -81,8 +81,7 @@ async def run_backfill(days: int = 30) -> dict:
             if bars[i].dt < cutoff:
                 continue  # only the last `days` calendar days are "scan days"
             cand, _ = signals.build_candidate(
-                sym, bars[: i + 1], live_price=bars[i].c, instrument=inst,
-                impulse_threshold=cfg.FX_OB_IMPULSE_THRESHOLD)
+                sym, bars[: i + 1], live_price=bars[i].c, instrument=inst)
             if cand is None:
                 continue
             detected += 1

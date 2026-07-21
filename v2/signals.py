@@ -23,6 +23,7 @@ from typing import Any
 import smc_detector  # salvaged v1 pure-math detectors
 from market_data import Bar
 from smc_detector import OB_IMPULSE_THRESHOLD
+from v2 import config as cfg
 from v2 import levels
 from v2.config import CANDIDATE_MIN_SCORE, OB_IMPULSE_OVERRIDES
 
@@ -64,12 +65,18 @@ def _setup_names(signals: dict[str, Any]) -> list[str]:
 
 
 def _zero_score_reason(signals: dict[str, Any]) -> str:
-    """Explain a score of 0 for rejection logging."""
+    """Explain a score of 0 for rejection logging, per detector stage."""
     if signals.get("regime_blocked"):
         return "regime_blocked"
     if signals.get("ob_retest") and signals.get("bos_retest"):
         return "conflicting_setups"
-    return "no_setup"
+    ob = signals.get("ob_stage")
+    bos = signals.get("bos_stage")
+    # Genuinely no structure -> keep the coarse token; otherwise surface the
+    # per-stage detail (impulse_found/retest_missed/bos_consumed/...).
+    if ob in (None, "no_impulse") and bos in (None, "no_swings", "no_break"):
+        return "no_setup"
+    return f"ob:{ob or 'none'}|bos:{bos or 'none'}"
 
 
 def build_candidate(
@@ -90,11 +97,24 @@ def build_candidate(
     if not bars or len(bars) < 20:
         return None, "too_few_bars"
 
-    threshold = (impulse_threshold if impulse_threshold is not None
-                 else OB_IMPULSE_OVERRIDES.get(symbol, OB_IMPULSE_THRESHOLD))
-    score, direction, signals = smc_detector.score_setups(bars, impulse_threshold=threshold)
-
     price = live_price if live_price is not None else bars[-1].c
+    atr = smc_detector.atr(bars)
+
+    # FX: vol-scaled impulse threshold, wider retest window, close-to-close
+    # impulse. Equities (no instrument) keeps the original detector exactly.
+    if instrument is not None:
+        threshold = cfg.fx_impulse_threshold(atr, price)
+        retest_window = cfg.FX_RETEST_WINDOW_BARS
+        impulse_c2c = cfg.FX_IMPULSE_C2C
+        impulse_max_len = cfg.FX_IMPULSE_MAX_LEN
+    else:
+        threshold = (impulse_threshold if impulse_threshold is not None
+                     else OB_IMPULSE_OVERRIDES.get(symbol, OB_IMPULSE_THRESHOLD))
+        retest_window, impulse_c2c, impulse_max_len = 1, False, 3
+
+    score, direction, signals = smc_detector.score_setups(
+        bars, impulse_threshold=threshold, retest_window=retest_window,
+        impulse_c2c=impulse_c2c, impulse_max_len=impulse_max_len)
 
     if score < CANDIDATE_MIN_SCORE or direction is None:
         return None, _zero_score_reason(signals)
@@ -103,8 +123,6 @@ def build_candidate(
     if zone is None:
         return None, "no_zone"
     zone_low, zone_high = zone
-
-    atr = smc_detector.atr(bars)
     if instrument is not None:
         lv = levels.compute_levels_fx(
             direction, zone_low, zone_high, atr=atr, price=price,

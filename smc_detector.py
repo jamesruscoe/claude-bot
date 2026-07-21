@@ -52,7 +52,19 @@ def detect_ob_retest(
     bars: list[Bar],
     *,
     impulse_threshold: float = OB_IMPULSE_THRESHOLD,
+    retest_window: int = 1,
+    impulse_c2c: bool = False,
+    impulse_max_len: int = 3,
+    diag: dict | None = None,
 ) -> OBRetest | None:
+    """`retest_window` (default 1) = how many recent bars the first retest of the
+    OB zone may fall within (1 = must be the current bar; equities behaviour).
+    `impulse_c2c` measures the impulse close-to-close instead of open-to-close
+    (Yahoo FX daily opens are degenerate). `impulse_max_len` bounds the impulse
+    window length in bars (default 3). NB: c2c anchors at close[start-1], one bar
+    earlier than o2c's open[start], so an o2c run at max_len N spans the same
+    price range as a c2c run at max_len N-1 — keep this in mind when comparing.
+    `diag`, if given, is populated with the failure stage for rejection logging."""
     n = len(bars)
     if n < 6:
         return None
@@ -63,15 +75,15 @@ def detect_ob_retest(
     earliest_end = max(2, n - 1 - OB_LOOKBACK_BARS)
     found = None
     for end_idx in range(n - 2, earliest_end - 1, -1):
-        for length in (1, 2, 3):
+        for length in range(1, impulse_max_len + 1):
             start_idx = end_idx - length + 1
             if start_idx < 1:
                 continue
-            o0 = bars[start_idx].o
             cN = bars[end_idx].c
-            if o0 <= 0:
+            base = bars[start_idx - 1].c if impulse_c2c else bars[start_idx].o
+            if base <= 0:
                 continue
-            move = (cN - o0) / o0
+            move = (cN - base) / base
             if move >= impulse_threshold:
                 found = ("long", start_idx, end_idx, move)
                 break
@@ -82,6 +94,8 @@ def detect_ob_retest(
             break
 
     if not found:
+        if diag is not None:
+            diag["ob"] = "no_impulse"
         return None
     direction, start_idx, end_idx, impulse_pct = found
 
@@ -101,21 +115,38 @@ def detect_ob_retest(
     ob_high = bars[ob_idx].h
     ob_low = bars[ob_idx].l
 
-    # No bar between (impulse end exclusive) and (current exclusive) may have
-    # touched or invalidated the OB. The current bar must be the first to
-    # retrace into the zone.
-    for k in range(end_idx + 1, n - 1):
-        in_zone = bars[k].l <= ob_high and bars[k].h >= ob_low
-        if in_zone:
-            return None
+    # Find the FIRST bar after the impulse to retrace into the OB zone. The
+    # retest is valid only if that first touch falls within the last
+    # `retest_window` bars (window=1 => it must be the current bar). A close
+    # through the zone before any touch invalidates the OB.
+    first_touch: int | None = None
+    for k in range(end_idx + 1, n):
+        if bars[k].l <= ob_high and bars[k].h >= ob_low:
+            first_touch = k
+            break
         if direction == "long" and bars[k].c < ob_low:
-            return None  # closed below the OB → invalidated
+            if diag is not None:
+                diag["ob"] = "ob_invalidated"
+            return None
         if direction == "short" and bars[k].c > ob_high:
-            return None  # closed above the OB → invalidated
+            if diag is not None:
+                diag["ob"] = "ob_invalidated"
+            return None
 
-    current = bars[-1]
-    in_zone_now = current.l <= ob_high and current.h >= ob_low
-    if not in_zone_now:
+    if first_touch is None:
+        if diag is not None:
+            cur = bars[-1]
+            if direction == "long" and ob_high:
+                dist = (cur.c - ob_high) / ob_high
+            elif ob_low:
+                dist = (ob_low - cur.c) / ob_low
+            else:
+                dist = 0.0
+            diag["ob"] = f"retest_missed:{dist * 100:.2f}%"
+        return None
+    if (n - 1) - first_touch > (retest_window - 1):
+        if diag is not None:
+            diag["ob"] = "retest_consumed"
         return None
 
     return OBRetest(
@@ -152,13 +183,18 @@ def _find_swings(bars: list[Bar], lookback: int = SWING_LOOKBACK) -> tuple[list[
     return sh, sl
 
 
-def detect_bos_retest(bars: list[Bar]) -> BOSRetest | None:
+def detect_bos_retest(bars: list[Bar], *, retest_window: int = 1,
+                      diag: dict | None = None) -> BOSRetest | None:
+    """`retest_window` (default 1) = how many recent bars the first retest of the
+    broken level may fall within. `diag`, if given, records the failure stage."""
     n = len(bars)
     if n < 10:
         return None
 
     sh, sl = _find_swings(bars)
     if not sh and not sl:
+        if diag is not None:
+            diag["bos"] = "no_swings"
         return None
 
     # For each swing, find the FIRST bar that closed beyond it. Among those
@@ -180,6 +216,8 @@ def detect_bos_retest(bars: list[Bar]) -> BOSRetest | None:
                 break
 
     if not candidates:
+        if diag is not None:
+            diag["bos"] = "no_break"
         return None
 
     # Most recent break, within the lookback window
@@ -191,32 +229,42 @@ def detect_bos_retest(bars: list[Bar]) -> BOSRetest | None:
             chosen = c
             break
     if chosen is None:
+        if diag is not None:
+            diag["bos"] = "no_break"
         return None
 
     direction, level, swing_idx, broken_at = chosen
 
-    # No bar between (broken_at exclusive) and (current exclusive) may have
-    # already retested or invalidated the level.
-    for k in range(broken_at + 1, n - 1):
-        if direction == "long":
-            if bars[k].c < level:
-                return None  # closed back under the broken level → invalidated
-            if bars[k].l <= level:
-                return None  # already retested previously
-        else:
-            if bars[k].c > level:
-                return None
-            if bars[k].h >= level:
-                return None
+    # First retest of the broken level after the break. Valid only if that first
+    # touch falls within the last `retest_window` bars; a close back through the
+    # level before any touch invalidates the break.
+    first_touch: int | None = None
+    for k in range(broken_at + 1, n):
+        touch = (bars[k].l <= level) if direction == "long" else (bars[k].h >= level)
+        if touch:
+            first_touch = k
+            break
+        if direction == "long" and bars[k].c < level:
+            if diag is not None:
+                diag["bos"] = "bos_invalidated"
+            return None
+        if direction == "short" and bars[k].c > level:
+            if diag is not None:
+                diag["bos"] = "bos_invalidated"
+            return None
 
-    current = bars[-1]
-    if direction == "long" and current.l <= level:
-        return BOSRetest(direction="long", level=round(level, 5),
-                         swing_index=swing_idx, broken_at=broken_at)
-    if direction == "short" and current.h >= level:
-        return BOSRetest(direction="short", level=round(level, 5),
-                         swing_index=swing_idx, broken_at=broken_at)
-    return None
+    if first_touch is None:
+        if diag is not None:
+            dist = abs(bars[-1].c - level) / level if level else 0.0
+            diag["bos"] = f"bos_not_retested:{dist * 100:.2f}%"
+        return None
+    if (n - 1) - first_touch > (retest_window - 1):
+        if diag is not None:
+            diag["bos"] = "bos_consumed"
+        return None
+
+    return BOSRetest(direction=direction, level=round(level, 5),
+                     swing_index=swing_idx, broken_at=broken_at)
 
 
 # ---------- 50MA regime filter ----------
@@ -336,6 +384,9 @@ def score_setups(
     bars: list[Bar],
     *,
     impulse_threshold: float = OB_IMPULSE_THRESHOLD,
+    retest_window: int = 1,
+    impulse_c2c: bool = False,
+    impulse_max_len: int = 3,
 ) -> tuple[int, str | None, dict[str, Any]]:
     """Return (score, direction, signals_dict).
 
@@ -343,13 +394,19 @@ def score_setups(
     100 — both setups fire AND agree on direction
     0   — none, both fire but disagree, or 50MA regime filter blocked it
 
-    `impulse_threshold` overrides the default OB impulse percentage — used
-    for smaller-cap symbols whose typical bar range is below 3%.
+    `impulse_threshold` overrides the default OB impulse percentage. `retest_window`
+    and `impulse_c2c` are the FX detector calibrations (see detect_ob_retest). The
+    per-stage failure reason for each detector is recorded in
+    signals["ob_stage"]/["bos_stage"] for rejection logging.
     """
-    ob = detect_ob_retest(bars, impulse_threshold=impulse_threshold)
-    bos = detect_bos_retest(bars)
+    diag: dict[str, str] = {}
+    ob = detect_ob_retest(bars, impulse_threshold=impulse_threshold,
+                          retest_window=retest_window, impulse_c2c=impulse_c2c,
+                          impulse_max_len=impulse_max_len, diag=diag)
+    bos = detect_bos_retest(bars, retest_window=retest_window, diag=diag)
 
-    signals: dict[str, Any] = {"ob_retest": None, "bos_retest": None}
+    signals: dict[str, Any] = {"ob_retest": None, "bos_retest": None,
+                               "ob_stage": diag.get("ob"), "bos_stage": diag.get("bos")}
     if ob:
         signals["ob_retest"] = {
             "direction": ob.direction,
