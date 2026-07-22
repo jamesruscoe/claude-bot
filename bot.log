@@ -158,3 +158,8 @@
 2026-07-22 15:02:32,424 [INFO] v2.journal: journal entry written: 2026-07-22-coin-short-bade1551.md
 2026-07-22 15:02:32,425 [INFO] v2.pipeline: reflected on 1 resolved trade(s)
 2026-07-22 15:02:32,431 [INFO] v2.report: wrote /home/runner/work/claude-bot/claude-bot/state/daily_report.md
+2026-07-22 20:54:37,201 [INFO] v2.pipeline: skip open NVDA short — already in an open position
+2026-07-22 20:54:37,206 [INFO] v2.pipeline: skip open TSLA short — already in an open position
+2026-07-22 20:54:37,220 [INFO] v2.pipeline: skip open APLD short — already in an open position
+2026-07-22 20:54:37,227 [INFO] v2.pipeline: skip open NFLX short — already in an open position
+2026-07-22 20:54:37,238 [INFO] v2.report: wrote /home/runner/work/claude-bot/claude-bot/state/daily_report.md
