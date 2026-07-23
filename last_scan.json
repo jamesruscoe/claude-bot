@@ -1,5 +1,5 @@
 {
-  "scan_ts": "2026-07-22T22:32:46.563055+00:00",
+  "scan_ts": "2026-07-23T22:30:18.027973+00:00",
   "skipped": false,
   "llm": false,
   "market": "fx",
@@ -37,7 +37,7 @@
     {
       "symbol": "NZDUSD=X",
       "candidate": false,
-      "reject_reason": "no_setup"
+      "reject_reason": "regime_blocked"
     },
     {
       "symbol": "EURGBP=X",
@@ -59,6 +59,7 @@
     "total_r": 0.0
   },
   "rejections": {
-    "no_setup": 9
+    "no_setup": 8,
+    "regime_blocked": 1
   }
 }
