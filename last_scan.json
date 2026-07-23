@@ -1,5 +1,5 @@
 {
-  "scan_ts": "2026-07-23T15:05:07.534240+00:00",
+  "scan_ts": "2026-07-23T20:50:20.424255+00:00",
   "skipped": false,
   "llm": false,
   "market": "equities",
@@ -47,9 +47,7 @@
       "size": "quarter",
       "rationale": "score 50 (bos_retest); R:R 2.0; probation (0 decided) \u2014 tiny stake to learn",
       "decided_by": "deterministic",
-      "pattern": "bos_retest",
-      "opened": true,
-      "pattern_confidence": "unproven (n=0 fwd)"
+      "pattern": "bos_retest"
     },
     {
       "symbol": "APLD",
@@ -77,64 +75,8 @@
       "reject_reason": "regime_blocked"
     }
   ],
-  "opened": [
-    {
-      "id": "2b421b96-84f8-46b3-aa62-3303722e8b51",
-      "signal_id": "046ad5dd-80c1-4cc6-8003-2670f02ae050",
-      "symbol": "SMCI",
-      "direction": "short",
-      "setups": "[\"bos_retest\"]",
-      "regime": "bullish",
-      "entry_price": 26.0607,
-      "stop_loss": 27.32799,
-      "original_sl": 27.32799,
-      "tp1": 23.52612,
-      "tp2": 22.25883,
-      "tp1_hit": 0,
-      "tp1_hit_at": null,
-      "size": "quarter",
-      "size_mult": 0.25,
-      "lots": null,
-      "source": "forward",
-      "pattern": "bos_retest",
-      "opened_at": "2026-07-23T15:05:07.534240+00:00",
-      "closed_at": null,
-      "close_price": null,
-      "outcome": null,
-      "pnl_r": null,
-      "raw_r": null,
-      "journaled": 0
-    }
-  ],
-  "closed": [
-    {
-      "id": "f508485e-8aaa-42a4-ba5b-da66f7a4619b",
-      "signal_id": "a7be8702-4845-472a-b6af-9c95956d9ca3",
-      "symbol": "TSLA",
-      "direction": "short",
-      "setups": "[\"ob_retest\"]",
-      "regime": "bullish",
-      "entry_price": 405.25,
-      "stop_loss": 429.79742,
-      "original_sl": 429.79742,
-      "tp1": 356.15516,
-      "tp2": 331.60774,
-      "tp1_hit": 0,
-      "tp1_hit_at": null,
-      "opened_at": "2026-07-09T15:54:43.450055+00:00",
-      "closed_at": "2026-07-23T15:06:10.083259+00:00",
-      "close_price": 374.01,
-      "outcome": "EXPIRED",
-      "pnl_r": 0.318,
-      "journaled": 0,
-      "size": "quarter",
-      "size_mult": 0.25,
-      "lots": null,
-      "raw_r": 1.273,
-      "source": "forward",
-      "pattern": "ob_retest"
-    }
-  ],
+  "opened": [],
+  "closed": [],
   "system_stats": {
     "total_closed": 15,
     "open": 5,
