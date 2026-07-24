@@ -1,19 +1,16 @@
-# Daily report — 2026-07-24T14:52:48+00:00
+# Daily report — 2026-07-24T20:55:17+00:00
 
 Market: **equities** · judge: deterministic · paper only
 
 ## Candidates (0)
 - none today
 
-## Resolved this run (1)
-- NFLX LOSS — -0.25R (sized)
-
 ## Ledger (running, sized R)
 - 4 open · 16 closed · win rate 23% · total +0.01R
 
 ## Rejections by reason (all-time)
-- no_setup: 201
-- regime_blocked: 61
+- no_setup: 210
+- regime_blocked: 62
 - levels_rejected_wide_stop: 16
 - conflicting_setups: 2
 

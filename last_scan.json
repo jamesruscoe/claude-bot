@@ -1,5 +1,5 @@
 {
-  "scan_ts": "2026-07-24T14:51:46.246468+00:00",
+  "scan_ts": "2026-07-24T20:54:14.172752+00:00",
   "skipped": false,
   "llm": false,
   "market": "equities",
@@ -56,35 +56,7 @@
     }
   ],
   "opened": [],
-  "closed": [
-    {
-      "id": "55d5e91a-2655-4231-b64d-d9c9cb1cd404",
-      "signal_id": "6f3c9f43-d12e-49fa-af95-75e630791ed7",
-      "symbol": "NFLX",
-      "direction": "short",
-      "setups": "[\"bos_retest\"]",
-      "regime": "bearish",
-      "entry_price": 67.788,
-      "stop_loss": 69.25656,
-      "original_sl": 69.25656,
-      "tp1": 64.85088,
-      "tp2": 63.38232,
-      "tp1_hit": 0,
-      "tp1_hit_at": null,
-      "opened_at": "2026-07-22T15:01:30.149886+00:00",
-      "closed_at": "2026-07-24T14:52:48.345684+00:00",
-      "close_price": 69.25656,
-      "outcome": "LOSS",
-      "pnl_r": -0.25,
-      "journaled": 0,
-      "size": "quarter",
-      "size_mult": 0.25,
-      "lots": null,
-      "raw_r": -1.0,
-      "source": "forward",
-      "pattern": "bos_retest"
-    }
-  ],
+  "closed": [],
   "system_stats": {
     "total_closed": 16,
     "open": 4,
