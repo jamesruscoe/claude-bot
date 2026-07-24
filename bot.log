@@ -170,3 +170,7 @@
 2026-07-23 15:06:10,094 [INFO] v2.report: wrote /home/runner/work/claude-bot/claude-bot/state/daily_report.md
 2026-07-23 20:51:21,905 [INFO] v2.pipeline: skip open SMCI short — already in an open position
 2026-07-23 20:51:21,923 [INFO] v2.report: wrote /home/runner/work/claude-bot/claude-bot/state/daily_report.md
+2026-07-24 14:52:48,347 [INFO] v2.store: trade closed: NFLX short -> LOSS @ 69.2566 (-0.25R sized, -1.00R raw)
+2026-07-24 14:52:48,348 [INFO] v2.journal: journal entry written: 2026-07-24-nflx-short-55d5e91a.md
+2026-07-24 14:52:48,350 [INFO] v2.pipeline: reflected on 1 resolved trade(s)
+2026-07-24 14:52:48,356 [INFO] v2.report: wrote /home/runner/work/claude-bot/claude-bot/state/daily_report.md

@@ -1,16 +1,19 @@
-# Daily report — 2026-07-23T20:51:21+00:00
+# Daily report — 2026-07-24T14:52:48+00:00
 
 Market: **equities** · judge: deterministic · paper only
 
-## Candidates (1)
-- **SMCI** short score 50 R:R 2.0 — TAKE/low/quarter
+## Candidates (0)
+- none today
+
+## Resolved this run (1)
+- NFLX LOSS — -0.25R (sized)
 
 ## Ledger (running, sized R)
-- 5 open · 15 closed · win rate 25% · total +0.26R
+- 4 open · 16 closed · win rate 23% · total +0.01R
 
 ## Rejections by reason (all-time)
-- no_setup: 192
-- regime_blocked: 60
+- no_setup: 201
+- regime_blocked: 61
 - levels_rejected_wide_stop: 16
 - conflicting_setups: 2
 

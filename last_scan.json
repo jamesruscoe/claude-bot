@@ -1,5 +1,5 @@
 {
-  "scan_ts": "2026-07-23T20:50:20.424255+00:00",
+  "scan_ts": "2026-07-24T14:51:46.246468+00:00",
   "skipped": false,
   "llm": false,
   "market": "equities",
@@ -12,7 +12,7 @@
     {
       "symbol": "NVDA",
       "candidate": false,
-      "reject_reason": "no_setup"
+      "reject_reason": "regime_blocked"
     },
     {
       "symbol": "TSLA",
@@ -26,28 +26,8 @@
     },
     {
       "symbol": "SMCI",
-      "candidate": true,
-      "score": 50,
-      "direction": "short",
-      "setups": [
-        "bos_retest"
-      ],
-      "regime": "bullish",
-      "price": 30.56,
-      "atr": 2.4564,
-      "entry": 26.0607,
-      "entry_low": 26.02161,
-      "entry_high": 26.09979,
-      "stop_loss": 27.32799,
-      "tp1": 23.52612,
-      "tp2": 22.25883,
-      "rr": 2.0,
-      "take": true,
-      "confidence": "low",
-      "size": "quarter",
-      "rationale": "score 50 (bos_retest); R:R 2.0; probation (0 decided) \u2014 tiny stake to learn",
-      "decided_by": "deterministic",
-      "pattern": "bos_retest"
+      "candidate": false,
+      "reject_reason": "no_setup"
     },
     {
       "symbol": "APLD",
@@ -72,19 +52,47 @@
     {
       "symbol": "COIN",
       "candidate": false,
-      "reject_reason": "regime_blocked"
+      "reject_reason": "no_setup"
     }
   ],
   "opened": [],
-  "closed": [],
+  "closed": [
+    {
+      "id": "55d5e91a-2655-4231-b64d-d9c9cb1cd404",
+      "signal_id": "6f3c9f43-d12e-49fa-af95-75e630791ed7",
+      "symbol": "NFLX",
+      "direction": "short",
+      "setups": "[\"bos_retest\"]",
+      "regime": "bearish",
+      "entry_price": 67.788,
+      "stop_loss": 69.25656,
+      "original_sl": 69.25656,
+      "tp1": 64.85088,
+      "tp2": 63.38232,
+      "tp1_hit": 0,
+      "tp1_hit_at": null,
+      "opened_at": "2026-07-22T15:01:30.149886+00:00",
+      "closed_at": "2026-07-24T14:52:48.345684+00:00",
+      "close_price": 69.25656,
+      "outcome": "LOSS",
+      "pnl_r": -0.25,
+      "journaled": 0,
+      "size": "quarter",
+      "size_mult": 0.25,
+      "lots": null,
+      "raw_r": -1.0,
+      "source": "forward",
+      "pattern": "bos_retest"
+    }
+  ],
   "system_stats": {
-    "total_closed": 15,
-    "open": 5,
-    "win_rate": 0.25,
-    "total_r": 0.255
+    "total_closed": 16,
+    "open": 4,
+    "win_rate": 0.23076923076923078,
+    "total_r": 0.005
   },
   "rejections": {
-    "no_setup": 8,
+    "no_setup": 9,
     "regime_blocked": 1
   }
 }
