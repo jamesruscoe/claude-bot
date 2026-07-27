@@ -1,13 +1,34 @@
 {
-  "scan_ts": "2026-07-24T22:34:08.193026+00:00",
+  "scan_ts": "2026-07-27T22:33:27.327197+00:00",
   "skipped": false,
   "llm": false,
   "market": "fx",
   "results": [
     {
       "symbol": "EURUSD=X",
-      "candidate": false,
-      "reject_reason": "no_setup"
+      "candidate": true,
+      "score": 50,
+      "direction": "short",
+      "setups": [
+        "bos_retest"
+      ],
+      "regime": "bearish",
+      "price": 1.13727,
+      "atr": 0.00513,
+      "entry": 1.13782,
+      "entry_low": 1.13617,
+      "entry_high": 1.13959,
+      "stop_loss": 1.14215,
+      "tp1": 1.12916,
+      "tp2": 1.12483,
+      "rr": 2.0,
+      "take": true,
+      "confidence": "low",
+      "size": "quarter",
+      "rationale": "score 50 (bos_retest); R:R 2.0; probation (0 decided) \u2014 tiny stake to learn",
+      "decided_by": "deterministic",
+      "pattern": "bos_retest",
+      "fx_blocked": "below calibrated FX_MIN_SCORE (50<85)"
     },
     {
       "symbol": "GBPUSD=X",
@@ -26,8 +47,29 @@
     },
     {
       "symbol": "AUDUSD=X",
-      "candidate": false,
-      "reject_reason": "no_setup"
+      "candidate": true,
+      "score": 50,
+      "direction": "short",
+      "setups": [
+        "bos_retest"
+      ],
+      "regime": "bearish",
+      "price": 0.69911,
+      "atr": 0.00451,
+      "entry": 0.69667,
+      "entry_low": 0.69572,
+      "entry_high": 0.69782,
+      "stop_loss": 0.70007,
+      "tp1": 0.68987,
+      "tp2": 0.68647,
+      "rr": 2.0,
+      "take": true,
+      "confidence": "low",
+      "size": "quarter",
+      "rationale": "score 50 (bos_retest); R:R 2.0; probation (0 decided) \u2014 tiny stake to learn",
+      "decided_by": "deterministic",
+      "pattern": "bos_retest",
+      "fx_blocked": "below calibrated FX_MIN_SCORE (50<85)"
     },
     {
       "symbol": "USDCAD=X",
@@ -46,8 +88,29 @@
     },
     {
       "symbol": "EURJPY=X",
-      "candidate": false,
-      "reject_reason": "no_setup"
+      "candidate": true,
+      "score": 50,
+      "direction": "long",
+      "setups": [
+        "bos_retest"
+      ],
+      "regime": "ranging",
+      "price": 186.155,
+      "atr": 0.7743,
+      "entry": 186.32299,
+      "entry_low": 186.02553,
+      "entry_high": 186.58445,
+      "stop_loss": 185.63838,
+      "tp1": 187.69221,
+      "tp2": 188.37682,
+      "rr": 2.0,
+      "take": true,
+      "confidence": "low",
+      "size": "quarter",
+      "rationale": "score 50 (bos_retest); R:R 2.0; probation (0 decided) \u2014 tiny stake to learn",
+      "decided_by": "deterministic",
+      "pattern": "bos_retest",
+      "fx_blocked": "below calibrated FX_MIN_SCORE (50<85)"
     }
   ],
   "opened": [],
@@ -59,6 +122,7 @@
     "total_r": 0.0
   },
   "rejections": {
-    "no_setup": 9
+    "no_setup": 6,
+    "below calibrated FX_MIN_SCORE (50<85)": 3
   }
 }
