@@ -187,3 +187,6 @@
 2026-07-27 21:01:34,435 [INFO] v2.journal: journal entry written: 2026-07-27-apld-short-e0d50a8c.md
 2026-07-27 21:01:34,437 [INFO] v2.pipeline: reflected on 1 resolved trade(s)
 2026-07-27 21:01:34,443 [INFO] v2.report: wrote /home/runner/work/claude-bot/claude-bot/state/daily_report.md
+2026-07-28 15:17:56,805 [INFO] v2.store: trade opened: TSLA short @ 314.6000 (sl 324.2940 tp1 295.2121 tp2 285.5181) size=quarter x0.25
+2026-07-28 15:17:56,834 [INFO] v2.store: trade opened: AMD short @ 544.0350 (sl 580.2163 tp1 471.6724 tp2 435.4911) size=quarter x0.25
+2026-07-28 15:17:56,890 [INFO] v2.report: wrote /home/runner/work/claude-bot/claude-bot/state/daily_report.md
