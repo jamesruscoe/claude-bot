@@ -1,20 +1,19 @@
-# Daily report — 2026-07-29T20:42:56+00:00
+# Daily report — 2026-07-30T15:08:27+00:00
 
 Market: **equities** · judge: deterministic · paper only
 
-## Candidates (2)
-- **NVDA** short score 50 R:R 2.0 — TAKE/low/quarter
-- **COIN** long score 50 R:R 2.0 — TAKE/low/quarter
+## Candidates (0)
+- none today
 
 ## Resolved this run (1)
-- NVDA BREAKEVEN — 0.0R (sized)
+- AMD WIN_TP2 — 0.75R (sized)
 
 ## Ledger (running, sized R)
-- 3 open · 21 closed · win rate 25% · total +0.26R
+- 2 open · 22 closed · win rate 29% · total +1.00R
 
 ## Rejections by reason (all-time)
-- no_setup: 252
-- regime_blocked: 70
+- no_setup: 261
+- regime_blocked: 71
 - levels_rejected_wide_stop: 16
 - conflicting_setups: 2
 

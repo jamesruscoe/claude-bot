@@ -205,3 +205,7 @@
 2026-07-29 20:42:56,198 [INFO] v2.journal: journal entry written: 2026-07-29-nvda-short-ba70e2bf.md
 2026-07-29 20:42:56,199 [INFO] v2.pipeline: reflected on 1 resolved trade(s)
 2026-07-29 20:42:56,205 [INFO] v2.report: wrote /home/runner/work/claude-bot/claude-bot/state/daily_report.md
+2026-07-30 15:08:27,162 [INFO] v2.store: trade closed: AMD short -> WIN_TP2 @ 435.4911 (0.75R sized, 3.00R raw)
+2026-07-30 15:08:27,164 [INFO] v2.journal: journal entry written: 2026-07-30-amd-short-f67abb02.md
+2026-07-30 15:08:27,166 [INFO] v2.pipeline: reflected on 1 resolved trade(s)
+2026-07-30 15:08:27,171 [INFO] v2.report: wrote /home/runner/work/claude-bot/claude-bot/state/daily_report.md
