@@ -1,5 +1,5 @@
 {
-  "scan_ts": "2026-07-29T22:28:24.962265+00:00",
+  "scan_ts": "2026-07-30T22:35:12.913047+00:00",
   "skipped": false,
   "llm": false,
   "market": "fx",
@@ -17,33 +17,12 @@
     {
       "symbol": "USDJPY=X",
       "candidate": false,
-      "reject_reason": "no_setup"
+      "reject_reason": "regime_blocked"
     },
     {
       "symbol": "USDCHF=X",
-      "candidate": true,
-      "score": 50,
-      "direction": "long",
-      "setups": [
-        "bos_retest"
-      ],
-      "regime": "bullish",
-      "price": 0.81384,
-      "atr": 0.00522,
-      "entry": 0.81715,
-      "entry_low": 0.8158,
-      "entry_high": 0.81826,
-      "stop_loss": 0.81319,
-      "tp1": 0.82507,
-      "tp2": 0.82903,
-      "rr": 2.0,
-      "take": true,
-      "confidence": "low",
-      "size": "quarter",
-      "rationale": "score 50 (bos_retest); R:R 2.0; probation (0 decided) \u2014 tiny stake to learn",
-      "decided_by": "deterministic",
-      "pattern": "bos_retest",
-      "fx_blocked": "below calibrated FX_MIN_SCORE (50<85)"
+      "candidate": false,
+      "reject_reason": "no_setup"
     },
     {
       "symbol": "AUDUSD=X",
@@ -81,6 +60,6 @@
   },
   "rejections": {
     "no_setup": 8,
-    "below calibrated FX_MIN_SCORE (50<85)": 1
+    "regime_blocked": 1
   }
 }
