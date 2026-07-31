@@ -210,3 +210,11 @@
 2026-07-30 15:08:27,166 [INFO] v2.pipeline: reflected on 1 resolved trade(s)
 2026-07-30 15:08:27,171 [INFO] v2.report: wrote /home/runner/work/claude-bot/claude-bot/state/daily_report.md
 2026-07-30 20:54:50,212 [INFO] v2.report: wrote /home/runner/work/claude-bot/claude-bot/state/daily_report.md
+2026-07-31 15:17:11,283 [INFO] v2.store: trade opened: NVDA short @ 191.1400 (sl 195.1803 tp1 183.0595 tp2 179.0192) size=quarter x0.25
+2026-07-31 15:17:11,302 [INFO] v2.pipeline: skip open TSLA short — already in an open position
+2026-07-31 15:17:11,316 [INFO] v2.store: trade opened: USOIL long @ 80.1050 (sl 75.4915 tp1 89.3320 tp2 93.9454) size=quarter x0.25
+2026-07-31 15:17:11,391 [INFO] v2.store: trade opened: APLD short @ 24.0300 (sl 25.6178 tp1 20.8543 tp2 19.2665) size=quarter x0.25
+2026-07-31 15:17:11,411 [INFO] v2.store: trade opened: AMZN short @ 238.2500 (sl 242.2779 tp1 230.1942 tp2 226.1663) size=quarter x0.25
+2026-07-31 15:17:11,432 [INFO] v2.store: trade opened: AMD short @ 437.2300 (sl 458.0695 tp1 395.5510 tp2 374.7115) size=quarter x0.25
+2026-07-31 15:17:11,452 [INFO] v2.store: trade opened: COIN short @ 163.3750 (sl 172.9789 tp1 144.1671 tp2 134.5632) size=quarter x0.25
+2026-07-31 15:17:11,527 [INFO] v2.report: wrote /home/runner/work/claude-bot/claude-bot/state/daily_report.md
