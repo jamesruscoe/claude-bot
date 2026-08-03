@@ -226,3 +226,7 @@
 2026-07-31 20:52:25,141 [INFO] v2.pipeline: skip open AMD short — already in an open position
 2026-07-31 20:52:25,147 [INFO] v2.pipeline: skip open COIN short — already in an open position
 2026-07-31 20:52:25,157 [INFO] v2.report: wrote /home/runner/work/claude-bot/claude-bot/state/daily_report.md
+2026-08-03 15:41:40,005 [INFO] v2.store: trade closed: COIN long -> LOSS @ 153.9527 (-0.25R sized, -1.00R raw)
+2026-08-03 15:41:40,009 [INFO] v2.journal: journal entry written: 2026-08-03-coin-long-6d0ba254.md
+2026-08-03 15:41:40,011 [INFO] v2.pipeline: reflected on 1 resolved trade(s)
+2026-08-03 15:41:40,016 [INFO] v2.report: wrote /home/runner/work/claude-bot/claude-bot/state/daily_report.md

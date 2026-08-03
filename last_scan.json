@@ -1,5 +1,5 @@
 {
-  "scan_ts": "2026-07-31T20:51:22.960612+00:00",
+  "scan_ts": "2026-08-03T15:40:37.547902+00:00",
   "skipped": false,
   "llm": false,
   "market": "equities",
@@ -11,201 +11,89 @@
     },
     {
       "symbol": "NVDA",
-      "candidate": true,
-      "score": 50,
-      "direction": "short",
-      "setups": [
-        "bos_retest"
-      ],
-      "regime": "ranging",
-      "price": 195.04,
-      "atr": 7.5071,
-      "entry": 191.14,
-      "entry_low": 190.85329,
-      "entry_high": 191.42671,
-      "stop_loss": 195.18026,
-      "tp1": 183.05948,
-      "tp2": 179.01922,
-      "rr": 2.0,
-      "take": true,
-      "confidence": "low",
-      "size": "quarter",
-      "rationale": "score 50 (bos_retest); R:R 2.0; probation (1 decided) \u2014 tiny stake to learn",
-      "decided_by": "deterministic",
-      "pattern": "bos_retest"
-    },
-    {
-      "symbol": "TSLA",
-      "candidate": true,
-      "score": 50,
-      "direction": "short",
-      "setups": [
-        "bos_retest"
-      ],
-      "regime": "bearish",
-      "price": 308.85,
-      "atr": 17.08336,
-      "entry": 300.41,
-      "entry_low": 299.95939,
-      "entry_high": 300.86062,
-      "stop_loss": 309.40229,
-      "tp1": 282.42542,
-      "tp2": 273.43313,
-      "rr": 2.0,
-      "take": true,
-      "confidence": "low",
-      "size": "quarter",
-      "rationale": "score 50 (bos_retest); R:R 2.0; probation (0 decided) \u2014 tiny stake to learn",
-      "decided_by": "deterministic",
-      "pattern": "bos_retest"
-    },
-    {
-      "symbol": "USOIL",
-      "candidate": true,
-      "score": 50,
-      "direction": "long",
-      "setups": [
-        "ob_retest"
-      ],
-      "regime": "bearish",
-      "price": 84.53,
-      "atr": 4.57697,
-      "entry": 80.105,
-      "entry_low": 77.78,
-      "entry_high": 82.43,
-      "stop_loss": 75.49152,
-      "tp1": 89.33196,
-      "tp2": 93.94544,
-      "rr": 2.0,
-      "take": true,
-      "confidence": "low",
-      "size": "quarter",
-      "rationale": "score 50 (ob_retest); R:R 2.0; thin sample (2 decided) \u2014 ramping",
-      "decided_by": "deterministic",
-      "pattern": "ob_retest"
-    },
-    {
-      "symbol": "SMCI",
       "candidate": false,
       "reject_reason": "no_setup"
     },
     {
-      "symbol": "APLD",
-      "candidate": true,
-      "score": 50,
-      "direction": "short",
-      "setups": [
-        "bos_retest"
-      ],
-      "regime": "bearish",
-      "price": 27.97,
-      "atr": 3.10357,
-      "entry": 24.03,
-      "entry_low": 23.99396,
-      "entry_high": 24.06605,
-      "stop_loss": 25.61783,
-      "tp1": 20.85434,
-      "tp2": 19.26651,
-      "rr": 2.0,
-      "take": true,
-      "confidence": "low",
-      "size": "quarter",
-      "rationale": "score 50 (bos_retest); R:R 2.0; thin sample (2 decided) \u2014 ramping",
-      "decided_by": "deterministic",
-      "pattern": "bos_retest"
+      "symbol": "TSLA",
+      "candidate": false,
+      "reject_reason": "no_setup"
     },
     {
-      "symbol": "AMZN",
-      "candidate": true,
-      "score": 50,
-      "direction": "short",
-      "setups": [
-        "bos_retest"
-      ],
-      "regime": "bearish",
-      "price": 235.5,
-      "atr": 7.34103,
-      "entry": 238.25,
-      "entry_low": 237.89263,
-      "entry_high": 238.60738,
-      "stop_loss": 242.27789,
-      "tp1": 230.19422,
-      "tp2": 226.16633,
-      "rr": 2.0,
-      "take": true,
-      "confidence": "low",
-      "size": "quarter",
-      "rationale": "score 50 (bos_retest); R:R 2.0; thin sample (2 decided) \u2014 ramping",
-      "decided_by": "deterministic",
-      "pattern": "bos_retest"
-    },
-    {
-      "symbol": "NFLX",
+      "symbol": "USOIL",
       "candidate": false,
       "reject_reason": "regime_blocked"
     },
     {
+      "symbol": "SMCI",
+      "candidate": false,
+      "reject_reason": "regime_blocked"
+    },
+    {
+      "symbol": "APLD",
+      "candidate": false,
+      "reject_reason": "regime_blocked"
+    },
+    {
+      "symbol": "AMZN",
+      "candidate": false,
+      "reject_reason": "no_setup"
+    },
+    {
+      "symbol": "NFLX",
+      "candidate": false,
+      "reject_reason": "no_setup"
+    },
+    {
       "symbol": "AMD",
-      "candidate": true,
-      "score": 50,
-      "direction": "short",
-      "setups": [
-        "bos_retest"
-      ],
-      "regime": "bullish",
-      "price": 485.39,
-      "atr": 40.36731,
-      "entry": 437.23,
-      "entry_low": 436.57416,
-      "entry_high": 437.88585,
-      "stop_loss": 458.0695,
-      "tp1": 395.551,
-      "tp2": 374.7115,
-      "rr": 2.0,
-      "take": true,
-      "confidence": "low",
-      "size": "quarter",
-      "rationale": "score 50 (bos_retest); R:R 2.0; thin sample (2 decided) \u2014 ramping",
-      "decided_by": "deterministic",
-      "pattern": "bos_retest"
+      "candidate": false,
+      "reject_reason": "no_setup"
     },
     {
       "symbol": "COIN",
-      "candidate": true,
-      "score": 50,
-      "direction": "short",
-      "setups": [
-        "ob_retest"
-      ],
-      "regime": "bearish",
-      "price": 163.58,
-      "atr": 9.61788,
-      "entry": 163.375,
-      "entry_low": 158.58,
-      "entry_high": 168.17,
-      "stop_loss": 172.97894,
-      "tp1": 144.16712,
-      "tp2": 134.56318,
-      "rr": 2.0,
-      "take": true,
-      "confidence": "low",
-      "size": "quarter",
-      "rationale": "score 50 (ob_retest); R:R 2.0; thin sample (2 decided) \u2014 ramping",
-      "decided_by": "deterministic",
-      "pattern": "ob_retest"
+      "candidate": false,
+      "reject_reason": "no_setup"
     }
   ],
   "opened": [],
-  "closed": [],
+  "closed": [
+    {
+      "id": "6d0ba254-91fe-4dc2-a745-7bde1c2dee96",
+      "signal_id": "d6cce18a-74f1-4200-9371-454b5e34934e",
+      "symbol": "COIN",
+      "direction": "long",
+      "setups": "[\"ob_retest\"]",
+      "regime": "bearish",
+      "entry_price": 162.31,
+      "stop_loss": 153.95273,
+      "original_sl": 153.95273,
+      "tp1": 179.02454,
+      "tp2": 187.38181,
+      "tp1_hit": 0,
+      "tp1_hit_at": null,
+      "opened_at": "2026-07-29T15:06:46.825778+00:00",
+      "closed_at": "2026-08-03T15:41:40.004939+00:00",
+      "close_price": 153.95273,
+      "outcome": "LOSS",
+      "pnl_r": -0.25,
+      "journaled": 0,
+      "size": "quarter",
+      "size_mult": 0.25,
+      "lots": null,
+      "raw_r": -1.0,
+      "source": "forward",
+      "pattern": "ob_retest"
+    }
+  ],
   "system_stats": {
-    "total_closed": 22,
-    "open": 8,
-    "win_rate": 0.29411764705882354,
-    "total_r": 1.005
+    "total_closed": 23,
+    "open": 7,
+    "win_rate": 0.2777777777777778,
+    "total_r": 0.755
   },
   "rejections": {
-    "regime_blocked": 1,
-    "no_setup": 1,
+    "no_setup": 6,
+    "regime_blocked": 3,
     "levels_rejected_wide_stop": 1
   }
 }
