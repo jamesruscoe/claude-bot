@@ -1,5 +1,5 @@
 {
-  "scan_ts": "2026-08-03T15:40:37.547902+00:00",
+  "scan_ts": "2026-08-03T20:53:07.326095+00:00",
   "skipped": false,
   "llm": false,
   "market": "equities",
@@ -56,35 +56,7 @@
     }
   ],
   "opened": [],
-  "closed": [
-    {
-      "id": "6d0ba254-91fe-4dc2-a745-7bde1c2dee96",
-      "signal_id": "d6cce18a-74f1-4200-9371-454b5e34934e",
-      "symbol": "COIN",
-      "direction": "long",
-      "setups": "[\"ob_retest\"]",
-      "regime": "bearish",
-      "entry_price": 162.31,
-      "stop_loss": 153.95273,
-      "original_sl": 153.95273,
-      "tp1": 179.02454,
-      "tp2": 187.38181,
-      "tp1_hit": 0,
-      "tp1_hit_at": null,
-      "opened_at": "2026-07-29T15:06:46.825778+00:00",
-      "closed_at": "2026-08-03T15:41:40.004939+00:00",
-      "close_price": 153.95273,
-      "outcome": "LOSS",
-      "pnl_r": -0.25,
-      "journaled": 0,
-      "size": "quarter",
-      "size_mult": 0.25,
-      "lots": null,
-      "raw_r": -1.0,
-      "source": "forward",
-      "pattern": "ob_retest"
-    }
-  ],
+  "closed": [],
   "system_stats": {
     "total_closed": 23,
     "open": 7,
