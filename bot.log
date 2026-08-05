@@ -199,3 +199,8 @@
 2026-08-04 22:35:03,518 [INFO] v2.datasource: data source: FX (yfinance), 9 pairs
 2026-08-04 22:35:08,380 [INFO] v2.report: wrote /home/runner/work/claude-bot/claude-bot/state/daily_report.md
 2026-08-04 22:35:08,666 [INFO] v2.report: wrote /home/runner/work/claude-bot/claude-bot/state/daily_report.md
+2026-08-05 22:33:59,847 [INFO] v2.datasource: data source: FX (yfinance), 9 pairs
+2026-08-05 22:34:04,785 [INFO] v2.store: trade opened: EURJPY=X short @ 184.7720 (sl 188.1755 tp1 177.9650 tp2 174.5615) size=quarter x0.25
+2026-08-05 22:34:05,588 [INFO] v2.report: wrote /home/runner/work/claude-bot/claude-bot/state/daily_report.md
+2026-08-05 22:34:05,591 [INFO] v2.alerts: FX alert queued: FX SIGNAL: EURJPY SHORT @ 184.77201 [ob_retest · unproven]
+2026-08-05 22:34:05,892 [INFO] v2.report: wrote /home/runner/work/claude-bot/claude-bot/state/daily_report.md

@@ -1,5 +1,5 @@
 {
-  "scan_ts": "2026-08-04T22:35:03.518499+00:00",
+  "scan_ts": "2026-08-05T22:33:59.847073+00:00",
   "skipped": false,
   "llm": false,
   "market": "fx",
@@ -46,19 +46,70 @@
     },
     {
       "symbol": "EURJPY=X",
-      "candidate": false,
-      "reject_reason": "no_setup"
+      "candidate": true,
+      "score": 100,
+      "direction": "short",
+      "setups": [
+        "ob_retest",
+        "bos_retest"
+      ],
+      "regime": "ranging",
+      "price": 182.189,
+      "atr": 1.529,
+      "entry": 184.77201,
+      "entry_low": 182.16901,
+      "entry_high": 187.411,
+      "stop_loss": 188.1755,
+      "tp1": 177.96503,
+      "tp2": 174.56154,
+      "rr": 2.0,
+      "take": true,
+      "confidence": "low",
+      "size": "quarter",
+      "rationale": "score 100 (ob_retest+bos_retest); R:R 2.0; dual-confluence (OB + BOS agree); probation (0 decided) \u2014 tiny stake to learn",
+      "decided_by": "deterministic",
+      "pattern": "ob_retest",
+      "opened": true,
+      "pattern_confidence": "unproven (n=0 fwd)"
     }
   ],
-  "opened": [],
+  "opened": [
+    {
+      "id": "ef0bff1d-2cf0-40fc-bbbc-6048d7ff6127",
+      "signal_id": "d076a62a-6f83-4eff-aa47-99c0c1c4a565",
+      "symbol": "EURJPY=X",
+      "direction": "short",
+      "setups": "[\"ob_retest\", \"bos_retest\"]",
+      "regime": "ranging",
+      "entry_price": 184.77201,
+      "stop_loss": 188.1755,
+      "original_sl": 188.1755,
+      "tp1": 177.96503,
+      "tp2": 174.56154,
+      "tp1_hit": 0,
+      "tp1_hit_at": null,
+      "size": "quarter",
+      "size_mult": 0.25,
+      "lots": 0.027,
+      "source": "forward",
+      "pattern": "ob_retest",
+      "opened_at": "2026-08-05T22:33:59.847073+00:00",
+      "closed_at": null,
+      "close_price": null,
+      "outcome": null,
+      "pnl_r": null,
+      "raw_r": null,
+      "journaled": 0
+    }
+  ],
   "closed": [],
   "system_stats": {
     "total_closed": 0,
-    "open": 0,
+    "open": 1,
     "win_rate": null,
     "total_r": 0.0
   },
   "rejections": {
-    "no_setup": 9
+    "no_setup": 8
   }
 }
