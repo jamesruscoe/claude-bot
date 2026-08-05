@@ -1,5 +1,5 @@
 {
-  "scan_ts": "2026-08-05T15:11:08.146428+00:00",
+  "scan_ts": "2026-08-05T20:55:11.867888+00:00",
   "skipped": false,
   "llm": false,
   "market": "equities",
@@ -57,9 +57,7 @@
       "size": "quarter",
       "rationale": "score 50 (bos_retest); R:R 2.0; thin sample (3 decided) \u2014 ramping",
       "decided_by": "deterministic",
-      "pattern": "bos_retest",
-      "opened": true,
-      "pattern_confidence": "unproven (n=8 fwd)"
+      "pattern": "bos_retest"
     },
     {
       "symbol": "NFLX",
@@ -89,9 +87,7 @@
       "size": "quarter",
       "rationale": "score 50 (ob_retest); R:R 2.0; thin sample (3 decided) \u2014 ramping",
       "decided_by": "deterministic",
-      "pattern": "ob_retest",
-      "opened": true,
-      "pattern_confidence": "unproven (n=21 fwd)"
+      "pattern": "ob_retest"
     },
     {
       "symbol": "COIN",
@@ -99,62 +95,7 @@
       "reject_reason": "no_setup"
     }
   ],
-  "opened": [
-    {
-      "id": "3c690eaf-d257-4cfc-ba20-b659eee2eb4d",
-      "signal_id": "dc46566b-b89a-41f1-a466-77ad5eb75c8b",
-      "symbol": "AMZN",
-      "direction": "long",
-      "setups": "[\"bos_retest\"]",
-      "regime": "ranging",
-      "entry_price": 278.56,
-      "stop_loss": 273.2306,
-      "original_sl": 273.2306,
-      "tp1": 289.2188,
-      "tp2": 294.5482,
-      "tp1_hit": 0,
-      "tp1_hit_at": null,
-      "size": "quarter",
-      "size_mult": 0.25,
-      "lots": null,
-      "source": "forward",
-      "pattern": "bos_retest",
-      "opened_at": "2026-08-05T15:11:08.146428+00:00",
-      "closed_at": null,
-      "close_price": null,
-      "outcome": null,
-      "pnl_r": null,
-      "raw_r": null,
-      "journaled": 0
-    },
-    {
-      "id": "ec2c3392-eae2-44e0-8294-16ee779f3145",
-      "signal_id": "b09d3940-7bf7-4c7f-a03f-84725521ae84",
-      "symbol": "AMD",
-      "direction": "long",
-      "setups": "[\"ob_retest\"]",
-      "regime": "bullish",
-      "entry_price": 495.69,
-      "stop_loss": 455.56557,
-      "original_sl": 455.56557,
-      "tp1": 575.93886,
-      "tp2": 616.06329,
-      "tp1_hit": 0,
-      "tp1_hit_at": null,
-      "size": "quarter",
-      "size_mult": 0.25,
-      "lots": null,
-      "source": "forward",
-      "pattern": "ob_retest",
-      "opened_at": "2026-08-05T15:11:08.146428+00:00",
-      "closed_at": null,
-      "close_price": null,
-      "outcome": null,
-      "pnl_r": null,
-      "raw_r": null,
-      "journaled": 0
-    }
-  ],
+  "opened": [],
   "closed": [],
   "system_stats": {
     "total_closed": 29,
