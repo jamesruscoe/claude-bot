@@ -1,17 +1,19 @@
-# Daily report — 2026-08-05T20:56:13+00:00
+# Daily report — 2026-08-06T15:11:49+00:00
 
 Market: **equities** · judge: deterministic · paper only
 
-## Candidates (2)
-- **AMZN** long score 50 R:R 2.0 — TAKE/low/quarter
-- **AMD** long score 50 R:R 2.0 — TAKE/low/quarter
+## Candidates (0)
+- none today
+
+## Resolved this run (1)
+- NVDA WIN_TP2 — 0.75R (sized)
 
 ## Ledger (running, sized R)
-- 5 open · 29 closed · win rate 21% · total -0.74R
+- 4 open · 30 closed · win rate 24% · total +0.01R
 
 ## Rejections by reason (all-time)
-- no_setup: 306
-- regime_blocked: 86
+- no_setup: 313
+- regime_blocked: 89
 - levels_rejected_wide_stop: 24
 - conflicting_setups: 2
 
