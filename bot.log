@@ -204,3 +204,7 @@
 2026-08-05 22:34:05,588 [INFO] v2.report: wrote /home/runner/work/claude-bot/claude-bot/state/daily_report.md
 2026-08-05 22:34:05,591 [INFO] v2.alerts: FX alert queued: FX SIGNAL: EURJPY SHORT @ 184.77201 [ob_retest · unproven]
 2026-08-05 22:34:05,892 [INFO] v2.report: wrote /home/runner/work/claude-bot/claude-bot/state/daily_report.md
+2026-08-07 01:03:42,057 [INFO] v2.datasource: data source: FX (yfinance), 9 pairs
+2026-08-07 01:03:47,706 [INFO] v2.pipeline: skip open AUDUSD=X — below calibrated FX_MIN_SCORE (50<85)
+2026-08-07 01:03:48,308 [INFO] v2.report: wrote /home/runner/work/claude-bot/claude-bot/state/daily_report.md
+2026-08-07 01:03:48,597 [INFO] v2.report: wrote /home/runner/work/claude-bot/claude-bot/state/daily_report.md
