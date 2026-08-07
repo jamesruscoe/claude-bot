@@ -1,5 +1,5 @@
 {
-  "scan_ts": "2026-08-06T15:10:46.828552+00:00",
+  "scan_ts": "2026-08-07T00:50:02.469721+00:00",
   "skipped": false,
   "llm": false,
   "market": "equities",
@@ -21,8 +21,28 @@
     },
     {
       "symbol": "USOIL",
-      "candidate": false,
-      "reject_reason": "no_setup"
+      "candidate": true,
+      "score": 50,
+      "direction": "short",
+      "setups": [
+        "bos_retest"
+      ],
+      "regime": "bearish",
+      "price": 78.38,
+      "atr": 4.61768,
+      "entry": 77.78,
+      "entry_low": 77.66333,
+      "entry_high": 77.89667,
+      "stop_loss": 80.20551,
+      "tp1": 72.92898,
+      "tp2": 70.50347,
+      "rr": 2.0,
+      "take": true,
+      "confidence": "low",
+      "size": "quarter",
+      "rationale": "score 50 (bos_retest); R:R 2.0; thin sample (3 decided) \u2014 ramping",
+      "decided_by": "deterministic",
+      "pattern": "bos_retest"
     },
     {
       "symbol": "SMCI",
@@ -56,35 +76,7 @@
     }
   ],
   "opened": [],
-  "closed": [
-    {
-      "id": "6fd99762-8dcc-42cd-b821-84b704e0a655",
-      "signal_id": "27e0fc19-1a2d-44bd-88d5-ede0a6f0d638",
-      "symbol": "NVDA",
-      "direction": "long",
-      "setups": "[\"ob_retest\"]",
-      "regime": "bearish",
-      "entry_price": 193.542,
-      "stop_loss": 186.11508,
-      "original_sl": 186.11508,
-      "tp1": 208.39584,
-      "tp2": 215.82276,
-      "tp1_hit": 0,
-      "tp1_hit_at": null,
-      "opened_at": "2026-08-04T15:22:08.146546+00:00",
-      "closed_at": "2026-08-06T15:11:49.628065+00:00",
-      "close_price": 215.82276,
-      "outcome": "WIN_TP2",
-      "pnl_r": 0.75,
-      "journaled": 0,
-      "size": "quarter",
-      "size_mult": 0.25,
-      "lots": null,
-      "raw_r": 3.0,
-      "source": "forward",
-      "pattern": "ob_retest"
-    }
-  ],
+  "closed": [],
   "system_stats": {
     "total_closed": 30,
     "open": 4,
@@ -92,7 +84,7 @@
     "total_r": 0.005
   },
   "rejections": {
-    "no_setup": 7,
+    "no_setup": 6,
     "regime_blocked": 3
   }
 }

@@ -1,19 +1,16 @@
-# Daily report — 2026-08-06T15:11:49+00:00
+# Daily report — 2026-08-07T00:51:04+00:00
 
 Market: **equities** · judge: deterministic · paper only
 
-## Candidates (0)
-- none today
-
-## Resolved this run (1)
-- NVDA WIN_TP2 — 0.75R (sized)
+## Candidates (1)
+- **USOIL** short score 50 R:R 2.0 — TAKE/low/quarter
 
 ## Ledger (running, sized R)
 - 4 open · 30 closed · win rate 24% · total +0.01R
 
 ## Rejections by reason (all-time)
-- no_setup: 313
-- regime_blocked: 89
+- no_setup: 319
+- regime_blocked: 92
 - levels_rejected_wide_stop: 24
 - conflicting_setups: 2
 
