@@ -263,3 +263,9 @@
 2026-08-06 15:11:49,640 [INFO] v2.report: wrote /home/runner/work/claude-bot/claude-bot/state/daily_report.md
 2026-08-07 00:51:04,801 [INFO] v2.pipeline: skip open USOIL short — already in an open position
 2026-08-07 00:51:04,825 [INFO] v2.report: wrote /home/runner/work/claude-bot/claude-bot/state/daily_report.md
+2026-08-07 14:10:54,632 [INFO] v2.pipeline: skip open USOIL short — already in an open position
+2026-08-07 14:10:54,648 [INFO] v2.store: trade opened: AMD short @ 473.1232 (sl 510.6702 tp1 398.0292 tp2 360.4821) size=quarter x0.25
+2026-08-07 14:10:54,725 [INFO] v2.store: trade closed: AMZN long -> LOSS @ 273.2306 (-0.25R sized, -1.00R raw)
+2026-08-07 14:10:54,727 [INFO] v2.journal: journal entry written: 2026-08-07-amzn-long-3c690eaf.md
+2026-08-07 14:10:54,729 [INFO] v2.pipeline: reflected on 1 resolved trade(s)
+2026-08-07 14:10:54,735 [INFO] v2.report: wrote /home/runner/work/claude-bot/claude-bot/state/daily_report.md
