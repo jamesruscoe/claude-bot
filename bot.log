@@ -212,3 +212,7 @@
 2026-08-07 22:05:30,837 [INFO] v2.pipeline: skip open AUDUSD=X — below calibrated FX_MIN_SCORE (50<85)
 2026-08-07 22:05:31,605 [INFO] v2.report: wrote /home/runner/work/claude-bot/claude-bot/state/daily_report.md
 2026-08-07 22:05:31,924 [INFO] v2.report: wrote /home/runner/work/claude-bot/claude-bot/state/daily_report.md
+2026-08-10 22:06:21,393 [INFO] v2.datasource: data source: FX (yfinance), 9 pairs
+2026-08-10 22:06:26,836 [INFO] v2.pipeline: skip open USDJPY=X — below calibrated FX_MIN_SCORE (50<85)
+2026-08-10 22:06:27,806 [INFO] v2.report: wrote /home/runner/work/claude-bot/claude-bot/state/daily_report.md
+2026-08-10 22:06:28,089 [INFO] v2.report: wrote /home/runner/work/claude-bot/claude-bot/state/daily_report.md
