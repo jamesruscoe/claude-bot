@@ -1,5 +1,5 @@
 {
-  "scan_ts": "2026-08-07T20:27:32.561012+00:00",
+  "scan_ts": "2026-08-10T14:18:01.856272+00:00",
   "skipped": false,
   "llm": false,
   "market": "equities",
@@ -7,7 +7,7 @@
     {
       "symbol": "ARM",
       "candidate": false,
-      "reject_reason": "regime_blocked"
+      "reject_reason": "no_setup"
     },
     {
       "symbol": "NVDA",
@@ -23,26 +23,28 @@
       "symbol": "USOIL",
       "candidate": true,
       "score": 50,
-      "direction": "short",
+      "direction": "long",
       "setups": [
         "ob_retest"
       ],
       "regime": "bearish",
-      "price": 77.08,
-      "atr": 4.49759,
-      "entry": 79.865,
-      "entry_low": 78.43,
-      "entry_high": 81.3,
-      "stop_loss": 83.5488,
-      "tp1": 72.4974,
-      "tp2": 68.8136,
+      "price": 80.73,
+      "atr": 4.40419,
+      "entry": 78.72,
+      "entry_low": 75.11,
+      "entry_high": 82.33,
+      "stop_loss": 72.9079,
+      "tp1": 90.3442,
+      "tp2": 96.1563,
       "rr": 2.0,
       "take": true,
       "confidence": "low",
       "size": "quarter",
       "rationale": "score 50 (ob_retest); R:R 2.0; thin sample (3 decided) \u2014 ramping",
       "decided_by": "deterministic",
-      "pattern": "ob_retest"
+      "pattern": "ob_retest",
+      "opened": true,
+      "pattern_confidence": "unproven (n=22 fwd)"
     },
     {
       "symbol": "SMCI",
@@ -57,55 +59,84 @@
     {
       "symbol": "AMZN",
       "candidate": false,
-      "reject_reason": "no_setup"
+      "reject_reason": "regime_blocked"
     },
     {
       "symbol": "NFLX",
       "candidate": false,
-      "reject_reason": "regime_blocked"
+      "reject_reason": "no_setup"
     },
     {
       "symbol": "AMD",
-      "candidate": true,
-      "score": 50,
-      "direction": "short",
-      "setups": [
-        "ob_retest"
-      ],
-      "regime": "bullish",
-      "price": 489.28,
-      "atr": 39.44763,
-      "entry": 473.1232,
-      "entry_low": 455.3,
-      "entry_high": 490.9464,
-      "stop_loss": 510.67022,
-      "tp1": 398.02916,
-      "tp2": 360.48214,
-      "rr": 2.0,
-      "take": true,
-      "confidence": "low",
-      "size": "quarter",
-      "rationale": "score 50 (ob_retest); R:R 2.0; thin sample (3 decided) \u2014 ramping",
-      "decided_by": "deterministic",
-      "pattern": "ob_retest"
+      "candidate": false,
+      "reject_reason": "regime_blocked"
     },
     {
       "symbol": "COIN",
-      "candidate": false,
-      "reject_reason": "regime_blocked"
+      "candidate": true,
+      "score": 100,
+      "direction": "short",
+      "setups": [
+        "ob_retest",
+        "bos_retest"
+      ],
+      "regime": "bearish",
+      "price": 153.6,
+      "atr": 9.86405,
+      "entry": 149.25,
+      "entry_low": 145.6,
+      "entry_high": 152.9,
+      "stop_loss": 157.83202,
+      "tp1": 132.08596,
+      "tp2": 123.50394,
+      "rr": 2.0,
+      "take": true,
+      "confidence": "medium",
+      "size": "half",
+      "rationale": "score 100 (ob_retest+bos_retest); R:R 2.0; dual-confluence (OB + BOS agree); thin sample (3 decided) \u2014 ramping",
+      "decided_by": "deterministic",
+      "pattern": "ob_retest"
     }
   ],
-  "opened": [],
+  "opened": [
+    {
+      "id": "3aabdd80-f33c-4c1d-aa9b-73d9efcc4387",
+      "signal_id": "4905bcb6-064f-42f8-8e61-4517d7cfd665",
+      "symbol": "USOIL",
+      "direction": "long",
+      "setups": "[\"ob_retest\"]",
+      "regime": "bearish",
+      "entry_price": 78.72,
+      "stop_loss": 72.9079,
+      "original_sl": 72.9079,
+      "tp1": 90.3442,
+      "tp2": 96.1563,
+      "tp1_hit": 0,
+      "tp1_hit_at": null,
+      "size": "quarter",
+      "size_mult": 0.25,
+      "lots": null,
+      "source": "forward",
+      "pattern": "ob_retest",
+      "opened_at": "2026-08-10T14:18:01.856272+00:00",
+      "closed_at": null,
+      "close_price": null,
+      "outcome": null,
+      "pnl_r": null,
+      "raw_r": null,
+      "journaled": 0
+    }
+  ],
   "closed": [],
   "system_stats": {
     "total_closed": 31,
-    "open": 4,
+    "open": 5,
     "win_rate": 0.23076923076923078,
     "total_r": -0.245
   },
   "rejections": {
-    "regime_blocked": 3,
-    "no_setup": 3,
+    "no_setup": 4,
+    "regime_blocked": 2,
     "levels_rejected_wide_stop": 2
   }
 }
