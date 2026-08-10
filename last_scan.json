@@ -1,5 +1,5 @@
 {
-  "scan_ts": "2026-08-10T14:18:01.856272+00:00",
+  "scan_ts": "2026-08-10T20:29:48.872998+00:00",
   "skipped": false,
   "llm": false,
   "market": "equities",
@@ -28,23 +28,21 @@
         "ob_retest"
       ],
       "regime": "bearish",
-      "price": 80.73,
-      "atr": 4.40419,
+      "price": 82.15,
+      "atr": 4.49991,
       "entry": 78.72,
       "entry_low": 75.11,
       "entry_high": 82.33,
-      "stop_loss": 72.9079,
-      "tp1": 90.3442,
-      "tp2": 96.1563,
+      "stop_loss": 72.86005,
+      "tp1": 90.4399,
+      "tp2": 96.29985,
       "rr": 2.0,
       "take": true,
       "confidence": "low",
       "size": "quarter",
       "rationale": "score 50 (ob_retest); R:R 2.0; thin sample (3 decided) \u2014 ramping",
       "decided_by": "deterministic",
-      "pattern": "ob_retest",
-      "opened": true,
-      "pattern_confidence": "unproven (n=22 fwd)"
+      "pattern": "ob_retest"
     },
     {
       "symbol": "SMCI",
@@ -98,35 +96,7 @@
       "pattern": "ob_retest"
     }
   ],
-  "opened": [
-    {
-      "id": "3aabdd80-f33c-4c1d-aa9b-73d9efcc4387",
-      "signal_id": "4905bcb6-064f-42f8-8e61-4517d7cfd665",
-      "symbol": "USOIL",
-      "direction": "long",
-      "setups": "[\"ob_retest\"]",
-      "regime": "bearish",
-      "entry_price": 78.72,
-      "stop_loss": 72.9079,
-      "original_sl": 72.9079,
-      "tp1": 90.3442,
-      "tp2": 96.1563,
-      "tp1_hit": 0,
-      "tp1_hit_at": null,
-      "size": "quarter",
-      "size_mult": 0.25,
-      "lots": null,
-      "source": "forward",
-      "pattern": "ob_retest",
-      "opened_at": "2026-08-10T14:18:01.856272+00:00",
-      "closed_at": null,
-      "close_price": null,
-      "outcome": null,
-      "pnl_r": null,
-      "raw_r": null,
-      "journaled": 0
-    }
-  ],
+  "opened": [],
   "closed": [],
   "system_stats": {
     "total_closed": 31,
