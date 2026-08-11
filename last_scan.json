@@ -1,5 +1,5 @@
 {
-  "scan_ts": "2026-08-11T14:17:11.737911+00:00",
+  "scan_ts": "2026-08-11T20:32:47.259542+00:00",
   "skipped": false,
   "llm": false,
   "market": "equities",
@@ -28,7 +28,7 @@
         "ob_retest"
       ],
       "regime": "bearish",
-      "price": 81.89,
+      "price": 83.44,
       "atr": 4.42104,
       "entry": 78.72,
       "entry_low": 75.11,
