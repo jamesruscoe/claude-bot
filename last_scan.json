@@ -1,5 +1,5 @@
 {
-  "scan_ts": "2026-08-10T20:29:48.872998+00:00",
+  "scan_ts": "2026-08-11T14:17:11.737911+00:00",
   "skipped": false,
   "llm": false,
   "market": "equities",
@@ -7,7 +7,7 @@
     {
       "symbol": "ARM",
       "candidate": false,
-      "reject_reason": "no_setup"
+      "reject_reason": "levels_rejected_wide_stop"
     },
     {
       "symbol": "NVDA",
@@ -17,7 +17,7 @@
     {
       "symbol": "TSLA",
       "candidate": false,
-      "reject_reason": "no_setup"
+      "reject_reason": "regime_blocked"
     },
     {
       "symbol": "USOIL",
@@ -28,14 +28,14 @@
         "ob_retest"
       ],
       "regime": "bearish",
-      "price": 82.15,
-      "atr": 4.49991,
+      "price": 81.89,
+      "atr": 4.42104,
       "entry": 78.72,
       "entry_low": 75.11,
       "entry_high": 82.33,
-      "stop_loss": 72.86005,
-      "tp1": 90.4399,
-      "tp2": 96.29985,
+      "stop_loss": 72.89948,
+      "tp1": 90.36104,
+      "tp2": 96.18156,
       "rr": 2.0,
       "take": true,
       "confidence": "low",
@@ -47,7 +47,7 @@
     {
       "symbol": "SMCI",
       "candidate": false,
-      "reject_reason": "levels_rejected_wide_stop"
+      "reject_reason": "no_setup"
     },
     {
       "symbol": "APLD",
@@ -57,7 +57,7 @@
     {
       "symbol": "AMZN",
       "candidate": false,
-      "reject_reason": "regime_blocked"
+      "reject_reason": "no_setup"
     },
     {
       "symbol": "NFLX",
@@ -67,33 +67,12 @@
     {
       "symbol": "AMD",
       "candidate": false,
-      "reject_reason": "regime_blocked"
+      "reject_reason": "no_setup"
     },
     {
       "symbol": "COIN",
-      "candidate": true,
-      "score": 100,
-      "direction": "short",
-      "setups": [
-        "ob_retest",
-        "bos_retest"
-      ],
-      "regime": "bearish",
-      "price": 153.6,
-      "atr": 9.86405,
-      "entry": 149.25,
-      "entry_low": 145.6,
-      "entry_high": 152.9,
-      "stop_loss": 157.83202,
-      "tp1": 132.08596,
-      "tp2": 123.50394,
-      "rr": 2.0,
-      "take": true,
-      "confidence": "medium",
-      "size": "half",
-      "rationale": "score 100 (ob_retest+bos_retest); R:R 2.0; dual-confluence (OB + BOS agree); thin sample (3 decided) \u2014 ramping",
-      "decided_by": "deterministic",
-      "pattern": "ob_retest"
+      "candidate": false,
+      "reject_reason": "regime_blocked"
     }
   ],
   "opened": [],
@@ -105,7 +84,7 @@
     "total_r": -0.245
   },
   "rejections": {
-    "no_setup": 4,
+    "no_setup": 5,
     "regime_blocked": 2,
     "levels_rejected_wide_stop": 2
   }
