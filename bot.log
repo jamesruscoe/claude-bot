@@ -219,3 +219,7 @@
 2026-08-11 22:10:57,196 [INFO] v2.datasource: data source: FX (yfinance), 9 pairs
 2026-08-11 22:11:03,291 [INFO] v2.report: wrote /home/runner/work/claude-bot/claude-bot/state/daily_report.md
 2026-08-11 22:11:03,567 [INFO] v2.report: wrote /home/runner/work/claude-bot/claude-bot/state/daily_report.md
+2026-08-12 22:09:41,431 [INFO] v2.datasource: data source: FX (yfinance), 9 pairs
+2026-08-12 22:09:47,066 [INFO] v2.pipeline: skip open GBPUSD=X — below calibrated FX_MIN_SCORE (50<85)
+2026-08-12 22:09:47,650 [INFO] v2.report: wrote /home/runner/work/claude-bot/claude-bot/state/daily_report.md
+2026-08-12 22:09:47,916 [INFO] v2.report: wrote /home/runner/work/claude-bot/claude-bot/state/daily_report.md
