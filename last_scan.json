@@ -1,5 +1,5 @@
 {
-  "scan_ts": "2026-08-12T14:18:51.230028+00:00",
+  "scan_ts": "2026-08-12T20:31:06.659575+00:00",
   "skipped": false,
   "llm": false,
   "market": "equities",
@@ -47,9 +47,7 @@
       "size": "quarter",
       "rationale": "score 50 (ob_retest); R:R 2.0; probation (1 decided) \u2014 tiny stake to learn",
       "decided_by": "deterministic",
-      "pattern": "ob_retest",
-      "opened": true,
-      "pattern_confidence": "unproven (n=22 fwd)"
+      "pattern": "ob_retest"
     },
     {
       "symbol": "APLD",
@@ -117,35 +115,7 @@
       "pattern": "ob_retest"
     }
   ],
-  "opened": [
-    {
-      "id": "dc3140a6-9d1d-4b27-8418-c03c467474a1",
-      "signal_id": "1f62a3a8-9613-4f9f-853a-224c1beef2ae",
-      "symbol": "SMCI",
-      "direction": "long",
-      "setups": "[\"ob_retest\"]",
-      "regime": "ranging",
-      "entry_price": 30.1325,
-      "stop_loss": 28.21878,
-      "original_sl": 28.21878,
-      "tp1": 33.95994,
-      "tp2": 35.87366,
-      "tp1_hit": 0,
-      "tp1_hit_at": null,
-      "size": "quarter",
-      "size_mult": 0.25,
-      "lots": null,
-      "source": "forward",
-      "pattern": "ob_retest",
-      "opened_at": "2026-08-12T14:18:51.230028+00:00",
-      "closed_at": null,
-      "close_price": null,
-      "outcome": null,
-      "pnl_r": null,
-      "raw_r": null,
-      "journaled": 0
-    }
-  ],
+  "opened": [],
   "closed": [],
   "system_stats": {
     "total_closed": 31,
