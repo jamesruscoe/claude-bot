@@ -1,5 +1,5 @@
 {
-  "scan_ts": "2026-08-12T22:09:41.431224+00:00",
+  "scan_ts": "2026-08-13T22:09:53.974949+00:00",
   "skipped": false,
   "llm": false,
   "market": "fx",
@@ -18,14 +18,14 @@
         "bos_retest"
       ],
       "regime": "ranging",
-      "price": 1.34927,
-      "atr": 0.00717,
+      "price": 1.34862,
+      "atr": 0.00696,
       "entry": 1.35023,
       "entry_low": 1.3481,
       "entry_high": 1.35216,
-      "stop_loss": 1.34452,
-      "tp1": 1.36165,
-      "tp2": 1.36736,
+      "stop_loss": 1.34463,
+      "tp1": 1.36143,
+      "tp2": 1.36703,
       "rr": 2.0,
       "take": true,
       "confidence": "low",
@@ -43,7 +43,7 @@
     {
       "symbol": "USDCHF=X",
       "candidate": false,
-      "reject_reason": "no_setup"
+      "reject_reason": "regime_blocked"
     },
     {
       "symbol": "AUDUSD=X",
@@ -80,7 +80,8 @@
     "total_r": 0.0
   },
   "rejections": {
-    "no_setup": 8,
+    "no_setup": 7,
+    "regime_blocked": 1,
     "below calibrated FX_MIN_SCORE (50<85)": 1
   }
 }
