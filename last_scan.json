@@ -1,5 +1,5 @@
 {
-  "scan_ts": "2026-08-12T20:31:06.659575+00:00",
+  "scan_ts": "2026-08-13T14:20:21.145827+00:00",
   "skipped": false,
   "llm": false,
   "market": "equities",
@@ -21,38 +21,38 @@
     },
     {
       "symbol": "USOIL",
-      "candidate": false,
-      "reject_reason": "no_setup"
-    },
-    {
-      "symbol": "SMCI",
       "candidate": true,
       "score": 50,
       "direction": "long",
       "setups": [
         "ob_retest"
       ],
-      "regime": "ranging",
-      "price": 31.6,
-      "atr": 2.22245,
-      "entry": 30.1325,
-      "entry_low": 29.33,
-      "entry_high": 30.935,
-      "stop_loss": 28.21878,
-      "tp1": 33.95994,
-      "tp2": 35.87366,
+      "regime": "bearish",
+      "price": 80.17,
+      "atr": 4.16921,
+      "entry": 78.72,
+      "entry_low": 75.11,
+      "entry_high": 82.33,
+      "stop_loss": 73.0254,
+      "tp1": 90.1092,
+      "tp2": 95.8038,
       "rr": 2.0,
       "take": true,
       "confidence": "low",
       "size": "quarter",
-      "rationale": "score 50 (ob_retest); R:R 2.0; probation (1 decided) \u2014 tiny stake to learn",
+      "rationale": "score 50 (ob_retest); R:R 2.0; thin sample (3 decided) \u2014 ramping",
       "decided_by": "deterministic",
       "pattern": "ob_retest"
     },
     {
+      "symbol": "SMCI",
+      "candidate": false,
+      "reject_reason": "no_setup"
+    },
+    {
       "symbol": "APLD",
       "candidate": false,
-      "reject_reason": "levels_rejected_wide_stop"
+      "reject_reason": "no_setup"
     },
     {
       "symbol": "AMZN",
@@ -62,7 +62,7 @@
     {
       "symbol": "NFLX",
       "candidate": false,
-      "reject_reason": "regime_blocked"
+      "reject_reason": "no_setup"
     },
     {
       "symbol": "AMD",
@@ -73,14 +73,14 @@
         "ob_retest"
       ],
       "regime": "bullish",
-      "price": 474.32,
-      "atr": 34.84229,
+      "price": 482.93,
+      "atr": 33.59426,
       "entry": 483.11,
       "entry_low": 469.5,
       "entry_high": 496.72,
-      "stop_loss": 514.14114,
-      "tp1": 421.04772,
-      "tp2": 390.01658,
+      "stop_loss": 513.51713,
+      "tp1": 422.29574,
+      "tp2": 391.88861,
       "rr": 2.0,
       "take": true,
       "confidence": "low",
@@ -98,14 +98,14 @@
         "ob_retest"
       ],
       "regime": "bearish",
-      "price": 148.58,
-      "atr": 9.35751,
+      "price": 149.04,
+      "atr": 8.97555,
       "entry": 150.48495,
       "entry_low": 145.57,
       "entry_high": 155.3999,
-      "stop_loss": 160.07866,
-      "tp1": 131.29753,
-      "tp2": 121.70382,
+      "stop_loss": 159.88767,
+      "tp1": 131.67951,
+      "tp2": 122.27679,
       "rr": 2.0,
       "take": true,
       "confidence": "low",
@@ -124,8 +124,8 @@
     "total_r": -0.245
   },
   "rejections": {
-    "no_setup": 3,
-    "regime_blocked": 2,
-    "levels_rejected_wide_stop": 2
+    "no_setup": 5,
+    "regime_blocked": 1,
+    "levels_rejected_wide_stop": 1
   }
 }
