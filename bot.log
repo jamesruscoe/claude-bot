@@ -298,3 +298,9 @@
 2026-08-13 20:29:18,336 [INFO] v2.pipeline: skip open AMD short — already in an open position
 2026-08-13 20:29:18,342 [INFO] v2.pipeline: skip open COIN short — already in an open position
 2026-08-13 20:29:18,354 [INFO] v2.report: wrote /home/runner/work/claude-bot/claude-bot/state/daily_report.md
+2026-08-14 14:15:15,973 [INFO] v2.store: trade closed: COIN short -> EXPIRED @ 153.9000 (0.25R sized, 0.99R raw)
+2026-08-14 14:15:15,977 [INFO] v2.store: trade closed: SMCI long -> WIN_TP2 @ 35.8737 (0.75R sized, 3.00R raw)
+2026-08-14 14:15:15,978 [INFO] v2.journal: journal entry written: 2026-08-14-coin-short-424daf54.md
+2026-08-14 14:15:15,980 [INFO] v2.journal: journal entry written: 2026-08-14-smci-long-dc3140a6.md
+2026-08-14 14:15:15,982 [INFO] v2.pipeline: reflected on 2 resolved trade(s)
+2026-08-14 14:15:15,988 [INFO] v2.report: wrote /home/runner/work/claude-bot/claude-bot/state/daily_report.md
