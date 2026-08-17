@@ -1,5 +1,5 @@
 {
-  "scan_ts": "2026-08-14T20:20:07.205784+00:00",
+  "scan_ts": "2026-08-17T13:35:28.277911+00:00",
   "skipped": false,
   "llm": false,
   "market": "equities",
@@ -7,17 +7,39 @@
     {
       "symbol": "ARM",
       "candidate": false,
-      "reject_reason": "levels_rejected_wide_stop"
+      "reject_reason": "regime_blocked"
     },
     {
       "symbol": "NVDA",
-      "candidate": false,
-      "reject_reason": "no_setup"
+      "candidate": true,
+      "score": 50,
+      "direction": "long",
+      "setups": [
+        "bos_retest"
+      ],
+      "regime": "ranging",
+      "price": 225.16,
+      "atr": 6.92642,
+      "entry": 224.76,
+      "entry_low": 224.42286,
+      "entry_high": 225.09714,
+      "stop_loss": 220.95965,
+      "tp1": 232.3607,
+      "tp2": 236.16105,
+      "rr": 2.0,
+      "take": true,
+      "confidence": "low",
+      "size": "quarter",
+      "rationale": "score 50 (bos_retest); R:R 2.0; thin sample (3 decided) \u2014 ramping",
+      "decided_by": "deterministic",
+      "pattern": "bos_retest",
+      "opened": true,
+      "pattern_confidence": "unproven (n=9 fwd)"
     },
     {
       "symbol": "TSLA",
       "candidate": false,
-      "reject_reason": "no_setup"
+      "reject_reason": "regime_blocked"
     },
     {
       "symbol": "USOIL",
@@ -31,8 +53,30 @@
     },
     {
       "symbol": "APLD",
-      "candidate": false,
-      "reject_reason": "levels_rejected_wide_stop"
+      "candidate": true,
+      "score": 50,
+      "direction": "short",
+      "setups": [
+        "ob_retest"
+      ],
+      "regime": "bearish",
+      "price": 31.2,
+      "atr": 2.62124,
+      "entry": 29.325,
+      "entry_low": 28.17,
+      "entry_high": 30.48,
+      "stop_loss": 31.79062,
+      "tp1": 24.39376,
+      "tp2": 21.92814,
+      "rr": 2.0,
+      "take": true,
+      "confidence": "low",
+      "size": "quarter",
+      "rationale": "score 50 (ob_retest); R:R 2.0; thin sample (3 decided) \u2014 ramping",
+      "decided_by": "deterministic",
+      "pattern": "ob_retest",
+      "opened": true,
+      "pattern_confidence": "unproven (n=24 fwd)"
     },
     {
       "symbol": "AMZN",
@@ -52,19 +96,102 @@
     {
       "symbol": "COIN",
       "candidate": false,
-      "reject_reason": "no_setup"
+      "reject_reason": "regime_blocked"
     }
   ],
-  "opened": [],
-  "closed": [],
+  "opened": [
+    {
+      "id": "ce9ee8b7-2965-431b-9609-18eb371d4aa3",
+      "signal_id": "61095514-7ad5-4899-b4e0-38adbc718413",
+      "symbol": "NVDA",
+      "direction": "long",
+      "setups": "[\"bos_retest\"]",
+      "regime": "ranging",
+      "entry_price": 224.76,
+      "stop_loss": 220.95965,
+      "original_sl": 220.95965,
+      "tp1": 232.3607,
+      "tp2": 236.16105,
+      "tp1_hit": 0,
+      "tp1_hit_at": null,
+      "size": "quarter",
+      "size_mult": 0.25,
+      "lots": null,
+      "source": "forward",
+      "pattern": "bos_retest",
+      "opened_at": "2026-08-17T13:35:28.277911+00:00",
+      "closed_at": null,
+      "close_price": null,
+      "outcome": null,
+      "pnl_r": null,
+      "raw_r": null,
+      "journaled": 0
+    },
+    {
+      "id": "8bd2c127-1d62-40df-a5dd-e4c29474d0b4",
+      "signal_id": "19b5b3b1-c535-4d21-b5e9-c958c0dedd47",
+      "symbol": "APLD",
+      "direction": "short",
+      "setups": "[\"ob_retest\"]",
+      "regime": "bearish",
+      "entry_price": 29.325,
+      "stop_loss": 31.79062,
+      "original_sl": 31.79062,
+      "tp1": 24.39376,
+      "tp2": 21.92814,
+      "tp1_hit": 0,
+      "tp1_hit_at": null,
+      "size": "quarter",
+      "size_mult": 0.25,
+      "lots": null,
+      "source": "forward",
+      "pattern": "ob_retest",
+      "opened_at": "2026-08-17T13:35:28.277911+00:00",
+      "closed_at": null,
+      "close_price": null,
+      "outcome": null,
+      "pnl_r": null,
+      "raw_r": null,
+      "journaled": 0
+    }
+  ],
+  "closed": [
+    {
+      "id": "23fb4ffb-983b-47d6-a93a-7142dc1924d3",
+      "signal_id": "ddd727f6-4bf1-4224-a211-0c25218615ba",
+      "symbol": "AMD",
+      "direction": "short",
+      "setups": "[\"ob_retest\"]",
+      "regime": "bullish",
+      "entry_price": 473.1232,
+      "stop_loss": 510.67022,
+      "original_sl": 510.67022,
+      "tp1": 398.02916,
+      "tp2": 360.48214,
+      "tp1_hit": 0,
+      "tp1_hit_at": null,
+      "opened_at": "2026-08-07T14:09:49.849166+00:00",
+      "closed_at": "2026-08-17T13:36:39.300302+00:00",
+      "close_price": 510.67022,
+      "outcome": "LOSS",
+      "pnl_r": -0.25,
+      "journaled": 0,
+      "size": "quarter",
+      "size_mult": 0.25,
+      "lots": null,
+      "raw_r": -1.0,
+      "source": "forward",
+      "pattern": "ob_retest"
+    }
+  ],
   "system_stats": {
-    "total_closed": 33,
-    "open": 4,
-    "win_rate": 0.25925925925925924,
-    "total_r": 0.752
+    "total_closed": 34,
+    "open": 5,
+    "win_rate": 0.25,
+    "total_r": 0.502
   },
   "rejections": {
-    "no_setup": 8,
-    "levels_rejected_wide_stop": 2
+    "no_setup": 5,
+    "regime_blocked": 3
   }
 }
