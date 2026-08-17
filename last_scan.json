@@ -1,5 +1,5 @@
 {
-  "scan_ts": "2026-08-14T21:48:52.347111+00:00",
+  "scan_ts": "2026-08-17T21:49:42.763834+00:00",
   "skipped": false,
   "llm": false,
   "market": "fx",
@@ -28,14 +28,14 @@
         "bos_retest"
       ],
       "regime": "bullish",
-      "price": 0.813,
-      "atr": 0.00515,
+      "price": 0.81065,
+      "atr": 0.00535,
       "entry": 0.81365,
       "entry_low": 0.81231,
       "entry_high": 0.81475,
-      "stop_loss": 0.80974,
-      "tp1": 0.82147,
-      "tp2": 0.82538,
+      "stop_loss": 0.80964,
+      "tp1": 0.82167,
+      "tp2": 0.82568,
       "rr": 2.0,
       "take": true,
       "confidence": "low",
@@ -58,33 +58,12 @@
     {
       "symbol": "NZDUSD=X",
       "candidate": false,
-      "reject_reason": "no_setup"
+      "reject_reason": "regime_blocked"
     },
     {
       "symbol": "EURGBP=X",
-      "candidate": true,
-      "score": 50,
-      "direction": "short",
-      "setups": [
-        "bos_retest"
-      ],
-      "regime": "ranging",
-      "price": 0.85477,
-      "atr": 0.00245,
-      "entry": 0.85416,
-      "entry_low": 0.853,
-      "entry_high": 0.85556,
-      "stop_loss": 0.85679,
-      "tp1": 0.8489,
-      "tp2": 0.84627,
-      "rr": 2.0,
-      "take": true,
-      "confidence": "low",
-      "size": "quarter",
-      "rationale": "score 50 (bos_retest); R:R 2.0; probation (0 decided) \u2014 tiny stake to learn",
-      "decided_by": "deterministic",
-      "pattern": "bos_retest",
-      "fx_blocked": "below calibrated FX_MIN_SCORE (50<85)"
+      "candidate": false,
+      "reject_reason": "no_setup"
     },
     {
       "symbol": "EURJPY=X",
@@ -102,6 +81,7 @@
   },
   "rejections": {
     "no_setup": 7,
-    "below calibrated FX_MIN_SCORE (50<85)": 2
+    "regime_blocked": 1,
+    "below calibrated FX_MIN_SCORE (50<85)": 1
   }
 }
