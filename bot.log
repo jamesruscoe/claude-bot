@@ -236,3 +236,8 @@
 2026-08-17 21:49:48,446 [INFO] v2.pipeline: skip open USDCHF=X — below calibrated FX_MIN_SCORE (50<85)
 2026-08-17 21:49:48,753 [INFO] v2.report: wrote /home/runner/work/claude-bot/claude-bot/state/daily_report.md
 2026-08-17 21:49:49,058 [INFO] v2.report: wrote /home/runner/work/claude-bot/claude-bot/state/daily_report.md
+2026-08-18 21:46:54,263 [INFO] v2.datasource: data source: FX (yfinance), 9 pairs
+2026-08-18 21:46:59,335 [INFO] v2.pipeline: skip open GBPUSD=X — below calibrated FX_MIN_SCORE (50<85)
+2026-08-18 21:46:59,354 [INFO] v2.pipeline: skip open USDCAD=X — below calibrated FX_MIN_SCORE (50<85)
+2026-08-18 21:46:59,806 [INFO] v2.report: wrote /home/runner/work/claude-bot/claude-bot/state/daily_report.md
+2026-08-18 21:47:00,101 [INFO] v2.report: wrote /home/runner/work/claude-bot/claude-bot/state/daily_report.md
