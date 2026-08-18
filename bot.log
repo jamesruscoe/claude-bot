@@ -314,3 +314,8 @@
 2026-08-17 20:14:30,522 [INFO] v2.pipeline: skip open NVDA long — already in an open position
 2026-08-17 20:14:30,538 [INFO] v2.pipeline: skip open APLD short — already in an open position
 2026-08-17 20:14:30,554 [INFO] v2.report: wrote /home/runner/work/claude-bot/claude-bot/state/daily_report.md
+2026-08-18 13:39:39,650 [INFO] v2.store: trade opened: NFLX long @ 75.6875 (sl 73.2878 tp1 80.4869 tp2 82.8865) size=quarter x0.25
+2026-08-18 13:39:39,740 [INFO] v2.store: trade closed: USOIL short -> EXPIRED @ 84.6100 (-0.09R sized, -0.35R raw)
+2026-08-18 13:39:39,743 [INFO] v2.journal: journal entry written: 2026-08-18-usoil-short-424b9b38.md
+2026-08-18 13:39:39,745 [INFO] v2.pipeline: reflected on 1 resolved trade(s)
+2026-08-18 13:39:39,751 [INFO] v2.report: wrote /home/runner/work/claude-bot/claude-bot/state/daily_report.md
