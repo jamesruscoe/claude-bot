@@ -241,3 +241,13 @@
 2026-08-18 21:46:59,354 [INFO] v2.pipeline: skip open USDCAD=X — below calibrated FX_MIN_SCORE (50<85)
 2026-08-18 21:46:59,806 [INFO] v2.report: wrote /home/runner/work/claude-bot/claude-bot/state/daily_report.md
 2026-08-18 21:47:00,101 [INFO] v2.report: wrote /home/runner/work/claude-bot/claude-bot/state/daily_report.md
+2026-08-19 21:50:09,317 [INFO] v2.datasource: data source: FX (yfinance), 9 pairs
+2026-08-19 21:50:15,889 [INFO] v2.pipeline: skip open EURUSD=X — below calibrated FX_MIN_SCORE (50<85)
+2026-08-19 21:50:15,908 [INFO] v2.pipeline: skip open AUDUSD=X — below calibrated FX_MIN_SCORE (50<85)
+2026-08-19 21:50:15,917 [INFO] v2.pipeline: skip open USDCAD=X — below calibrated FX_MIN_SCORE (50<85)
+2026-08-19 21:50:15,925 [INFO] v2.pipeline: skip open NZDUSD=X — below calibrated FX_MIN_SCORE (50<85)
+2026-08-19 21:50:16,359 [INFO] v2.store: trade closed: EURJPY=X short -> EXPIRED @ 184.6060 (0.01R sized, 0.05R raw)
+2026-08-19 21:50:16,360 [INFO] v2.journal: journal entry written: 2026-08-19-eurjpy-x-short-ef0bff1d.md
+2026-08-19 21:50:16,362 [INFO] v2.pipeline: reflected on 1 resolved trade(s)
+2026-08-19 21:50:16,366 [INFO] v2.report: wrote /home/runner/work/claude-bot/claude-bot/state/daily_report.md
+2026-08-19 21:50:16,663 [INFO] v2.report: wrote /home/runner/work/claude-bot/claude-bot/state/daily_report.md
