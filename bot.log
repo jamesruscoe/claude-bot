@@ -321,3 +321,11 @@
 2026-08-18 13:39:39,751 [INFO] v2.report: wrote /home/runner/work/claude-bot/claude-bot/state/daily_report.md
 2026-08-18 20:11:37,934 [INFO] v2.pipeline: skip open NFLX long — already in an open position
 2026-08-18 20:11:37,948 [INFO] v2.report: wrote /home/runner/work/claude-bot/claude-bot/state/daily_report.md
+2026-08-19 13:40:56,963 [INFO] v2.pipeline: skip open USOIL long — already in an open position
+2026-08-19 13:40:56,971 [INFO] v2.store: trade opened: SMCI long @ 36.8000 (sl 35.4665 tp1 39.4669 tp2 40.8004) size=quarter x0.25
+2026-08-19 13:40:57,019 [INFO] v2.store: trade closed: AMD long -> EXPIRED @ 484.3900 (-0.07R sized, -0.28R raw)
+2026-08-19 13:40:57,021 [INFO] v2.store: trade closed: NVDA long -> LOSS @ 220.9597 (-0.25R sized, -1.00R raw)
+2026-08-19 13:40:57,023 [INFO] v2.journal: journal entry written: 2026-08-19-amd-long-ec2c3392.md
+2026-08-19 13:40:57,025 [INFO] v2.journal: journal entry written: 2026-08-19-nvda-long-ce9ee8b7.md
+2026-08-19 13:40:57,027 [INFO] v2.pipeline: reflected on 2 resolved trade(s)
+2026-08-19 13:40:57,034 [INFO] v2.report: wrote /home/runner/work/claude-bot/claude-bot/state/daily_report.md
