@@ -251,3 +251,6 @@
 2026-08-19 21:50:16,362 [INFO] v2.pipeline: reflected on 1 resolved trade(s)
 2026-08-19 21:50:16,366 [INFO] v2.report: wrote /home/runner/work/claude-bot/claude-bot/state/daily_report.md
 2026-08-19 21:50:16,663 [INFO] v2.report: wrote /home/runner/work/claude-bot/claude-bot/state/daily_report.md
+2026-08-20 21:52:50,592 [INFO] v2.datasource: data source: FX (yfinance), 9 pairs
+2026-08-20 21:52:55,384 [INFO] v2.report: wrote /home/runner/work/claude-bot/claude-bot/state/daily_report.md
+2026-08-20 21:52:55,668 [INFO] v2.report: wrote /home/runner/work/claude-bot/claude-bot/state/daily_report.md

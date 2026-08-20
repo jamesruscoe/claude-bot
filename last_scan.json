@@ -1,34 +1,13 @@
 {
-  "scan_ts": "2026-08-19T21:50:09.317799+00:00",
+  "scan_ts": "2026-08-20T21:52:50.592055+00:00",
   "skipped": false,
   "llm": false,
   "market": "fx",
   "results": [
     {
       "symbol": "EURUSD=X",
-      "candidate": true,
-      "score": 50,
-      "direction": "long",
-      "setups": [
-        "bos_retest"
-      ],
-      "regime": "ranging",
-      "price": 1.16809,
-      "atr": 0.00548,
-      "entry": 1.158,
-      "entry_low": 1.1562,
-      "entry_high": 1.15968,
-      "stop_loss": 1.15346,
-      "tp1": 1.16708,
-      "tp2": 1.17162,
-      "rr": 2.0,
-      "take": true,
-      "confidence": "low",
-      "size": "quarter",
-      "rationale": "score 50 (bos_retest); R:R 2.0; probation (0 decided) \u2014 tiny stake to learn",
-      "decided_by": "deterministic",
-      "pattern": "bos_retest",
-      "fx_blocked": "below calibrated FX_MIN_SCORE (50<85)"
+      "candidate": false,
+      "reject_reason": "no_setup"
     },
     {
       "symbol": "GBPUSD=X",
@@ -38,7 +17,7 @@
     {
       "symbol": "USDJPY=X",
       "candidate": false,
-      "reject_reason": "regime_blocked"
+      "reject_reason": "no_setup"
     },
     {
       "symbol": "USDCHF=X",
@@ -47,81 +26,18 @@
     },
     {
       "symbol": "AUDUSD=X",
-      "candidate": true,
-      "score": 50,
-      "direction": "long",
-      "setups": [
-        "bos_retest"
-      ],
-      "regime": "ranging",
-      "price": 0.71276,
-      "atr": 0.00478,
-      "entry": 0.709,
-      "entry_low": 0.70784,
-      "entry_high": 0.70996,
-      "stop_loss": 0.70544,
-      "tp1": 0.71612,
-      "tp2": 0.71968,
-      "rr": 2.0,
-      "take": true,
-      "confidence": "low",
-      "size": "quarter",
-      "rationale": "score 50 (bos_retest); R:R 2.0; probation (0 decided) \u2014 tiny stake to learn",
-      "decided_by": "deterministic",
-      "pattern": "bos_retest",
-      "fx_blocked": "below calibrated FX_MIN_SCORE (50<85)"
+      "candidate": false,
+      "reject_reason": "no_setup"
     },
     {
       "symbol": "USDCAD=X",
-      "candidate": true,
-      "score": 50,
-      "direction": "short",
-      "setups": [
-        "bos_retest"
-      ],
-      "regime": "ranging",
-      "price": 1.38043,
-      "atr": 0.00627,
-      "entry": 1.38991,
-      "entry_low": 1.38794,
-      "entry_high": 1.39212,
-      "stop_loss": 1.39525,
-      "tp1": 1.37923,
-      "tp2": 1.37389,
-      "rr": 2.0,
-      "take": true,
-      "confidence": "low",
-      "size": "quarter",
-      "rationale": "score 50 (bos_retest); R:R 2.0; probation (0 decided) \u2014 tiny stake to learn",
-      "decided_by": "deterministic",
-      "pattern": "bos_retest",
-      "fx_blocked": "below calibrated FX_MIN_SCORE (50<85)"
+      "candidate": false,
+      "reject_reason": "no_setup"
     },
     {
       "symbol": "NZDUSD=X",
-      "candidate": true,
-      "score": 50,
-      "direction": "long",
-      "setups": [
-        "ob_retest"
-      ],
-      "regime": "ranging",
-      "price": 0.59351,
-      "atr": 0.00481,
-      "entry": 0.5878,
-      "entry_low": 0.58541,
-      "entry_high": 0.58991,
-      "stop_loss": 0.58301,
-      "tp1": 0.59738,
-      "tp2": 0.60217,
-      "rr": 2.0,
-      "take": true,
-      "confidence": "low",
-      "size": "quarter",
-      "rationale": "score 50 (ob_retest); R:R 2.0; probation (0 decided) \u2014 tiny stake to learn",
-      "decided_by": "deterministic",
-      "pattern": "ob_retest",
-      "fx_blocked": "below calibrated FX_MIN_SCORE (50<85)"
+      "candidate": false,
+      "reject_reason": "no_setup"
     },
     {
       "symbol": "EURGBP=X",
@@ -135,35 +51,7 @@
     }
   ],
   "opened": [],
-  "closed": [
-    {
-      "id": "ef0bff1d-2cf0-40fc-bbbc-6048d7ff6127",
-      "signal_id": "d076a62a-6f83-4eff-aa47-99c0c1c4a565",
-      "symbol": "EURJPY=X",
-      "direction": "short",
-      "setups": "[\"ob_retest\", \"bos_retest\"]",
-      "regime": "ranging",
-      "entry_price": 184.77201,
-      "stop_loss": 188.1755,
-      "original_sl": 188.1755,
-      "tp1": 177.96503,
-      "tp2": 174.56154,
-      "tp1_hit": 0,
-      "tp1_hit_at": null,
-      "size": "quarter",
-      "size_mult": 0.25,
-      "lots": 0.027,
-      "opened_at": "2026-08-05T22:33:59.847073+00:00",
-      "closed_at": "2026-08-19T21:50:16.358500+00:00",
-      "close_price": 184.6060028076172,
-      "outcome": "EXPIRED",
-      "pnl_r": 0.012,
-      "raw_r": 0.049,
-      "journaled": 0,
-      "source": "forward",
-      "pattern": "ob_retest"
-    }
-  ],
+  "closed": [],
   "system_stats": {
     "total_closed": 1,
     "open": 0,
@@ -171,8 +59,6 @@
     "total_r": 0.012
   },
   "rejections": {
-    "no_setup": 4,
-    "below calibrated FX_MIN_SCORE (50<85)": 4,
-    "regime_blocked": 1
+    "no_setup": 9
   }
 }
