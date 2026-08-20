@@ -1,5 +1,5 @@
 {
-  "scan_ts": "2026-08-20T13:42:10.828894+00:00",
+  "scan_ts": "2026-08-20T20:15:52.796824+00:00",
   "skipped": false,
   "llm": false,
   "market": "equities",
@@ -27,9 +27,7 @@
       "size": "quarter",
       "rationale": "score 50 (bos_retest); R:R 2.0; thin sample (2 decided) \u2014 ramping",
       "decided_by": "deterministic",
-      "pattern": "bos_retest",
-      "opened": true,
-      "pattern_confidence": "unproven (n=10 fwd)"
+      "pattern": "bos_retest"
     },
     {
       "symbol": "NVDA",
@@ -89,9 +87,7 @@
       "size": "quarter",
       "rationale": "score 50 (ob_retest); R:R 2.0; thin sample (4 decided) \u2014 ramping",
       "decided_by": "deterministic",
-      "pattern": "ob_retest",
-      "opened": true,
-      "pattern_confidence": "unproven (n=27 fwd)"
+      "pattern": "ob_retest"
     },
     {
       "symbol": "COIN",
@@ -99,62 +95,7 @@
       "reject_reason": "regime_blocked"
     }
   ],
-  "opened": [
-    {
-      "id": "72058c32-296b-4020-a05c-41d69e35489d",
-      "signal_id": "68ae3865-7058-4998-ae71-a4649e9d6279",
-      "symbol": "ARM",
-      "direction": "short",
-      "setups": "[\"bos_retest\"]",
-      "regime": "bearish",
-      "entry_price": 265.37,
-      "stop_loss": 276.98645,
-      "original_sl": 276.98645,
-      "tp1": 242.1371,
-      "tp2": 230.52065,
-      "tp1_hit": 0,
-      "tp1_hit_at": null,
-      "size": "quarter",
-      "size_mult": 0.25,
-      "lots": null,
-      "source": "forward",
-      "pattern": "bos_retest",
-      "opened_at": "2026-08-20T13:42:10.828894+00:00",
-      "closed_at": null,
-      "close_price": null,
-      "outcome": null,
-      "pnl_r": null,
-      "raw_r": null,
-      "journaled": 0
-    },
-    {
-      "id": "43f80d1b-1531-4c02-91bf-7ba14e2b2af9",
-      "signal_id": "825b78c0-36d3-470c-86c8-54f4092b1e7e",
-      "symbol": "AMD",
-      "direction": "short",
-      "setups": "[\"ob_retest\"]",
-      "regime": "bearish",
-      "entry_price": 498.935,
-      "stop_loss": 529.91989,
-      "original_sl": 529.91989,
-      "tp1": 436.96522,
-      "tp2": 405.98033,
-      "tp1_hit": 0,
-      "tp1_hit_at": null,
-      "size": "quarter",
-      "size_mult": 0.25,
-      "lots": null,
-      "source": "forward",
-      "pattern": "ob_retest",
-      "opened_at": "2026-08-20T13:42:10.828894+00:00",
-      "closed_at": null,
-      "close_price": null,
-      "outcome": null,
-      "pnl_r": null,
-      "raw_r": null,
-      "journaled": 0
-    }
-  ],
+  "opened": [],
   "closed": [],
   "system_stats": {
     "total_closed": 37,
