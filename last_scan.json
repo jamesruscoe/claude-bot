@@ -1,5 +1,5 @@
 {
-  "scan_ts": "2026-08-20T21:52:50.592055+00:00",
+  "scan_ts": "2026-08-21T21:48:06.779825+00:00",
   "skipped": false,
   "llm": false,
   "market": "fx",
@@ -16,13 +16,55 @@
     },
     {
       "symbol": "USDJPY=X",
-      "candidate": false,
-      "reject_reason": "no_setup"
+      "candidate": true,
+      "score": 50,
+      "direction": "short",
+      "setups": [
+        "bos_retest"
+      ],
+      "regime": "ranging",
+      "price": 158.862,
+      "atr": 1.17211,
+      "entry": 158.62699,
+      "entry_low": 158.39903,
+      "entry_high": 158.87495,
+      "stop_loss": 159.461,
+      "tp1": 156.95897,
+      "tp2": 156.12496,
+      "rr": 2.0,
+      "take": true,
+      "confidence": "low",
+      "size": "quarter",
+      "rationale": "score 50 (bos_retest); R:R 2.0; probation (0 decided) \u2014 tiny stake to learn",
+      "decided_by": "deterministic",
+      "pattern": "bos_retest",
+      "fx_blocked": "below calibrated FX_MIN_SCORE (50<85)"
     },
     {
       "symbol": "USDCHF=X",
-      "candidate": false,
-      "reject_reason": "no_setup"
+      "candidate": true,
+      "score": 50,
+      "direction": "short",
+      "setups": [
+        "bos_retest"
+      ],
+      "regime": "bullish",
+      "price": 0.80084,
+      "atr": 0.00646,
+      "entry": 0.80078,
+      "entry_low": 0.7997,
+      "entry_high": 0.8021,
+      "stop_loss": 0.80533,
+      "tp1": 0.79168,
+      "tp2": 0.78713,
+      "rr": 2.0,
+      "take": true,
+      "confidence": "low",
+      "size": "quarter",
+      "rationale": "score 50 (bos_retest); R:R 2.0; probation (0 decided) \u2014 tiny stake to learn",
+      "decided_by": "deterministic",
+      "pattern": "bos_retest",
+      "fx_blocked": "below calibrated FX_MIN_SCORE (50<85)"
     },
     {
       "symbol": "AUDUSD=X",
@@ -42,7 +84,7 @@
     {
       "symbol": "EURGBP=X",
       "candidate": false,
-      "reject_reason": "no_setup"
+      "reject_reason": "regime_blocked"
     },
     {
       "symbol": "EURJPY=X",
@@ -59,6 +101,8 @@
     "total_r": 0.012
   },
   "rejections": {
-    "no_setup": 9
+    "no_setup": 6,
+    "below calibrated FX_MIN_SCORE (50<85)": 2,
+    "regime_blocked": 1
   }
 }
