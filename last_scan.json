@@ -1,5 +1,5 @@
 {
-  "scan_ts": "2026-08-24T13:47:01.954207+00:00",
+  "scan_ts": "2026-08-24T20:16:55.945873+00:00",
   "skipped": false,
   "llm": false,
   "market": "equities",
@@ -56,35 +56,7 @@
     }
   ],
   "opened": [],
-  "closed": [
-    {
-      "id": "3aabdd80-f33c-4c1d-aa9b-73d9efcc4387",
-      "signal_id": "4905bcb6-064f-42f8-8e61-4517d7cfd665",
-      "symbol": "USOIL",
-      "direction": "long",
-      "setups": "[\"ob_retest\"]",
-      "regime": "bearish",
-      "entry_price": 78.72,
-      "stop_loss": 72.9079,
-      "original_sl": 72.9079,
-      "tp1": 90.3442,
-      "tp2": 96.1563,
-      "tp1_hit": 0,
-      "tp1_hit_at": null,
-      "opened_at": "2026-08-10T14:18:01.856272+00:00",
-      "closed_at": "2026-08-24T13:48:04.528762+00:00",
-      "close_price": 85.9000015258789,
-      "outcome": "EXPIRED",
-      "pnl_r": 0.309,
-      "journaled": 0,
-      "size": "quarter",
-      "size_mult": 0.25,
-      "lots": null,
-      "raw_r": 1.235,
-      "source": "forward",
-      "pattern": "ob_retest"
-    }
-  ],
+  "closed": [],
   "system_stats": {
     "total_closed": 38,
     "open": 5,
