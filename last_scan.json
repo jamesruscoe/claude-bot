@@ -1,36 +1,26 @@
 {
-  "scan_ts": "2026-08-21T21:48:06.779825+00:00",
+  "scan_ts": "2026-08-24T21:53:08.082887+00:00",
   "skipped": false,
   "llm": false,
   "market": "fx",
   "results": [
     {
       "symbol": "EURUSD=X",
-      "candidate": false,
-      "reject_reason": "no_setup"
-    },
-    {
-      "symbol": "GBPUSD=X",
-      "candidate": false,
-      "reject_reason": "no_setup"
-    },
-    {
-      "symbol": "USDJPY=X",
       "candidate": true,
       "score": 50,
-      "direction": "short",
+      "direction": "long",
       "setups": [
         "bos_retest"
       ],
       "regime": "ranging",
-      "price": 158.862,
-      "atr": 1.17211,
-      "entry": 158.62699,
-      "entry_low": 158.39903,
-      "entry_high": 158.87495,
-      "stop_loss": 159.461,
-      "tp1": 156.95897,
-      "tp2": 156.12496,
+      "price": 1.16673,
+      "atr": 0.00569,
+      "entry": 1.16861,
+      "entry_low": 1.1668,
+      "entry_high": 1.1703,
+      "stop_loss": 1.16395,
+      "tp1": 1.17793,
+      "tp2": 1.18259,
       "rr": 2.0,
       "take": true,
       "confidence": "low",
@@ -41,22 +31,22 @@
       "fx_blocked": "below calibrated FX_MIN_SCORE (50<85)"
     },
     {
-      "symbol": "USDCHF=X",
+      "symbol": "GBPUSD=X",
       "candidate": true,
       "score": 50,
-      "direction": "short",
+      "direction": "long",
       "setups": [
         "bos_retest"
       ],
-      "regime": "bullish",
-      "price": 0.80084,
-      "atr": 0.00646,
-      "entry": 0.80078,
-      "entry_low": 0.7997,
-      "entry_high": 0.8021,
-      "stop_loss": 0.80533,
-      "tp1": 0.79168,
-      "tp2": 0.78713,
+      "regime": "ranging",
+      "price": 1.36349,
+      "atr": 0.00717,
+      "entry": 1.36443,
+      "entry_low": 1.36228,
+      "entry_high": 1.36638,
+      "stop_loss": 1.3587,
+      "tp1": 1.37589,
+      "tp2": 1.38162,
       "rr": 2.0,
       "take": true,
       "confidence": "low",
@@ -65,6 +55,16 @@
       "decided_by": "deterministic",
       "pattern": "bos_retest",
       "fx_blocked": "below calibrated FX_MIN_SCORE (50<85)"
+    },
+    {
+      "symbol": "USDJPY=X",
+      "candidate": false,
+      "reject_reason": "no_setup"
+    },
+    {
+      "symbol": "USDCHF=X",
+      "candidate": false,
+      "reject_reason": "no_setup"
     },
     {
       "symbol": "AUDUSD=X",
@@ -84,7 +84,7 @@
     {
       "symbol": "EURGBP=X",
       "candidate": false,
-      "reject_reason": "regime_blocked"
+      "reject_reason": "no_setup"
     },
     {
       "symbol": "EURJPY=X",
@@ -101,8 +101,7 @@
     "total_r": 0.012
   },
   "rejections": {
-    "no_setup": 6,
-    "below calibrated FX_MIN_SCORE (50<85)": 2,
-    "regime_blocked": 1
+    "no_setup": 7,
+    "below calibrated FX_MIN_SCORE (50<85)": 2
   }
 }
