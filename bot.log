@@ -342,3 +342,7 @@
 2026-08-21 13:42:12,017 [INFO] v2.report: wrote /home/runner/work/claude-bot/claude-bot/state/daily_report.md
 2026-08-21 20:13:31,236 [INFO] v2.pipeline: skip open USOIL long — already in an open position
 2026-08-21 20:13:31,258 [INFO] v2.report: wrote /home/runner/work/claude-bot/claude-bot/state/daily_report.md
+2026-08-24 13:48:04,530 [INFO] v2.store: trade closed: USOIL long -> EXPIRED @ 85.9000 (0.31R sized, 1.24R raw)
+2026-08-24 13:48:04,534 [INFO] v2.journal: journal entry written: 2026-08-24-usoil-long-3aabdd80.md
+2026-08-24 13:48:04,535 [INFO] v2.pipeline: reflected on 1 resolved trade(s)
+2026-08-24 13:48:04,541 [INFO] v2.report: wrote /home/runner/work/claude-bot/claude-bot/state/daily_report.md
