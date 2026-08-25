@@ -347,3 +347,8 @@
 2026-08-24 13:48:04,535 [INFO] v2.pipeline: reflected on 1 resolved trade(s)
 2026-08-24 13:48:04,541 [INFO] v2.report: wrote /home/runner/work/claude-bot/claude-bot/state/daily_report.md
 2026-08-24 20:17:57,991 [INFO] v2.report: wrote /home/runner/work/claude-bot/claude-bot/state/daily_report.md
+2026-08-25 13:46:09,155 [INFO] v2.store: trade opened: USOIL long @ 81.6950 (sl 78.3029 tp1 88.4792 tp2 91.8712) size=quarter x0.25
+2026-08-25 13:46:09,260 [INFO] v2.store: trade closed: SMCI long -> LOSS @ 35.4665 (-0.25R sized, -1.00R raw)
+2026-08-25 13:46:09,263 [INFO] v2.journal: journal entry written: 2026-08-25-smci-long-c044f5c6.md
+2026-08-25 13:46:09,265 [INFO] v2.pipeline: reflected on 1 resolved trade(s)
+2026-08-25 13:46:09,272 [INFO] v2.report: wrote /home/runner/work/claude-bot/claude-bot/state/daily_report.md
