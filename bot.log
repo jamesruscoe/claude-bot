@@ -354,3 +354,8 @@
 2026-08-25 13:46:09,272 [INFO] v2.report: wrote /home/runner/work/claude-bot/claude-bot/state/daily_report.md
 2026-08-25 20:16:26,170 [INFO] v2.pipeline: skip open USOIL long — already in an open position
 2026-08-25 20:16:26,193 [INFO] v2.report: wrote /home/runner/work/claude-bot/claude-bot/state/daily_report.md
+2026-08-26 13:52:03,089 [INFO] v2.pipeline: skip open ARM short — already in an open position
+2026-08-26 13:52:03,099 [INFO] v2.store: trade opened: TSLA short @ 356.7000 (sl 373.2593 tp1 323.5813 tp2 307.0220) size=quarter x0.25
+2026-08-26 13:52:03,207 [INFO] v2.pipeline: skip open APLD short — already in an open position
+2026-08-26 13:52:03,218 [INFO] v2.pipeline: skip open AMD short — already in an open position
+2026-08-26 13:52:03,230 [INFO] v2.report: wrote /home/runner/work/claude-bot/claude-bot/state/daily_report.md
