@@ -359,3 +359,8 @@
 2026-08-26 13:52:03,207 [INFO] v2.pipeline: skip open APLD short — already in an open position
 2026-08-26 13:52:03,218 [INFO] v2.pipeline: skip open AMD short — already in an open position
 2026-08-26 13:52:03,230 [INFO] v2.report: wrote /home/runner/work/claude-bot/claude-bot/state/daily_report.md
+2026-08-26 22:35:00,703 [INFO] v2.pipeline: skip open ARM short — already in an open position
+2026-08-26 22:35:00,713 [INFO] v2.pipeline: skip open TSLA short — already in an open position
+2026-08-26 22:35:00,730 [INFO] v2.pipeline: skip open APLD short — already in an open position
+2026-08-26 22:35:00,741 [INFO] v2.pipeline: skip open AMD short — already in an open position
+2026-08-26 22:35:00,752 [INFO] v2.report: wrote /home/runner/work/claude-bot/claude-bot/state/daily_report.md
