@@ -1,38 +1,18 @@
 {
-  "scan_ts": "2026-08-28T03:54:01.236002+00:00",
+  "scan_ts": "2026-08-28T22:51:30.617005+00:00",
   "skipped": false,
   "llm": false,
   "market": "equities",
   "results": [
     {
       "symbol": "ARM",
-      "candidate": true,
-      "score": 50,
-      "direction": "short",
-      "setups": [
-        "ob_retest"
-      ],
-      "regime": "bearish",
-      "price": 251.06,
-      "atr": 18.99716,
-      "entry": 246.755,
-      "entry_low": 242.28,
-      "entry_high": 251.23,
-      "stop_loss": 260.72858,
-      "tp1": 218.80784,
-      "tp2": 204.83426,
-      "rr": 2.0,
-      "take": true,
-      "confidence": "low",
-      "size": "quarter",
-      "rationale": "score 50 (ob_retest); R:R 2.0; thin sample (2 decided) \u2014 ramping",
-      "decided_by": "deterministic",
-      "pattern": "ob_retest"
+      "candidate": false,
+      "reject_reason": "no_setup"
     },
     {
       "symbol": "NVDA",
       "candidate": false,
-      "reject_reason": "no_setup"
+      "reject_reason": "regime_blocked"
     },
     {
       "symbol": "TSLA",
@@ -43,14 +23,14 @@
         "ob_retest"
       ],
       "regime": "bearish",
-      "price": 345.82,
-      "atr": 13.22447,
+      "price": 354.81,
+      "atr": 13.01487,
       "entry": 356.7,
       "entry_low": 346.9,
       "entry_high": 366.5,
-      "stop_loss": 373.11224,
-      "tp1": 323.87552,
-      "tp2": 307.46328,
+      "stop_loss": 373.00743,
+      "tp1": 324.08514,
+      "tp2": 307.77771,
       "rr": 2.0,
       "take": true,
       "confidence": "low",
@@ -71,8 +51,28 @@
     },
     {
       "symbol": "APLD",
-      "candidate": false,
-      "reject_reason": "regime_blocked"
+      "candidate": true,
+      "score": 50,
+      "direction": "short",
+      "setups": [
+        "ob_retest"
+      ],
+      "regime": "bearish",
+      "price": 27.44,
+      "atr": 2.31273,
+      "entry": 28.0029,
+      "entry_low": 27.08,
+      "entry_high": 28.9258,
+      "stop_loss": 30.08216,
+      "tp1": 23.84438,
+      "tp2": 21.76512,
+      "rr": 2.0,
+      "take": true,
+      "confidence": "low",
+      "size": "quarter",
+      "rationale": "score 50 (ob_retest); R:R 2.0; thin sample (3 decided) \u2014 ramping",
+      "decided_by": "deterministic",
+      "pattern": "ob_retest"
     },
     {
       "symbol": "AMZN",
@@ -81,8 +81,29 @@
     },
     {
       "symbol": "NFLX",
-      "candidate": false,
-      "reject_reason": "no_setup"
+      "candidate": true,
+      "score": 100,
+      "direction": "long",
+      "setups": [
+        "ob_retest",
+        "bos_retest"
+      ],
+      "regime": "bearish",
+      "price": 79.84,
+      "atr": 2.2578,
+      "entry": 79.83,
+      "entry_low": 79.17,
+      "entry_high": 80.49,
+      "stop_loss": 78.0411,
+      "tp1": 83.4078,
+      "tp2": 85.1967,
+      "rr": 2.0,
+      "take": true,
+      "confidence": "medium",
+      "size": "half",
+      "rationale": "score 100 (ob_retest+bos_retest); R:R 2.0; dual-confluence (OB + BOS agree); thin sample (3 decided) \u2014 ramping",
+      "decided_by": "deterministic",
+      "pattern": "ob_retest"
     },
     {
       "symbol": "AMD",
@@ -98,14 +119,14 @@
         "ob_retest"
       ],
       "regime": "bullish",
-      "price": 181.78,
-      "atr": 10.37861,
+      "price": 190.72,
+      "atr": 10.61586,
       "entry": 185.17935,
       "entry_low": 178.52,
       "entry_high": 191.8387,
-      "stop_loss": 173.33069,
-      "tp1": 208.87667,
-      "tp2": 220.72533,
+      "stop_loss": 173.21207,
+      "tp1": 209.11391,
+      "tp2": 221.08119,
       "rr": 2.0,
       "take": true,
       "confidence": "low",
@@ -116,15 +137,43 @@
     }
   ],
   "opened": [],
-  "closed": [],
+  "closed": [
+    {
+      "id": "72058c32-296b-4020-a05c-41d69e35489d",
+      "signal_id": "68ae3865-7058-4998-ae71-a4649e9d6279",
+      "symbol": "ARM",
+      "direction": "short",
+      "setups": "[\"bos_retest\"]",
+      "regime": "bearish",
+      "entry_price": 265.37,
+      "stop_loss": 265.37,
+      "original_sl": 276.98645,
+      "tp1": 242.1371,
+      "tp2": 230.52065,
+      "tp1_hit": 1,
+      "tp1_hit_at": "2026-08-24T04:00:00+00:00",
+      "opened_at": "2026-08-20T13:42:10.828894+00:00",
+      "closed_at": "2026-08-28T22:52:32.986370+00:00",
+      "close_price": 265.37,
+      "outcome": "BREAKEVEN",
+      "pnl_r": 0.0,
+      "journaled": 0,
+      "size": "quarter",
+      "size_mult": 0.25,
+      "lots": null,
+      "raw_r": 0.0,
+      "source": "forward",
+      "pattern": "bos_retest"
+    }
+  ],
   "system_stats": {
-    "total_closed": 39,
-    "open": 7,
+    "total_closed": 40,
+    "open": 6,
     "win_rate": 0.23333333333333334,
     "total_r": 0.152
   },
   "rejections": {
-    "no_setup": 6,
+    "no_setup": 5,
     "regime_blocked": 1
   }
 }
