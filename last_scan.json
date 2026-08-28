@@ -1,5 +1,5 @@
 {
-  "scan_ts": "2026-08-27T22:44:27.603378+00:00",
+  "scan_ts": "2026-08-28T03:54:01.236002+00:00",
   "skipped": false,
   "llm": false,
   "market": "equities",
@@ -112,40 +112,10 @@
       "size": "quarter",
       "rationale": "score 50 (ob_retest); R:R 2.0; thin sample (3 decided) \u2014 ramping",
       "decided_by": "deterministic",
-      "pattern": "ob_retest",
-      "opened": true,
-      "pattern_confidence": "unproven (n=28 fwd)"
+      "pattern": "ob_retest"
     }
   ],
-  "opened": [
-    {
-      "id": "e2f0fa7c-f73b-487a-966a-6de29d77113c",
-      "signal_id": "314f9eb3-0546-495b-b96d-ea619cdd2b7c",
-      "symbol": "COIN",
-      "direction": "long",
-      "setups": "[\"ob_retest\"]",
-      "regime": "bullish",
-      "entry_price": 185.17935,
-      "stop_loss": 173.33069,
-      "original_sl": 173.33069,
-      "tp1": 208.87667,
-      "tp2": 220.72533,
-      "tp1_hit": 0,
-      "tp1_hit_at": null,
-      "size": "quarter",
-      "size_mult": 0.25,
-      "lots": null,
-      "source": "forward",
-      "pattern": "ob_retest",
-      "opened_at": "2026-08-27T22:44:27.603378+00:00",
-      "closed_at": null,
-      "close_price": null,
-      "outcome": null,
-      "pnl_r": null,
-      "raw_r": null,
-      "journaled": 0
-    }
-  ],
+  "opened": [],
   "closed": [],
   "system_stats": {
     "total_closed": 39,
