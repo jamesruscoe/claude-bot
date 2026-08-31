@@ -381,3 +381,9 @@
 2026-08-28 22:52:32,993 [INFO] v2.pipeline: reflected on 1 resolved trade(s)
 2026-08-28 22:52:32,999 [INFO] v2.report: wrote /home/runner/work/claude-bot/claude-bot/state/daily_report.md
 2026-08-29 02:33:16,281 [INFO] v2.pipeline: market closed — 2026-08-29 is a weekend. Skipping scan.
+2026-08-31 19:22:44,611 [INFO] v2.store: trade opened: NVDA long @ 227.3999 (sl 223.2273 tp1 235.7451 tp2 239.9177) size=quarter x0.25
+2026-08-31 19:22:44,706 [INFO] v2.pipeline: skip open COIN long — already in an open position
+2026-08-31 19:22:44,707 [INFO] v2.store: trade closed: APLD short -> EXPIRED @ 25.3400 (0.40R sized, 1.62R raw)
+2026-08-31 19:22:44,709 [INFO] v2.journal: journal entry written: 2026-08-31-apld-short-8bd2c127.md
+2026-08-31 19:22:44,711 [INFO] v2.pipeline: reflected on 1 resolved trade(s)
+2026-08-31 19:22:44,715 [INFO] v2.report: wrote /home/runner/work/claude-bot/claude-bot/state/daily_report.md
