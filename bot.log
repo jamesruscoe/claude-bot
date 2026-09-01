@@ -390,3 +390,10 @@
 2026-08-31 23:30:05,341 [INFO] v2.pipeline: skip open NVDA long — already in an open position
 2026-08-31 23:30:05,382 [INFO] v2.pipeline: skip open COIN long — already in an open position
 2026-08-31 23:30:05,390 [INFO] v2.report: wrote /home/runner/work/claude-bot/claude-bot/state/daily_report.md
+2026-09-01 17:08:36,114 [INFO] v2.store: trade opened: ARM short @ 245.7500 (sl 261.9154 tp1 213.4193 tp2 197.2539) size=quarter x0.25
+2026-09-01 17:08:36,225 [INFO] v2.store: trade opened: AMZN long @ 257.3400 (sl 251.4201 tp1 269.1799 tp2 275.0998) size=half x0.50
+2026-09-01 17:08:36,320 [INFO] v2.pipeline: skip open AMD short — already in an open position
+2026-09-01 17:08:36,324 [INFO] v2.store: trade closed: NFLX long -> EXPIRED @ 81.0500 (0.56R sized, 2.23R raw)
+2026-09-01 17:08:36,328 [INFO] v2.journal: journal entry written: 2026-09-01-nflx-long-b45db54a.md
+2026-09-01 17:08:36,329 [INFO] v2.pipeline: reflected on 1 resolved trade(s)
+2026-09-01 17:08:36,336 [INFO] v2.report: wrote /home/runner/work/claude-bot/claude-bot/state/daily_report.md
