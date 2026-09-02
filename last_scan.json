@@ -1,5 +1,5 @@
 {
-  "scan_ts": "2026-09-02T16:57:30.918844+00:00",
+  "scan_ts": "2026-09-02T22:05:23.195106+00:00",
   "skipped": false,
   "llm": false,
   "market": "equities",
@@ -28,7 +28,7 @@
         "bos_retest"
       ],
       "regime": "bullish",
-      "price": 91.05,
+      "price": 90.63,
       "atr": 3.61675,
       "entry": 89.0,
       "entry_low": 88.8665,
@@ -42,9 +42,7 @@
       "size": "quarter",
       "rationale": "score 50 (bos_retest); R:R 2.0; thin sample (3 decided) \u2014 ramping",
       "decided_by": "deterministic",
-      "pattern": "bos_retest",
-      "opened": true,
-      "pattern_confidence": "unproven (n=12 fwd)"
+      "pattern": "bos_retest"
     },
     {
       "symbol": "SMCI",
@@ -97,64 +95,8 @@
       "pattern": "ob_retest"
     }
   ],
-  "opened": [
-    {
-      "id": "0964555c-9810-4eae-bda5-bc4f1332a542",
-      "signal_id": "1eb02de4-7f9d-4ab2-a648-4505b6a7e414",
-      "symbol": "USOIL",
-      "direction": "long",
-      "setups": "[\"bos_retest\"]",
-      "regime": "bullish",
-      "entry_price": 89.0,
-      "stop_loss": 87.05813,
-      "original_sl": 87.05813,
-      "tp1": 92.88374,
-      "tp2": 94.82561,
-      "tp1_hit": 0,
-      "tp1_hit_at": null,
-      "size": "quarter",
-      "size_mult": 0.25,
-      "lots": null,
-      "source": "forward",
-      "pattern": "bos_retest",
-      "opened_at": "2026-09-02T16:57:30.918844+00:00",
-      "closed_at": null,
-      "close_price": null,
-      "outcome": null,
-      "pnl_r": null,
-      "raw_r": null,
-      "journaled": 0
-    }
-  ],
-  "closed": [
-    {
-      "id": "2a1c5517-94e4-44f0-9455-f191f370e9b3",
-      "signal_id": "af63d887-5618-4550-a6e1-020ff50c948e",
-      "symbol": "NVDA",
-      "direction": "long",
-      "setups": "[\"bos_retest\"]",
-      "regime": "ranging",
-      "entry_price": 227.3999,
-      "stop_loss": 223.22729,
-      "original_sl": 223.22729,
-      "tp1": 235.74512,
-      "tp2": 239.91773,
-      "tp1_hit": 0,
-      "tp1_hit_at": null,
-      "opened_at": "2026-08-31T19:21:42.230462+00:00",
-      "closed_at": "2026-09-02T16:58:34.112541+00:00",
-      "close_price": 223.22729,
-      "outcome": "LOSS",
-      "pnl_r": -0.25,
-      "journaled": 0,
-      "size": "quarter",
-      "size_mult": 0.25,
-      "lots": null,
-      "raw_r": -1.0,
-      "source": "forward",
-      "pattern": "bos_retest"
-    }
-  ],
+  "opened": [],
+  "closed": [],
   "system_stats": {
     "total_closed": 44,
     "open": 6,
