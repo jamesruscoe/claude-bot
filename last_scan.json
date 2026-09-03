@@ -1,5 +1,5 @@
 {
-  "scan_ts": "2026-09-02T22:05:23.195106+00:00",
+  "scan_ts": "2026-09-03T16:52:45.390213+00:00",
   "skipped": false,
   "llm": false,
   "market": "equities",
@@ -12,37 +12,17 @@
     {
       "symbol": "NVDA",
       "candidate": false,
-      "reject_reason": "no_setup"
+      "reject_reason": "regime_blocked"
     },
     {
       "symbol": "TSLA",
       "candidate": false,
-      "reject_reason": "regime_blocked"
+      "reject_reason": "no_setup"
     },
     {
       "symbol": "USOIL",
-      "candidate": true,
-      "score": 50,
-      "direction": "long",
-      "setups": [
-        "bos_retest"
-      ],
-      "regime": "bullish",
-      "price": 90.63,
-      "atr": 3.61675,
-      "entry": 89.0,
-      "entry_low": 88.8665,
-      "entry_high": 89.1335,
-      "stop_loss": 87.05813,
-      "tp1": 92.88374,
-      "tp2": 94.82561,
-      "rr": 2.0,
-      "take": true,
-      "confidence": "low",
-      "size": "quarter",
-      "rationale": "score 50 (bos_retest); R:R 2.0; thin sample (3 decided) \u2014 ramping",
-      "decided_by": "deterministic",
-      "pattern": "bos_retest"
+      "candidate": false,
+      "reject_reason": "no_setup"
     },
     {
       "symbol": "SMCI",
@@ -57,7 +37,7 @@
     {
       "symbol": "AMZN",
       "candidate": false,
-      "reject_reason": "no_setup"
+      "reject_reason": "regime_blocked"
     },
     {
       "symbol": "NFLX",
@@ -71,40 +51,75 @@
     },
     {
       "symbol": "COIN",
-      "candidate": true,
-      "score": 50,
-      "direction": "long",
-      "setups": [
-        "ob_retest"
-      ],
-      "regime": "bullish",
-      "price": 176.82,
-      "atr": 11.21768,
-      "entry": 182.58,
-      "entry_low": 176.06,
-      "entry_high": 189.1,
-      "stop_loss": 170.45116,
-      "tp1": 206.83768,
-      "tp2": 218.96652,
-      "rr": 2.0,
-      "take": true,
-      "confidence": "low",
-      "size": "quarter",
-      "rationale": "score 50 (ob_retest); R:R 2.0; thin sample (3 decided) \u2014 ramping",
-      "decided_by": "deterministic",
-      "pattern": "ob_retest"
+      "candidate": false,
+      "reject_reason": "no_setup"
     }
   ],
   "opened": [],
-  "closed": [],
+  "closed": [
+    {
+      "id": "43f80d1b-1531-4c02-91bf-7ba14e2b2af9",
+      "signal_id": "825b78c0-36d3-470c-86c8-54f4092b1e7e",
+      "symbol": "AMD",
+      "direction": "short",
+      "setups": "[\"ob_retest\"]",
+      "regime": "bearish",
+      "entry_price": 498.935,
+      "stop_loss": 529.91989,
+      "original_sl": 529.91989,
+      "tp1": 436.96522,
+      "tp2": 405.98033,
+      "tp1_hit": 0,
+      "tp1_hit_at": null,
+      "opened_at": "2026-08-20T13:42:10.828894+00:00",
+      "closed_at": "2026-09-03T16:53:47.967425+00:00",
+      "close_price": 457.06,
+      "outcome": "EXPIRED",
+      "pnl_r": 0.338,
+      "journaled": 0,
+      "size": "quarter",
+      "size_mult": 0.25,
+      "lots": null,
+      "raw_r": 1.351,
+      "source": "forward",
+      "pattern": "ob_retest"
+    },
+    {
+      "id": "e2f0fa7c-f73b-487a-966a-6de29d77113c",
+      "signal_id": "314f9eb3-0546-495b-b96d-ea619cdd2b7c",
+      "symbol": "COIN",
+      "direction": "long",
+      "setups": "[\"ob_retest\"]",
+      "regime": "bullish",
+      "entry_price": 185.17935,
+      "stop_loss": 173.33069,
+      "original_sl": 173.33069,
+      "tp1": 208.87667,
+      "tp2": 220.72533,
+      "tp1_hit": 0,
+      "tp1_hit_at": null,
+      "opened_at": "2026-08-27T22:44:27.603378+00:00",
+      "closed_at": "2026-09-03T16:53:47.967425+00:00",
+      "close_price": 173.33069,
+      "outcome": "LOSS",
+      "pnl_r": -0.25,
+      "journaled": 0,
+      "size": "quarter",
+      "size_mult": 0.25,
+      "lots": null,
+      "raw_r": -1.0,
+      "source": "forward",
+      "pattern": "ob_retest"
+    }
+  ],
   "system_stats": {
-    "total_closed": 44,
-    "open": 6,
-    "win_rate": 0.22580645161290322,
-    "total_r": 0.865
+    "total_closed": 46,
+    "open": 4,
+    "win_rate": 0.21875,
+    "total_r": 0.953
   },
   "rejections": {
-    "no_setup": 6,
-    "regime_blocked": 2
+    "no_setup": 7,
+    "regime_blocked": 3
   }
 }
