@@ -1,63 +1,23 @@
 {
-  "scan_ts": "2026-09-04T21:54:49.051509+00:00",
+  "scan_ts": "2026-09-08T17:02:16.961133+00:00",
   "skipped": false,
   "llm": false,
   "market": "equities",
   "results": [
     {
       "symbol": "ARM",
-      "candidate": true,
-      "score": 50,
-      "direction": "short",
-      "setups": [
-        "ob_retest"
-      ],
-      "regime": "bearish",
-      "price": 242.59,
-      "atr": 16.84979,
-      "entry": 245.75,
-      "entry_low": 238.5,
-      "entry_high": 253.0,
-      "stop_loss": 261.4249,
-      "tp1": 214.4002,
-      "tp2": 198.7253,
-      "rr": 2.0,
-      "take": true,
-      "confidence": "low",
-      "size": "quarter",
-      "rationale": "score 50 (ob_retest); R:R 2.0; thin sample (2 decided) \u2014 ramping",
-      "decided_by": "deterministic",
-      "pattern": "ob_retest"
+      "candidate": false,
+      "reject_reason": "regime_blocked"
     },
     {
       "symbol": "NVDA",
-      "candidate": true,
-      "score": 50,
-      "direction": "long",
-      "setups": [
-        "ob_retest"
-      ],
-      "regime": "bullish",
-      "price": 228.45,
-      "atr": 7.46307,
-      "entry": 223.035,
-      "entry_low": 216.81,
-      "entry_high": 229.26,
-      "stop_loss": 213.07847,
-      "tp1": 242.94806,
-      "tp2": 252.90459,
-      "rr": 2.0,
-      "take": false,
-      "confidence": "low",
-      "size": "none",
-      "rationale": "skip \u2014 NVDA track record is negative (win rate 20%, avg -0.04R over 6 trades)",
-      "decided_by": "deterministic",
-      "pattern": "ob_retest"
+      "candidate": false,
+      "reject_reason": "no_setup"
     },
     {
       "symbol": "TSLA",
       "candidate": false,
-      "reject_reason": "no_setup"
+      "reject_reason": "regime_blocked"
     },
     {
       "symbol": "USOIL",
@@ -72,12 +32,12 @@
     {
       "symbol": "APLD",
       "candidate": false,
-      "reject_reason": "regime_blocked"
+      "reject_reason": "no_setup"
     },
     {
       "symbol": "AMZN",
       "candidate": false,
-      "reject_reason": "regime_blocked"
+      "reject_reason": "no_setup"
     },
     {
       "symbol": "NFLX",
@@ -85,24 +45,24 @@
       "score": 50,
       "direction": "long",
       "setups": [
-        "bos_retest"
+        "ob_retest"
       ],
-      "regime": "ranging",
-      "price": 82.67,
-      "atr": 2.23724,
-      "entry": 82.455,
-      "entry_low": 82.33132,
-      "entry_high": 82.57868,
-      "stop_loss": 81.2127,
-      "tp1": 84.9396,
-      "tp2": 86.1819,
+      "regime": "bearish",
+      "price": 78.25,
+      "atr": 2.39601,
+      "entry": 80.21505,
+      "entry_low": 79.2801,
+      "entry_high": 81.15,
+      "stop_loss": 78.0821,
+      "tp1": 84.48095,
+      "tp2": 86.6139,
       "rr": 2.0,
       "take": true,
       "confidence": "low",
       "size": "quarter",
-      "rationale": "score 50 (bos_retest); R:R 2.0; thin sample (3 decided) \u2014 ramping",
+      "rationale": "score 50 (ob_retest); R:R 2.0; thin sample (3 decided) \u2014 ramping",
       "decided_by": "deterministic",
-      "pattern": "bos_retest"
+      "pattern": "ob_retest"
     },
     {
       "symbol": "AMD",
@@ -111,21 +71,71 @@
     },
     {
       "symbol": "COIN",
-      "candidate": false,
-      "reject_reason": "regime_blocked"
+      "candidate": true,
+      "score": 100,
+      "direction": "long",
+      "setups": [
+        "ob_retest",
+        "bos_retest"
+      ],
+      "regime": "bullish",
+      "price": 184.64,
+      "atr": 11.48136,
+      "entry": 179.495,
+      "entry_low": 175.0,
+      "entry_high": 183.99,
+      "stop_loss": 169.25932,
+      "tp1": 199.96636,
+      "tp2": 210.20204,
+      "rr": 2.0,
+      "take": true,
+      "confidence": "medium",
+      "size": "half",
+      "rationale": "score 100 (ob_retest+bos_retest); R:R 2.0; dual-confluence (OB + BOS agree); thin sample (4 decided) \u2014 ramping",
+      "decided_by": "deterministic",
+      "pattern": "ob_retest",
+      "opened": true,
+      "pattern_confidence": "provisional (n=34, not yet validated)"
     }
   ],
-  "opened": [],
+  "opened": [
+    {
+      "id": "d7023ff6-937c-468b-a4f8-157e7c1ed264",
+      "signal_id": "a15a4cbf-2f29-4ae2-8e7f-c8afd003a189",
+      "symbol": "COIN",
+      "direction": "long",
+      "setups": "[\"ob_retest\", \"bos_retest\"]",
+      "regime": "bullish",
+      "entry_price": 179.495,
+      "stop_loss": 169.25932,
+      "original_sl": 169.25932,
+      "tp1": 199.96636,
+      "tp2": 210.20204,
+      "tp1_hit": 0,
+      "tp1_hit_at": null,
+      "size": "half",
+      "size_mult": 0.5,
+      "lots": null,
+      "source": "forward",
+      "pattern": "ob_retest",
+      "opened_at": "2026-09-08T17:02:16.961133+00:00",
+      "closed_at": null,
+      "close_price": null,
+      "outcome": null,
+      "pnl_r": null,
+      "raw_r": null,
+      "journaled": 0
+    }
+  ],
   "closed": [],
   "system_stats": {
     "total_closed": 48,
-    "open": 3,
+    "open": 4,
     "win_rate": 0.21212121212121213,
     "total_r": 0.703
   },
   "rejections": {
-    "no_setup": 4,
-    "regime_blocked": 3,
-    "judge_skip": 1
+    "no_setup": 6,
+    "regime_blocked": 2
   }
 }
