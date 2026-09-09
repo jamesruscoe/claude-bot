@@ -440,3 +440,11 @@
 2026-09-08 22:07:59,652 [INFO] v2.pipeline: skip open NFLX long — already in an open position
 2026-09-08 22:07:59,661 [INFO] v2.pipeline: skip open COIN long — already in an open position
 2026-09-08 22:07:59,669 [INFO] v2.report: wrote /home/runner/work/claude-bot/claude-bot/state/daily_report.md
+2026-09-09 17:00:23,145 [INFO] v2.store: trade opened: APLD short @ 26.6400 (sl 27.6735 tp1 24.5729 tp2 23.5393) size=quarter x0.25
+2026-09-09 17:00:23,205 [INFO] v2.pipeline: skip open COIN long — already in an open position
+2026-09-09 17:00:23,206 [INFO] v2.store: trade closed: ARM short -> LOSS @ 261.9154 (-0.25R sized, -1.00R raw)
+2026-09-09 17:00:23,207 [INFO] v2.store: trade closed: NFLX long -> LOSS @ 81.2127 (-0.25R sized, -1.00R raw)
+2026-09-09 17:00:23,208 [INFO] v2.journal: journal entry written: 2026-09-09-arm-short-ae744553.md
+2026-09-09 17:00:23,210 [INFO] v2.journal: journal entry written: 2026-09-09-nflx-long-db6343c0.md
+2026-09-09 17:00:23,212 [INFO] v2.pipeline: reflected on 2 resolved trade(s)
+2026-09-09 17:00:23,219 [INFO] v2.report: wrote /home/runner/work/claude-bot/claude-bot/state/daily_report.md
