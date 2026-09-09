@@ -448,3 +448,6 @@
 2026-09-09 17:00:23,210 [INFO] v2.journal: journal entry written: 2026-09-09-nflx-long-db6343c0.md
 2026-09-09 17:00:23,212 [INFO] v2.pipeline: reflected on 2 resolved trade(s)
 2026-09-09 17:00:23,219 [INFO] v2.report: wrote /home/runner/work/claude-bot/claude-bot/state/daily_report.md
+2026-09-09 22:05:08,903 [INFO] v2.pipeline: skip open APLD short — already in an open position
+2026-09-09 22:05:08,916 [INFO] v2.pipeline: skip open COIN long — already in an open position
+2026-09-09 22:05:08,925 [INFO] v2.report: wrote /home/runner/work/claude-bot/claude-bot/state/daily_report.md
