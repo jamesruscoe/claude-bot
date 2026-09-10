@@ -1,18 +1,19 @@
-# Daily report — 2026-09-09T22:05:08+00:00
+# Daily report — 2026-09-10T16:53:16+00:00
 
 Market: **equities** · judge: deterministic · paper only
 
-## Candidates (3)
-- **APLD** short score 50 R:R 2.0 — TAKE/low/quarter
-- **COIN** long score 50 R:R 2.0 — TAKE/low/quarter
-- **NVDA** long score 50 R:R 2.0 — skip/low/none
+## Candidates (0)
+- none today
+
+## Resolved this run (1)
+- AMZN LOSS — -0.5R (sized)
 
 ## Ledger (running, sized R)
-- 3 open · 50 closed · win rate 20% · total +0.20R
+- 2 open · 51 closed · win rate 19% · total -0.30R
 
 ## Rejections by reason (all-time)
-- no_setup: 568
-- regime_blocked: 181
+- no_setup: 576
+- regime_blocked: 183
 - levels_rejected_wide_stop: 46
 - judge_skip: 4
 - conflicting_setups: 4
