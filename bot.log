@@ -457,3 +457,7 @@
 2026-09-10 16:53:16,015 [INFO] v2.pipeline: reflected on 1 resolved trade(s)
 2026-09-10 16:53:16,021 [INFO] v2.report: wrote /home/runner/work/claude-bot/claude-bot/state/daily_report.md
 2026-09-10 22:02:50,096 [INFO] v2.report: wrote /home/runner/work/claude-bot/claude-bot/state/daily_report.md
+2026-09-11 16:52:59,991 [INFO] v2.store: trade opened: TSLA long @ 358.0050 (sl 343.9928 tp1 386.0295 tp2 400.0417) size=quarter x0.25
+2026-09-11 16:53:00,126 [INFO] v2.store: trade opened: SMCI long @ 36.7550 (sl 34.5090 tp1 41.2471 tp2 43.4931) size=half x0.50
+2026-09-11 16:53:00,256 [INFO] v2.store: trade opened: AMD long @ 517.3493 (sl 505.1399 tp1 541.7682 tp2 553.9776) size=quarter x0.25
+2026-09-11 16:53:00,313 [INFO] v2.report: wrote /home/runner/work/claude-bot/claude-bot/state/daily_report.md
