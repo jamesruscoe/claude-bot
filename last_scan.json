@@ -1,5 +1,5 @@
 {
-  "scan_ts": "2026-09-10T23:19:06.510135+00:00",
+  "scan_ts": "2026-09-11T23:26:44.560347+00:00",
   "skipped": false,
   "llm": false,
   "market": "fx",
@@ -27,7 +27,7 @@
     {
       "symbol": "AUDUSD=X",
       "candidate": false,
-      "reject_reason": "no_setup"
+      "reject_reason": "regime_blocked"
     },
     {
       "symbol": "USDCAD=X",
@@ -36,8 +36,29 @@
     },
     {
       "symbol": "NZDUSD=X",
-      "candidate": false,
-      "reject_reason": "no_setup"
+      "candidate": true,
+      "score": 50,
+      "direction": "short",
+      "setups": [
+        "bos_retest"
+      ],
+      "regime": "ranging",
+      "price": 0.58163,
+      "atr": 0.00489,
+      "entry": 0.58216,
+      "entry_low": 0.58143,
+      "entry_high": 0.58317,
+      "stop_loss": 0.58562,
+      "tp1": 0.57524,
+      "tp2": 0.57178,
+      "rr": 2.0,
+      "take": true,
+      "confidence": "low",
+      "size": "quarter",
+      "rationale": "score 50 (bos_retest); R:R 2.0; probation (0 decided) \u2014 tiny stake to learn",
+      "decided_by": "deterministic",
+      "pattern": "bos_retest",
+      "fx_blocked": "below calibrated FX_MIN_SCORE (50<85)"
     },
     {
       "symbol": "EURGBP=X",
@@ -59,6 +80,8 @@
     "total_r": 0.012
   },
   "rejections": {
-    "no_setup": 9
+    "no_setup": 7,
+    "regime_blocked": 1,
+    "below calibrated FX_MIN_SCORE (50<85)": 1
   }
 }
