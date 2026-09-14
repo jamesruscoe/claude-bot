@@ -467,3 +467,5 @@
 2026-09-11 22:05:25,579 [INFO] v2.report: wrote /home/runner/work/claude-bot/claude-bot/state/daily_report.md
 2026-09-14 18:20:27,484 [INFO] v2.store: trade opened: ARM short @ 261.3050 (sl 275.9525 tp1 232.0100 tp2 217.3625) size=quarter x0.25
 2026-09-14 18:20:27,791 [INFO] v2.report: wrote /home/runner/work/claude-bot/claude-bot/state/daily_report.md
+2026-09-14 22:51:02,166 [INFO] v2.pipeline: skip open ARM short — already in an open position
+2026-09-14 22:51:02,203 [INFO] v2.report: wrote /home/runner/work/claude-bot/claude-bot/state/daily_report.md

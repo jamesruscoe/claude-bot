@@ -1,5 +1,5 @@
 {
-  "scan_ts": "2026-09-14T18:19:24.828743+00:00",
+  "scan_ts": "2026-09-14T22:49:58.961485+00:00",
   "skipped": false,
   "llm": false,
   "market": "equities",
@@ -27,9 +27,7 @@
       "size": "quarter",
       "rationale": "score 50 (ob_retest); R:R 2.0; thin sample (3 decided) \u2014 ramping",
       "decided_by": "deterministic",
-      "pattern": "ob_retest",
-      "opened": true,
-      "pattern_confidence": "provisional (n=36, not yet validated)"
+      "pattern": "ob_retest"
     },
     {
       "symbol": "NVDA",
@@ -77,35 +75,7 @@
       "reject_reason": "regime_blocked"
     }
   ],
-  "opened": [
-    {
-      "id": "0430b035-ac9e-43c7-9e3a-ca4c7de5f8cb",
-      "signal_id": "3c7e0b87-83df-4e24-b961-334ee355a2e9",
-      "symbol": "ARM",
-      "direction": "short",
-      "setups": "[\"ob_retest\"]",
-      "regime": "bearish",
-      "entry_price": 261.305,
-      "stop_loss": 275.95251,
-      "original_sl": 275.95251,
-      "tp1": 232.00998,
-      "tp2": 217.36247,
-      "tp1_hit": 0,
-      "tp1_hit_at": null,
-      "size": "quarter",
-      "size_mult": 0.25,
-      "lots": null,
-      "source": "forward",
-      "pattern": "ob_retest",
-      "opened_at": "2026-09-14T18:19:24.828743+00:00",
-      "closed_at": null,
-      "close_price": null,
-      "outcome": null,
-      "pnl_r": null,
-      "raw_r": null,
-      "journaled": 0
-    }
-  ],
+  "opened": [],
   "closed": [],
   "system_stats": {
     "total_closed": 51,
