@@ -480,3 +480,11 @@
 2026-09-15 22:31:45,662 [INFO] v2.journal: journal entry written: 2026-09-15-apld-short-5a062c1a.md
 2026-09-15 22:31:45,666 [INFO] v2.pipeline: reflected on 1 resolved trade(s)
 2026-09-15 22:31:45,672 [INFO] v2.report: wrote /home/runner/work/claude-bot/claude-bot/state/daily_report.md
+2026-09-16 17:27:27,673 [INFO] v2.pipeline: skip open ARM short — already in an open position
+2026-09-16 17:27:27,691 [INFO] v2.store: trade opened: USOIL long @ 102.7400 (sl 98.3641 tp1 111.4918 tp2 115.8677) size=quarter x0.25
+2026-09-16 17:27:27,828 [INFO] v2.pipeline: skip open COIN long — already in an open position
+2026-09-16 17:27:27,830 [INFO] v2.store: trade closed: COIN long -> LOSS @ 169.2593 (-0.50R sized, -1.00R raw)
+2026-09-16 17:27:27,833 [INFO] v2.journal: journal entry written: 2026-09-16-coin-long-d7023ff6.md
+2026-09-16 17:27:27,836 [INFO] v2.journal: lesson written: 20260916-172727-coin.md
+2026-09-16 17:27:27,836 [INFO] v2.pipeline: reflected on 1 resolved trade(s)
+2026-09-16 17:27:27,843 [INFO] v2.report: wrote /home/runner/work/claude-bot/claude-bot/state/daily_report.md
