@@ -1,5 +1,5 @@
 {
-  "scan_ts": "2026-09-16T17:26:25.892158+00:00",
+  "scan_ts": "2026-09-16T22:27:23.509833+00:00",
   "skipped": false,
   "llm": false,
   "market": "equities",
@@ -48,23 +48,21 @@
         "ob_retest"
       ],
       "regime": "bullish",
-      "price": 102.74,
-      "atr": 4.33182,
+      "price": 101.96,
+      "atr": 4.26754,
       "entry": 102.74,
       "entry_low": 100.53,
       "entry_high": 104.95,
-      "stop_loss": 98.36409,
-      "tp1": 111.49182,
-      "tp2": 115.86773,
+      "stop_loss": 98.39623,
+      "tp1": 111.42754,
+      "tp2": 115.77131,
       "rr": 2.0,
       "take": true,
       "confidence": "low",
       "size": "quarter",
       "rationale": "score 50 (ob_retest); R:R 2.0; thin sample (3 decided) \u2014 ramping",
       "decided_by": "deterministic",
-      "pattern": "ob_retest",
-      "opened": true,
-      "pattern_confidence": "provisional (n=36, not yet validated)"
+      "pattern": "ob_retest"
     },
     {
       "symbol": "SMCI",
@@ -109,72 +107,16 @@
       "tp1": 202.02132,
       "tp2": 213.14698,
       "rr": 2.0,
-      "take": true,
+      "take": false,
       "confidence": "low",
-      "size": "quarter",
-      "rationale": "score 50 (ob_retest); R:R 2.0; thin sample (4 decided) \u2014 ramping",
+      "size": "none",
+      "rationale": "skip \u2014 COIN track record is negative (win rate 0%, avg -0.21R over 6 trades)",
       "decided_by": "deterministic",
       "pattern": "ob_retest"
     }
   ],
-  "opened": [
-    {
-      "id": "9341221e-fe7b-430d-9e48-81a64a93b408",
-      "signal_id": "73ce94c3-7de7-47ed-970a-ea384d78c2a3",
-      "symbol": "USOIL",
-      "direction": "long",
-      "setups": "[\"ob_retest\"]",
-      "regime": "bullish",
-      "entry_price": 102.74,
-      "stop_loss": 98.36409,
-      "original_sl": 98.36409,
-      "tp1": 111.49182,
-      "tp2": 115.86773,
-      "tp1_hit": 0,
-      "tp1_hit_at": null,
-      "size": "quarter",
-      "size_mult": 0.25,
-      "lots": null,
-      "source": "forward",
-      "pattern": "ob_retest",
-      "opened_at": "2026-09-16T17:26:25.892158+00:00",
-      "closed_at": null,
-      "close_price": null,
-      "outcome": null,
-      "pnl_r": null,
-      "raw_r": null,
-      "journaled": 0
-    }
-  ],
-  "closed": [
-    {
-      "id": "d7023ff6-937c-468b-a4f8-157e7c1ed264",
-      "signal_id": "a15a4cbf-2f29-4ae2-8e7f-c8afd003a189",
-      "symbol": "COIN",
-      "direction": "long",
-      "setups": "[\"ob_retest\", \"bos_retest\"]",
-      "regime": "bullish",
-      "entry_price": 179.495,
-      "stop_loss": 169.25932,
-      "original_sl": 169.25932,
-      "tp1": 199.96636,
-      "tp2": 210.20204,
-      "tp1_hit": 0,
-      "tp1_hit_at": null,
-      "opened_at": "2026-09-08T17:02:16.961133+00:00",
-      "closed_at": "2026-09-16T17:27:27.829470+00:00",
-      "close_price": 169.25932,
-      "outcome": "LOSS",
-      "pnl_r": -0.5,
-      "journaled": 0,
-      "size": "half",
-      "size_mult": 0.5,
-      "lots": null,
-      "raw_r": -1.0,
-      "source": "forward",
-      "pattern": "ob_retest"
-    }
-  ],
+  "opened": [],
+  "closed": [],
   "system_stats": {
     "total_closed": 54,
     "open": 4,
@@ -183,6 +125,7 @@
   },
   "rejections": {
     "no_setup": 6,
-    "regime_blocked": 1
+    "regime_blocked": 1,
+    "judge_skip": 1
   }
 }
