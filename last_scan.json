@@ -1,5 +1,5 @@
 {
-  "scan_ts": "2026-09-15T23:35:30.948656+00:00",
+  "scan_ts": "2026-09-16T23:43:24.059660+00:00",
   "skipped": false,
   "llm": false,
   "market": "fx",
@@ -17,7 +17,7 @@
     {
       "symbol": "USDJPY=X",
       "candidate": false,
-      "reject_reason": "no_setup"
+      "reject_reason": "regime_blocked"
     },
     {
       "symbol": "USDCHF=X",
@@ -59,6 +59,7 @@
     "total_r": 0.012
   },
   "rejections": {
-    "no_setup": 9
+    "no_setup": 8,
+    "regime_blocked": 1
   }
 }
