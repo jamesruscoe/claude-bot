@@ -495,3 +495,7 @@
 2026-09-17 17:27:07,031 [INFO] v2.store: trade opened: APLD short @ 24.9375 (sl 26.4032 tp1 22.0060 tp2 20.5403) size=half x0.50
 2026-09-17 17:27:07,112 [INFO] v2.store: trade opened: NFLX long @ 76.2950 (sl 74.7400 tp1 79.4050 tp2 80.9600) size=quarter x0.25
 2026-09-17 17:27:07,247 [INFO] v2.report: wrote /home/runner/work/claude-bot/claude-bot/state/daily_report.md
+2026-09-17 22:31:44,125 [INFO] v2.pipeline: skip open ARM short — already in an open position
+2026-09-17 22:31:44,145 [INFO] v2.pipeline: skip open APLD short — already in an open position
+2026-09-17 22:31:44,153 [INFO] v2.pipeline: skip open NFLX long — already in an open position
+2026-09-17 22:31:44,169 [INFO] v2.report: wrote /home/runner/work/claude-bot/claude-bot/state/daily_report.md
