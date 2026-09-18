@@ -499,3 +499,8 @@
 2026-09-17 22:31:44,145 [INFO] v2.pipeline: skip open APLD short — already in an open position
 2026-09-17 22:31:44,153 [INFO] v2.pipeline: skip open NFLX long — already in an open position
 2026-09-17 22:31:44,169 [INFO] v2.report: wrote /home/runner/work/claude-bot/claude-bot/state/daily_report.md
+2026-09-18 16:55:39,864 [INFO] v2.pipeline: skip open USOIL long — already in an open position
+2026-09-18 16:55:39,885 [INFO] v2.store: trade closed: USOIL long -> LOSS @ 98.3641 (-0.25R sized, -1.00R raw)
+2026-09-18 16:55:39,887 [INFO] v2.journal: journal entry written: 2026-09-18-usoil-long-9341221e.md
+2026-09-18 16:55:39,889 [INFO] v2.pipeline: reflected on 1 resolved trade(s)
+2026-09-18 16:55:39,896 [INFO] v2.report: wrote /home/runner/work/claude-bot/claude-bot/state/daily_report.md
