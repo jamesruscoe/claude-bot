@@ -1,5 +1,5 @@
 {
-  "scan_ts": "2026-09-18T22:00:03.926496+00:00",
+  "scan_ts": "2026-09-21T18:26:24.426867+00:00",
   "skipped": false,
   "llm": false,
   "market": "equities",
@@ -28,28 +28,26 @@
         "bos_retest"
       ],
       "regime": "bullish",
-      "price": 95.47,
-      "atr": 4.46433,
+      "price": 92.31,
+      "atr": 4.61111,
       "entry": 97.0,
       "entry_low": 96.8545,
       "entry_high": 97.1455,
-      "stop_loss": 94.62234,
-      "tp1": 101.75532,
-      "tp2": 104.13298,
+      "stop_loss": 94.54895,
+      "tp1": 101.9021,
+      "tp2": 104.35315,
       "rr": 2.0,
       "take": true,
       "confidence": "low",
       "size": "quarter",
       "rationale": "score 50 (bos_retest); R:R 2.0; thin sample (4 decided) \u2014 ramping",
       "decided_by": "deterministic",
-      "pattern": "bos_retest",
-      "opened": true,
-      "pattern_confidence": "unproven (n=17 fwd)"
+      "pattern": "bos_retest"
     },
     {
       "symbol": "SMCI",
       "candidate": false,
-      "reject_reason": "regime_blocked"
+      "reject_reason": "no_setup"
     },
     {
       "symbol": "APLD",
@@ -58,28 +56,8 @@
     },
     {
       "symbol": "AMZN",
-      "candidate": true,
-      "score": 50,
-      "direction": "short",
-      "setups": [
-        "bos_retest"
-      ],
-      "regime": "bullish",
-      "price": 251.19,
-      "atr": 6.17436,
-      "entry": 249.58,
-      "entry_low": 249.20563,
-      "entry_high": 249.95437,
-      "stop_loss": 253.04155,
-      "tp1": 242.6569,
-      "tp2": 239.19535,
-      "rr": 2.0,
-      "take": false,
-      "confidence": "low",
-      "size": "none",
-      "rationale": "skip \u2014 AMZN track record is negative (win rate 20%, avg -0.25R over 5 trades)",
-      "decided_by": "deterministic",
-      "pattern": "bos_retest"
+      "candidate": false,
+      "reject_reason": "no_setup"
     },
     {
       "symbol": "NFLX",
@@ -97,7 +75,62 @@
       "reject_reason": "regime_blocked"
     }
   ],
-  "opened": [
+  "opened": [],
+  "closed": [
+    {
+      "id": "006d3e8b-95f4-49ae-99a4-4393db975160",
+      "signal_id": "a40bd135-9166-4c89-9ad5-76e06bc637ca",
+      "symbol": "APLD",
+      "direction": "short",
+      "setups": "[\"ob_retest\", \"bos_retest\"]",
+      "regime": "bearish",
+      "entry_price": 24.9375,
+      "stop_loss": 26.40324,
+      "original_sl": 26.40324,
+      "tp1": 22.00602,
+      "tp2": 20.54028,
+      "tp1_hit": 0,
+      "tp1_hit_at": null,
+      "opened_at": "2026-09-17T17:26:04.116127+00:00",
+      "closed_at": "2026-09-21T18:27:26.467910+00:00",
+      "close_price": 26.40324,
+      "outcome": "LOSS",
+      "pnl_r": -0.5,
+      "journaled": 0,
+      "size": "half",
+      "size_mult": 0.5,
+      "lots": null,
+      "raw_r": -1.0,
+      "source": "forward",
+      "pattern": "ob_retest"
+    },
+    {
+      "id": "3d6dba63-ccd6-49bf-b027-c6a6a78fbad3",
+      "signal_id": "d51dcfcf-3d86-45dd-a5a1-fb543a62a286",
+      "symbol": "NFLX",
+      "direction": "long",
+      "setups": "[\"ob_retest\"]",
+      "regime": "bullish",
+      "entry_price": 76.295,
+      "stop_loss": 74.74001,
+      "original_sl": 74.74001,
+      "tp1": 79.40498,
+      "tp2": 80.95997,
+      "tp1_hit": 0,
+      "tp1_hit_at": null,
+      "opened_at": "2026-09-17T17:26:04.116127+00:00",
+      "closed_at": "2026-09-21T18:27:26.467910+00:00",
+      "close_price": 74.74001,
+      "outcome": "LOSS",
+      "pnl_r": -0.25,
+      "journaled": 0,
+      "size": "quarter",
+      "size_mult": 0.25,
+      "lots": null,
+      "raw_r": -1.0,
+      "source": "forward",
+      "pattern": "ob_retest"
+    },
     {
       "id": "0897ecaf-fa31-402c-b83c-8f31798cfdfb",
       "signal_id": "0b647521-d8be-4035-8734-dca2b97577ca",
@@ -112,30 +145,28 @@
       "tp2": 104.13298,
       "tp1_hit": 0,
       "tp1_hit_at": null,
+      "opened_at": "2026-09-18T22:00:03.926496+00:00",
+      "closed_at": "2026-09-21T18:27:26.467910+00:00",
+      "close_price": 94.62234,
+      "outcome": "LOSS",
+      "pnl_r": -0.25,
+      "journaled": 0,
       "size": "quarter",
       "size_mult": 0.25,
       "lots": null,
+      "raw_r": -1.0,
       "source": "forward",
-      "pattern": "bos_retest",
-      "opened_at": "2026-09-18T22:00:03.926496+00:00",
-      "closed_at": null,
-      "close_price": null,
-      "outcome": null,
-      "pnl_r": null,
-      "raw_r": null,
-      "journaled": 0
+      "pattern": "bos_retest"
     }
   ],
-  "closed": [],
   "system_stats": {
-    "total_closed": 55,
-    "open": 6,
-    "win_rate": 0.1794871794871795,
-    "total_r": -1.297
+    "total_closed": 58,
+    "open": 3,
+    "win_rate": 0.16666666666666666,
+    "total_r": -2.297
   },
   "rejections": {
-    "no_setup": 6,
-    "regime_blocked": 2,
-    "judge_skip": 1
+    "no_setup": 8,
+    "regime_blocked": 1
   }
 }

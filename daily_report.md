@@ -1,20 +1,21 @@
-# Daily report — 2026-09-18T22:01:06+00:00
+# Daily report — 2026-09-21T18:27:26+00:00
 
 Market: **equities** · judge: deterministic · paper only
 
-## Candidates (2)
-- **USOIL** long score 50 R:R 2.0 — TAKE/low/quarter ← opened
-- **AMZN** short score 50 R:R 2.0 — skip/low/none
+## Candidates (1)
+- **USOIL** long score 50 R:R 2.0 — TAKE/low/quarter
 
-## Opened this run (1)
-- USOIL long @ 97.0 (sl 94.62234 tp1 101.75532 tp2 104.13298, size quarter)
+## Resolved this run (3)
+- APLD LOSS — -0.5R (sized)
+- NFLX LOSS — -0.25R (sized)
+- USOIL LOSS — -0.25R (sized)
 
 ## Ledger (running, sized R)
-- 6 open · 55 closed · win rate 18% · total -1.30R
+- 3 open · 58 closed · win rate 17% · total -2.30R
 
 ## Rejections by reason (all-time)
-- no_setup: 654
-- regime_blocked: 207
+- no_setup: 662
+- regime_blocked: 208
 - levels_rejected_wide_stop: 46
 - judge_skip: 9
 - conflicting_setups: 4

@@ -506,3 +506,14 @@
 2026-09-18 16:55:39,896 [INFO] v2.report: wrote /home/runner/work/claude-bot/claude-bot/state/daily_report.md
 2026-09-18 22:01:06,756 [INFO] v2.store: trade opened: USOIL long @ 97.0000 (sl 94.6223 tp1 101.7553 tp2 104.1330) size=quarter x0.25
 2026-09-18 22:01:06,826 [INFO] v2.report: wrote /home/runner/work/claude-bot/claude-bot/state/daily_report.md
+2026-09-21 18:27:26,440 [INFO] v2.pipeline: skip open USOIL long — already in an open position
+2026-09-21 18:27:26,469 [INFO] v2.store: trade closed: APLD short -> LOSS @ 26.4032 (-0.50R sized, -1.00R raw)
+2026-09-21 18:27:26,469 [INFO] v2.store: trade closed: NFLX long -> LOSS @ 74.7400 (-0.25R sized, -1.00R raw)
+2026-09-21 18:27:26,471 [INFO] v2.store: trade closed: USOIL long -> LOSS @ 94.6223 (-0.25R sized, -1.00R raw)
+2026-09-21 18:27:26,472 [INFO] v2.journal: journal entry written: 2026-09-21-apld-short-006d3e8b.md
+2026-09-21 18:27:26,474 [INFO] v2.journal: journal entry written: 2026-09-21-nflx-long-3d6dba63.md
+2026-09-21 18:27:26,477 [INFO] v2.journal: lesson written: 20260921-182726-nflx.md
+2026-09-21 18:27:26,478 [INFO] v2.journal: journal entry written: 2026-09-21-usoil-long-0897ecaf.md
+2026-09-21 18:27:26,480 [INFO] v2.journal: lesson written: 20260921-182726-usoil.md
+2026-09-21 18:27:26,481 [INFO] v2.pipeline: reflected on 3 resolved trade(s)
+2026-09-21 18:27:26,486 [INFO] v2.report: wrote /home/runner/work/claude-bot/claude-bot/state/daily_report.md
