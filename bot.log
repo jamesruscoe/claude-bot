@@ -518,3 +518,7 @@
 2026-09-21 18:27:26,481 [INFO] v2.pipeline: reflected on 3 resolved trade(s)
 2026-09-21 18:27:26,486 [INFO] v2.report: wrote /home/runner/work/claude-bot/claude-bot/state/daily_report.md
 2026-09-21 22:55:54,720 [INFO] v2.report: wrote /home/runner/work/claude-bot/claude-bot/state/daily_report.md
+2026-09-22 17:31:13,181 [INFO] v2.store: trade closed: ARM short -> LOSS @ 275.9525 (-0.25R sized, -1.00R raw)
+2026-09-22 17:31:13,183 [INFO] v2.journal: journal entry written: 2026-09-22-arm-short-0430b035.md
+2026-09-22 17:31:13,184 [INFO] v2.pipeline: reflected on 1 resolved trade(s)
+2026-09-22 17:31:13,191 [INFO] v2.report: wrote /home/runner/work/claude-bot/claude-bot/state/daily_report.md
