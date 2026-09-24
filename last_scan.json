@@ -1,5 +1,5 @@
 {
-  "scan_ts": "2026-09-23T22:31:50.991451+00:00",
+  "scan_ts": "2026-09-24T17:43:14.750857+00:00",
   "skipped": false,
   "llm": false,
   "market": "equities",
@@ -33,14 +33,14 @@
         "bos_retest"
       ],
       "regime": "bullish",
-      "price": 41.54,
-      "atr": 2.36417,
-      "entry": 40.45,
-      "entry_low": 40.38933,
-      "entry_high": 40.51068,
-      "stop_loss": 39.20724,
-      "tp1": 42.93552,
-      "tp2": 44.17828,
+      "price": 41.44,
+      "atr": 2.33172,
+      "entry": 41.53,
+      "entry_low": 41.46771,
+      "entry_high": 41.5923,
+      "stop_loss": 40.30184,
+      "tp1": 43.98632,
+      "tp2": 45.21448,
       "rr": 2.0,
       "take": true,
       "confidence": "low",
@@ -57,7 +57,7 @@
     {
       "symbol": "AMZN",
       "candidate": false,
-      "reject_reason": "regime_blocked"
+      "reject_reason": "no_setup"
     },
     {
       "symbol": "NFLX",
@@ -71,8 +71,28 @@
     },
     {
       "symbol": "COIN",
-      "candidate": false,
-      "reject_reason": "no_setup"
+      "candidate": true,
+      "score": 50,
+      "direction": "long",
+      "setups": [
+        "bos_retest"
+      ],
+      "regime": "bullish",
+      "price": 198.13,
+      "atr": 11.95302,
+      "entry": 196.6205,
+      "entry_low": 196.32557,
+      "entry_high": 196.91543,
+      "stop_loss": 190.34906,
+      "tp1": 209.16338,
+      "tp2": 215.43482,
+      "rr": 2.0,
+      "take": false,
+      "confidence": "low",
+      "size": "none",
+      "rationale": "skip \u2014 COIN track record is negative (win rate 0%, avg -0.21R over 6 trades)",
+      "decided_by": "deterministic",
+      "pattern": "bos_retest"
     }
   ],
   "opened": [],
@@ -85,6 +105,6 @@
   },
   "rejections": {
     "no_setup": 8,
-    "regime_blocked": 1
+    "judge_skip": 1
   }
 }
