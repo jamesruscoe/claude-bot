@@ -1,5 +1,5 @@
 {
-  "scan_ts": "2026-09-25T17:44:34.879327+00:00",
+  "scan_ts": "2026-09-25T22:54:58.564229+00:00",
   "skipped": false,
   "llm": false,
   "market": "equities",
@@ -28,7 +28,7 @@
         "ob_retest"
       ],
       "regime": "bullish",
-      "price": 92.28,
+      "price": 92.44,
       "atr": 4.55749,
       "entry": 94.91,
       "entry_low": 92.4,
