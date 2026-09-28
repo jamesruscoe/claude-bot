@@ -1,5 +1,5 @@
 {
-  "scan_ts": "2026-09-25T22:54:58.564229+00:00",
+  "scan_ts": "2026-09-28T19:57:58.898485+00:00",
   "skipped": false,
   "llm": false,
   "market": "equities",
@@ -7,7 +7,7 @@
     {
       "symbol": "ARM",
       "candidate": false,
-      "reject_reason": "no_setup"
+      "reject_reason": "regime_blocked"
     },
     {
       "symbol": "NVDA",
@@ -16,33 +16,35 @@
     },
     {
       "symbol": "TSLA",
-      "candidate": false,
-      "reject_reason": "no_setup"
-    },
-    {
-      "symbol": "USOIL",
       "candidate": true,
       "score": 50,
       "direction": "long",
       "setups": [
-        "ob_retest"
+        "bos_retest"
       ],
-      "regime": "bullish",
-      "price": 92.44,
-      "atr": 4.55749,
-      "entry": 94.91,
-      "entry_low": 92.4,
-      "entry_high": 97.42,
-      "stop_loss": 90.12125,
-      "tp1": 104.4875,
-      "tp2": 109.27625,
+      "regime": "bearish",
+      "price": 372.11,
+      "atr": 12.73223,
+      "entry": 375.44,
+      "entry_low": 374.87684,
+      "entry_high": 376.00316,
+      "stop_loss": 368.51073,
+      "tp1": 389.29854,
+      "tp2": 396.22781,
       "rr": 2.0,
-      "take": false,
+      "take": true,
       "confidence": "low",
-      "size": "none",
-      "rationale": "skip \u2014 USOIL track record is negative (win rate 0%, avg -0.11R over 9 trades)",
+      "size": "quarter",
+      "rationale": "score 50 (bos_retest); R:R 2.0; thin sample (2 decided) \u2014 ramping",
       "decided_by": "deterministic",
-      "pattern": "ob_retest"
+      "pattern": "bos_retest",
+      "opened": true,
+      "pattern_confidence": "unproven (n=18 fwd)"
+    },
+    {
+      "symbol": "USOIL",
+      "candidate": false,
+      "reject_reason": "no_setup"
     },
     {
       "symbol": "SMCI",
@@ -61,28 +63,8 @@
     },
     {
       "symbol": "NFLX",
-      "candidate": true,
-      "score": 50,
-      "direction": "short",
-      "setups": [
-        "ob_retest"
-      ],
-      "regime": "bearish",
-      "price": 71.72,
-      "atr": 2.20545,
-      "entry": 72.83,
-      "entry_low": 71.79,
-      "entry_high": 73.87,
-      "stop_loss": 74.97273,
-      "tp1": 68.54454,
-      "tp2": 66.40181,
-      "rr": 2.0,
-      "take": false,
-      "confidence": "low",
-      "size": "none",
-      "rationale": "skip \u2014 NFLX track record is negative (win rate 20%, avg +0.05R over 6 trades)",
-      "decided_by": "deterministic",
-      "pattern": "ob_retest"
+      "candidate": false,
+      "reject_reason": "no_setup"
     },
     {
       "symbol": "AMD",
@@ -92,20 +74,47 @@
     {
       "symbol": "COIN",
       "candidate": false,
-      "reject_reason": "regime_blocked"
+      "reject_reason": "no_setup"
     }
   ],
-  "opened": [],
+  "opened": [
+    {
+      "id": "1789cf39-a087-44b9-a27d-7daa74807b39",
+      "signal_id": "37bf1b57-fcc1-40b9-b4b5-f550a806e4e7",
+      "symbol": "TSLA",
+      "direction": "long",
+      "setups": "[\"bos_retest\"]",
+      "regime": "bearish",
+      "entry_price": 375.44,
+      "stop_loss": 368.51073,
+      "original_sl": 368.51073,
+      "tp1": 389.29854,
+      "tp2": 396.22781,
+      "tp1_hit": 0,
+      "tp1_hit_at": null,
+      "size": "quarter",
+      "size_mult": 0.25,
+      "lots": null,
+      "source": "forward",
+      "pattern": "bos_retest",
+      "opened_at": "2026-09-28T19:57:58.898485+00:00",
+      "closed_at": null,
+      "close_price": null,
+      "outcome": null,
+      "pnl_r": null,
+      "raw_r": null,
+      "journaled": 0
+    }
+  ],
   "closed": [],
   "system_stats": {
     "total_closed": 61,
-    "open": 1,
+    "open": 2,
     "win_rate": 0.16279069767441862,
     "total_r": -2.547
   },
   "rejections": {
-    "no_setup": 7,
-    "judge_skip": 2,
+    "no_setup": 8,
     "regime_blocked": 1
   }
 }
