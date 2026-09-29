@@ -1,13 +1,35 @@
 {
-  "scan_ts": "2026-09-29T00:01:34.460869+00:00",
+  "scan_ts": "2026-09-29T18:26:10.714969+00:00",
   "skipped": false,
   "llm": false,
   "market": "equities",
   "results": [
     {
       "symbol": "ARM",
-      "candidate": false,
-      "reject_reason": "regime_blocked"
+      "candidate": true,
+      "score": 50,
+      "direction": "long",
+      "setups": [
+        "bos_retest"
+      ],
+      "regime": "bearish",
+      "price": 283.33,
+      "atr": 19.83346,
+      "entry": 294.0,
+      "entry_low": 293.559,
+      "entry_high": 294.441,
+      "stop_loss": 283.64227,
+      "tp1": 314.71546,
+      "tp2": 325.07319,
+      "rr": 2.0,
+      "take": true,
+      "confidence": "low",
+      "size": "quarter",
+      "rationale": "score 50 (bos_retest); R:R 2.0; thin sample (4 decided) \u2014 ramping",
+      "decided_by": "deterministic",
+      "pattern": "bos_retest",
+      "opened": true,
+      "pattern_confidence": "unproven (n=19 fwd)"
     },
     {
       "symbol": "NVDA",
@@ -16,28 +38,8 @@
     },
     {
       "symbol": "TSLA",
-      "candidate": true,
-      "score": 50,
-      "direction": "long",
-      "setups": [
-        "bos_retest"
-      ],
-      "regime": "bearish",
-      "price": 372.11,
-      "atr": 12.73223,
-      "entry": 375.44,
-      "entry_low": 374.87684,
-      "entry_high": 376.00316,
-      "stop_loss": 368.51073,
-      "tp1": 389.29854,
-      "tp2": 396.22781,
-      "rr": 2.0,
-      "take": true,
-      "confidence": "low",
-      "size": "quarter",
-      "rationale": "score 50 (bos_retest); R:R 2.0; thin sample (2 decided) \u2014 ramping",
-      "decided_by": "deterministic",
-      "pattern": "bos_retest"
+      "candidate": false,
+      "reject_reason": "no_setup"
     },
     {
       "symbol": "USOIL",
@@ -46,8 +48,31 @@
     },
     {
       "symbol": "SMCI",
-      "candidate": false,
-      "reject_reason": "no_setup"
+      "candidate": true,
+      "score": 100,
+      "direction": "long",
+      "setups": [
+        "ob_retest",
+        "bos_retest"
+      ],
+      "regime": "bullish",
+      "price": 41.78,
+      "atr": 2.33008,
+      "entry": 41.745,
+      "entry_low": 40.79,
+      "entry_high": 42.7,
+      "stop_loss": 39.62496,
+      "tp1": 45.98508,
+      "tp2": 48.10512,
+      "rr": 2.0,
+      "take": true,
+      "confidence": "medium",
+      "size": "half",
+      "rationale": "score 100 (ob_retest+bos_retest); R:R 2.0; dual-confluence (OB + BOS agree); thin sample (3 decided) \u2014 ramping",
+      "decided_by": "deterministic",
+      "pattern": "ob_retest",
+      "opened": true,
+      "pattern_confidence": "provisional (n=43, not yet validated)"
     },
     {
       "symbol": "APLD",
@@ -66,8 +91,28 @@
     },
     {
       "symbol": "AMD",
-      "candidate": false,
-      "reject_reason": "no_setup"
+      "candidate": true,
+      "score": 50,
+      "direction": "long",
+      "setups": [
+        "ob_retest"
+      ],
+      "regime": "bullish",
+      "price": 607.87,
+      "atr": 25.41542,
+      "entry": 616.38495,
+      "entry_low": 608.08,
+      "entry_high": 624.6899,
+      "stop_loss": 595.37229,
+      "tp1": 658.41027,
+      "tp2": 679.42293,
+      "rr": 2.0,
+      "take": false,
+      "confidence": "low",
+      "size": "none",
+      "rationale": "skip \u2014 AMD track record is negative (win rate 20%, avg +0.02R over 8 trades)",
+      "decided_by": "deterministic",
+      "pattern": "ob_retest"
     },
     {
       "symbol": "COIN",
@@ -75,44 +120,71 @@
       "reject_reason": "no_setup"
     }
   ],
-  "opened": [],
-  "closed": [
+  "opened": [
     {
-      "id": "c197756a-14f7-4aa0-a25b-13b85d4ba4b0",
-      "signal_id": "a5c3cbbc-ef88-417c-bcb8-cd48d5bc3af5",
-      "symbol": "SMCI",
+      "id": "465e1ead-8593-4523-8841-4bddcdaaceb4",
+      "signal_id": "a6c0efd3-64f6-4eb5-90a7-fe075a994a15",
+      "symbol": "ARM",
       "direction": "long",
       "setups": "[\"bos_retest\"]",
-      "regime": "bullish",
-      "entry_price": 40.45,
-      "stop_loss": 40.45,
-      "original_sl": 39.20724,
-      "tp1": 42.93552,
-      "tp2": 44.17828,
-      "tp1_hit": 1,
-      "tp1_hit_at": "2026-09-25T04:00:00+00:00",
-      "opened_at": "2026-09-23T17:40:09.967475+00:00",
-      "closed_at": "2026-09-29T00:02:36.694239+00:00",
-      "close_price": 40.45,
-      "outcome": "BREAKEVEN",
-      "pnl_r": 0.0,
-      "journaled": 0,
+      "regime": "bearish",
+      "entry_price": 294.0,
+      "stop_loss": 283.64227,
+      "original_sl": 283.64227,
+      "tp1": 314.71546,
+      "tp2": 325.07319,
+      "tp1_hit": 0,
+      "tp1_hit_at": null,
       "size": "quarter",
       "size_mult": 0.25,
       "lots": null,
-      "raw_r": 0.0,
       "source": "forward",
-      "pattern": "bos_retest"
+      "pattern": "bos_retest",
+      "opened_at": "2026-09-29T18:26:10.714969+00:00",
+      "closed_at": null,
+      "close_price": null,
+      "outcome": null,
+      "pnl_r": null,
+      "raw_r": null,
+      "journaled": 0
+    },
+    {
+      "id": "2250ab30-1b83-4cdf-a365-2f53f7145374",
+      "signal_id": "ae942d0b-c795-45cd-872e-0a3351314e11",
+      "symbol": "SMCI",
+      "direction": "long",
+      "setups": "[\"ob_retest\", \"bos_retest\"]",
+      "regime": "bullish",
+      "entry_price": 41.745,
+      "stop_loss": 39.62496,
+      "original_sl": 39.62496,
+      "tp1": 45.98508,
+      "tp2": 48.10512,
+      "tp1_hit": 0,
+      "tp1_hit_at": null,
+      "size": "half",
+      "size_mult": 0.5,
+      "lots": null,
+      "source": "forward",
+      "pattern": "ob_retest",
+      "opened_at": "2026-09-29T18:26:10.714969+00:00",
+      "closed_at": null,
+      "close_price": null,
+      "outcome": null,
+      "pnl_r": null,
+      "raw_r": null,
+      "journaled": 0
     }
   ],
+  "closed": [],
   "system_stats": {
     "total_closed": 62,
-    "open": 1,
+    "open": 3,
     "win_rate": 0.16279069767441862,
     "total_r": -2.547
   },
   "rejections": {
-    "no_setup": 8,
-    "regime_blocked": 1
+    "no_setup": 7,
+    "judge_skip": 1
   }
 }

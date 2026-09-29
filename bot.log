@@ -546,3 +546,6 @@
 2026-09-29 00:02:36,696 [INFO] v2.journal: journal entry written: 2026-09-29-smci-long-c197756a.md
 2026-09-29 00:02:36,697 [INFO] v2.pipeline: reflected on 1 resolved trade(s)
 2026-09-29 00:02:36,704 [INFO] v2.report: wrote /home/runner/work/claude-bot/claude-bot/state/daily_report.md
+2026-09-29 18:27:12,844 [INFO] v2.store: trade opened: ARM long @ 294.0000 (sl 283.6423 tp1 314.7155 tp2 325.0732) size=quarter x0.25
+2026-09-29 18:27:12,932 [INFO] v2.store: trade opened: SMCI long @ 41.7450 (sl 39.6250 tp1 45.9851 tp2 48.1051) size=half x0.50
+2026-09-29 18:27:13,103 [INFO] v2.report: wrote /home/runner/work/claude-bot/claude-bot/state/daily_report.md
