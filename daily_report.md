@@ -1,19 +1,19 @@
-# Daily report — 2026-09-28T19:59:02+00:00
+# Daily report — 2026-09-29T00:02:36+00:00
 
 Market: **equities** · judge: deterministic · paper only
 
 ## Candidates (1)
-- **TSLA** long score 50 R:R 2.0 — TAKE/low/quarter ← opened
+- **TSLA** long score 50 R:R 2.0 — TAKE/low/quarter
 
-## Opened this run (1)
-- TSLA long @ 375.44 (sl 368.51073 tp1 389.29854 tp2 396.22781, size quarter)
+## Resolved this run (1)
+- SMCI BREAKEVEN — 0.0R (sized)
 
 ## Ledger (running, sized R)
-- 2 open · 61 closed · win rate 16% · total -2.55R
+- 1 open · 62 closed · win rate 16% · total -2.55R
 
 ## Rejections by reason (all-time)
-- no_setup: 742
-- regime_blocked: 214
+- no_setup: 750
+- regime_blocked: 215
 - levels_rejected_wide_stop: 46
 - judge_skip: 18
 - conflicting_setups: 4

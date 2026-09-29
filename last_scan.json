@@ -1,5 +1,5 @@
 {
-  "scan_ts": "2026-09-28T19:57:58.898485+00:00",
+  "scan_ts": "2026-09-29T00:01:34.460869+00:00",
   "skipped": false,
   "llm": false,
   "market": "equities",
@@ -37,9 +37,7 @@
       "size": "quarter",
       "rationale": "score 50 (bos_retest); R:R 2.0; thin sample (2 decided) \u2014 ramping",
       "decided_by": "deterministic",
-      "pattern": "bos_retest",
-      "opened": true,
-      "pattern_confidence": "unproven (n=18 fwd)"
+      "pattern": "bos_retest"
     },
     {
       "symbol": "USOIL",
@@ -77,39 +75,39 @@
       "reject_reason": "no_setup"
     }
   ],
-  "opened": [
+  "opened": [],
+  "closed": [
     {
-      "id": "1789cf39-a087-44b9-a27d-7daa74807b39",
-      "signal_id": "37bf1b57-fcc1-40b9-b4b5-f550a806e4e7",
-      "symbol": "TSLA",
+      "id": "c197756a-14f7-4aa0-a25b-13b85d4ba4b0",
+      "signal_id": "a5c3cbbc-ef88-417c-bcb8-cd48d5bc3af5",
+      "symbol": "SMCI",
       "direction": "long",
       "setups": "[\"bos_retest\"]",
-      "regime": "bearish",
-      "entry_price": 375.44,
-      "stop_loss": 368.51073,
-      "original_sl": 368.51073,
-      "tp1": 389.29854,
-      "tp2": 396.22781,
-      "tp1_hit": 0,
-      "tp1_hit_at": null,
+      "regime": "bullish",
+      "entry_price": 40.45,
+      "stop_loss": 40.45,
+      "original_sl": 39.20724,
+      "tp1": 42.93552,
+      "tp2": 44.17828,
+      "tp1_hit": 1,
+      "tp1_hit_at": "2026-09-25T04:00:00+00:00",
+      "opened_at": "2026-09-23T17:40:09.967475+00:00",
+      "closed_at": "2026-09-29T00:02:36.694239+00:00",
+      "close_price": 40.45,
+      "outcome": "BREAKEVEN",
+      "pnl_r": 0.0,
+      "journaled": 0,
       "size": "quarter",
       "size_mult": 0.25,
       "lots": null,
+      "raw_r": 0.0,
       "source": "forward",
-      "pattern": "bos_retest",
-      "opened_at": "2026-09-28T19:57:58.898485+00:00",
-      "closed_at": null,
-      "close_price": null,
-      "outcome": null,
-      "pnl_r": null,
-      "raw_r": null,
-      "journaled": 0
+      "pattern": "bos_retest"
     }
   ],
-  "closed": [],
   "system_stats": {
-    "total_closed": 61,
-    "open": 2,
+    "total_closed": 62,
+    "open": 1,
     "win_rate": 0.16279069767441862,
     "total_r": -2.547
   },

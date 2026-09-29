@@ -541,3 +541,8 @@
 2026-09-25 22:56:00,834 [INFO] v2.report: wrote /home/runner/work/claude-bot/claude-bot/state/daily_report.md
 2026-09-28 19:59:01,935 [INFO] v2.store: trade opened: TSLA long @ 375.4400 (sl 368.5107 tp1 389.2985 tp2 396.2278) size=quarter x0.25
 2026-09-28 19:59:02,030 [INFO] v2.report: wrote /home/runner/work/claude-bot/claude-bot/state/daily_report.md
+2026-09-29 00:02:36,675 [INFO] v2.pipeline: skip open TSLA long — already in an open position
+2026-09-29 00:02:36,694 [INFO] v2.store: trade closed: SMCI long -> BREAKEVEN @ 40.4500 (0.00R sized, 0.00R raw)
+2026-09-29 00:02:36,696 [INFO] v2.journal: journal entry written: 2026-09-29-smci-long-c197756a.md
+2026-09-29 00:02:36,697 [INFO] v2.pipeline: reflected on 1 resolved trade(s)
+2026-09-29 00:02:36,704 [INFO] v2.report: wrote /home/runner/work/claude-bot/claude-bot/state/daily_report.md
