@@ -348,3 +348,7 @@
 2026-09-29 01:08:31,823 [INFO] v2.pipeline: skip open USDJPY=X — below calibrated FX_MIN_SCORE (50<85)
 2026-09-29 01:08:31,850 [INFO] v2.report: wrote /home/runner/work/claude-bot/claude-bot/state/daily_report.md
 2026-09-29 01:08:32,156 [INFO] v2.report: wrote /home/runner/work/claude-bot/claude-bot/state/daily_report.md
+2026-09-30 00:39:23,771 [INFO] v2.datasource: data source: FX (yfinance), 9 pairs
+2026-09-30 00:39:29,106 [INFO] v2.pipeline: skip open USDJPY=X — below calibrated FX_MIN_SCORE (50<85)
+2026-09-30 00:39:29,305 [INFO] v2.report: wrote /home/runner/work/claude-bot/claude-bot/state/daily_report.md
+2026-09-30 00:39:29,534 [INFO] v2.report: wrote /home/runner/work/claude-bot/claude-bot/state/daily_report.md
