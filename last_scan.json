@@ -1,5 +1,5 @@
 {
-  "scan_ts": "2026-10-01T18:40:12.348460+00:00",
+  "scan_ts": "2026-10-01T23:32:08.912074+00:00",
   "skipped": false,
   "llm": false,
   "market": "equities",
@@ -56,35 +56,7 @@
     }
   ],
   "opened": [],
-  "closed": [
-    {
-      "id": "465e1ead-8593-4523-8841-4bddcdaaceb4",
-      "signal_id": "a6c0efd3-64f6-4eb5-90a7-fe075a994a15",
-      "symbol": "ARM",
-      "direction": "long",
-      "setups": "[\"bos_retest\"]",
-      "regime": "bearish",
-      "entry_price": 294.0,
-      "stop_loss": 283.64227,
-      "original_sl": 283.64227,
-      "tp1": 314.71546,
-      "tp2": 325.07319,
-      "tp1_hit": 0,
-      "tp1_hit_at": null,
-      "opened_at": "2026-09-29T18:26:10.714969+00:00",
-      "closed_at": "2026-10-01T18:41:14.361047+00:00",
-      "close_price": 283.64227,
-      "outcome": "LOSS",
-      "pnl_r": -0.25,
-      "journaled": 0,
-      "size": "quarter",
-      "size_mult": 0.25,
-      "lots": null,
-      "raw_r": -1.0,
-      "source": "forward",
-      "pattern": "bos_retest"
-    }
-  ],
+  "closed": [],
   "system_stats": {
     "total_closed": 64,
     "open": 1,
