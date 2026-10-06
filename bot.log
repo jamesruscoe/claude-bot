@@ -362,3 +362,7 @@
 2026-10-03 00:36:30,091 [INFO] v2.datasource: data source: FX (yfinance), 9 pairs
 2026-10-03 00:36:30,091 [INFO] v2.pipeline: market closed — 2026-10-03 is a weekend. Skipping scan.
 2026-10-03 00:36:30,273 [INFO] v2.report: wrote /home/runner/work/claude-bot/claude-bot/state/daily_report.md
+2026-10-06 01:49:27,622 [INFO] v2.datasource: data source: FX (yfinance), 9 pairs
+2026-10-06 01:49:32,901 [INFO] v2.pipeline: skip open USDCAD=X — below calibrated FX_MIN_SCORE (50<85)
+2026-10-06 01:49:32,917 [INFO] v2.report: wrote /home/runner/work/claude-bot/claude-bot/state/daily_report.md
+2026-10-06 01:49:33,189 [INFO] v2.report: wrote /home/runner/work/claude-bot/claude-bot/state/daily_report.md
