@@ -569,3 +569,5 @@
 2026-10-02 18:12:06,982 [INFO] v2.report: wrote /home/runner/work/claude-bot/claude-bot/state/daily_report.md
 2026-10-02 23:24:16,124 [INFO] v2.pipeline: skip open APLD short — already in an open position
 2026-10-02 23:24:16,140 [INFO] v2.report: wrote /home/runner/work/claude-bot/claude-bot/state/daily_report.md
+2026-10-06 01:02:07,247 [INFO] v2.pipeline: skip open APLD short — already in an open position
+2026-10-06 01:02:07,261 [INFO] v2.report: wrote /home/runner/work/claude-bot/claude-bot/state/daily_report.md

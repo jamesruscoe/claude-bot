@@ -1,17 +1,16 @@
-# Daily report — 2026-10-02T23:24:16+00:00
+# Daily report — 2026-10-06T01:02:07+00:00
 
 Market: **equities** · judge: deterministic · paper only
 
-## Candidates (2)
+## Candidates (1)
 - **APLD** short score 50 R:R 2.0 — TAKE/low/quarter
-- **USOIL** long score 50 R:R 2.0 — skip/low/none
 
 ## Ledger (running, sized R)
 - 2 open · 64 closed · win rate 16% · total -3.05R
 
 ## Rejections by reason (all-time)
-- no_setup: 797
-- regime_blocked: 232
+- no_setup: 805
+- regime_blocked: 233
 - levels_rejected_wide_stop: 46
 - judge_skip: 26
 - conflicting_setups: 4
