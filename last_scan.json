@@ -1,38 +1,38 @@
 {
-  "scan_ts": "2026-10-09T23:38:52.062690+00:00",
+  "scan_ts": "2026-10-12T21:31:47.303884+00:00",
   "skipped": false,
   "llm": false,
   "market": "equities",
   "results": [
     {
       "symbol": "ARM",
-      "candidate": false,
-      "reject_reason": "no_setup"
-    },
-    {
-      "symbol": "NVDA",
       "candidate": true,
       "score": 50,
-      "direction": "long",
+      "direction": "short",
       "setups": [
-        "ob_retest"
+        "bos_retest"
       ],
-      "regime": "bullish",
-      "price": 230.48,
-      "atr": 5.75459,
-      "entry": 230.27,
-      "entry_low": 228.17,
-      "entry_high": 232.37,
-      "stop_loss": 225.2927,
-      "tp1": 240.2246,
-      "tp2": 245.2019,
+      "regime": "ranging",
+      "price": 266.28,
+      "atr": 17.63033,
+      "entry": 279.2,
+      "entry_low": 278.7812,
+      "entry_high": 279.6188,
+      "stop_loss": 288.43396,
+      "tp1": 260.73208,
+      "tp2": 251.49812,
       "rr": 2.0,
       "take": false,
       "confidence": "low",
       "size": "none",
-      "rationale": "skip \u2014 NVDA track record is negative (win rate 20%, avg -0.04R over 6 trades)",
+      "rationale": "skip \u2014 ARM track record is negative (win rate 0%, avg -0.21R over 6 trades)",
       "decided_by": "deterministic",
-      "pattern": "ob_retest"
+      "pattern": "bos_retest"
+    },
+    {
+      "symbol": "NVDA",
+      "candidate": false,
+      "reject_reason": "no_setup"
     },
     {
       "symbol": "TSLA",
@@ -41,34 +41,33 @@
     },
     {
       "symbol": "USOIL",
-      "candidate": false,
-      "reject_reason": "no_setup"
+      "candidate": true,
+      "score": 50,
+      "direction": "long",
+      "setups": [
+        "ob_retest"
+      ],
+      "regime": "bullish",
+      "price": 93.16,
+      "atr": 4.28898,
+      "entry": 89.47,
+      "entry_low": 87.96,
+      "entry_high": 90.98,
+      "stop_loss": 85.81551,
+      "tp1": 96.77898,
+      "tp2": 100.43347,
+      "rr": 2.0,
+      "take": false,
+      "confidence": "low",
+      "size": "none",
+      "rationale": "skip \u2014 USOIL track record is negative (win rate 0%, avg -0.11R over 9 trades)",
+      "decided_by": "deterministic",
+      "pattern": "ob_retest"
     },
     {
       "symbol": "SMCI",
-      "candidate": true,
-      "score": 100,
-      "direction": "long",
-      "setups": [
-        "ob_retest",
-        "bos_retest"
-      ],
-      "regime": "bullish",
-      "price": 42.77,
-      "atr": 2.31806,
-      "entry": 43.88,
-      "entry_low": 43.02,
-      "entry_high": 44.74,
-      "stop_loss": 41.86097,
-      "tp1": 47.91806,
-      "tp2": 49.93709,
-      "rr": 2.0,
-      "take": true,
-      "confidence": "medium",
-      "size": "half",
-      "rationale": "score 100 (ob_retest+bos_retest); R:R 2.0; dual-confluence (OB + BOS agree); thin sample (3 decided) \u2014 ramping",
-      "decided_by": "deterministic",
-      "pattern": "ob_retest"
+      "candidate": false,
+      "reject_reason": "no_setup"
     },
     {
       "symbol": "APLD",
@@ -78,7 +77,7 @@
     {
       "symbol": "AMZN",
       "candidate": false,
-      "reject_reason": "regime_blocked"
+      "reject_reason": "no_setup"
     },
     {
       "symbol": "NFLX",
@@ -87,33 +86,13 @@
     },
     {
       "symbol": "AMD",
-      "candidate": true,
-      "score": 50,
-      "direction": "long",
-      "setups": [
-        "ob_retest"
-      ],
-      "regime": "bullish",
-      "price": 620.68,
-      "atr": 24.0747,
-      "entry": 614.69,
-      "entry_low": 605.25,
-      "entry_high": 624.13,
-      "stop_loss": 593.21265,
-      "tp1": 657.6447,
-      "tp2": 679.12205,
-      "rr": 2.0,
-      "take": false,
-      "confidence": "low",
-      "size": "none",
-      "rationale": "skip \u2014 AMD track record is negative (win rate 20%, avg +0.02R over 8 trades)",
-      "decided_by": "deterministic",
-      "pattern": "ob_retest"
+      "candidate": false,
+      "reject_reason": "regime_blocked"
     },
     {
       "symbol": "COIN",
       "candidate": false,
-      "reject_reason": "no_setup"
+      "reject_reason": "regime_blocked"
     }
   ],
   "opened": [],
@@ -126,7 +105,7 @@
   },
   "rejections": {
     "no_setup": 6,
-    "judge_skip": 2,
-    "regime_blocked": 1
+    "regime_blocked": 2,
+    "judge_skip": 2
   }
 }
