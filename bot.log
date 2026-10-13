@@ -586,3 +586,7 @@
 2026-10-09 23:39:58,239 [INFO] v2.pipeline: skip open SMCI long — already in an open position
 2026-10-09 23:39:58,259 [INFO] v2.report: wrote /home/runner/work/claude-bot/claude-bot/state/daily_report.md
 2026-10-12 21:32:51,067 [INFO] v2.report: wrote /home/runner/work/claude-bot/claude-bot/state/daily_report.md
+2026-10-13 01:43:21,629 [INFO] v2.store: trade closed: SMCI long -> EXPIRED @ 41.8550 (0.03R sized, 0.05R raw)
+2026-10-13 01:43:21,630 [INFO] v2.journal: journal entry written: 2026-10-13-smci-long-2250ab30.md
+2026-10-13 01:43:21,632 [INFO] v2.pipeline: reflected on 1 resolved trade(s)
+2026-10-13 01:43:21,639 [INFO] v2.report: wrote /home/runner/work/claude-bot/claude-bot/state/daily_report.md
