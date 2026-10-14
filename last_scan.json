@@ -1,5 +1,5 @@
 {
-  "scan_ts": "2026-10-13T23:28:19.151399+00:00",
+  "scan_ts": "2026-10-14T17:45:22.667721+00:00",
   "skipped": false,
   "llm": false,
   "market": "equities",
@@ -36,28 +36,8 @@
     },
     {
       "symbol": "AMZN",
-      "candidate": true,
-      "score": 50,
-      "direction": "long",
-      "setups": [
-        "bos_retest"
-      ],
-      "regime": "bullish",
-      "price": 259.53,
-      "atr": 5.79645,
-      "entry": 261.12,
-      "entry_low": 260.72832,
-      "entry_high": 261.51168,
-      "stop_loss": 257.8301,
-      "tp1": 267.6998,
-      "tp2": 270.9897,
-      "rr": 2.0,
-      "take": false,
-      "confidence": "low",
-      "size": "none",
-      "rationale": "skip \u2014 AMZN track record is negative (win rate 20%, avg -0.25R over 5 trades)",
-      "decided_by": "deterministic",
-      "pattern": "bos_retest"
+      "candidate": false,
+      "reject_reason": "no_setup"
     },
     {
       "symbol": "NFLX",
@@ -67,12 +47,32 @@
     {
       "symbol": "AMD",
       "candidate": false,
-      "reject_reason": "no_setup"
+      "reject_reason": "regime_blocked"
     },
     {
       "symbol": "COIN",
-      "candidate": false,
-      "reject_reason": "regime_blocked"
+      "candidate": true,
+      "score": 50,
+      "direction": "long",
+      "setups": [
+        "ob_retest"
+      ],
+      "regime": "bullish",
+      "price": 181.79,
+      "atr": 10.09848,
+      "entry": 175.43245,
+      "entry_low": 171.81,
+      "entry_high": 179.0549,
+      "stop_loss": 166.76076,
+      "tp1": 192.77583,
+      "tp2": 201.44752,
+      "rr": 2.0,
+      "take": false,
+      "confidence": "low",
+      "size": "none",
+      "rationale": "skip \u2014 COIN track record is negative (win rate 0%, avg -0.21R over 6 trades)",
+      "decided_by": "deterministic",
+      "pattern": "ob_retest"
     }
   ],
   "opened": [],
