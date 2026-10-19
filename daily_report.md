@@ -1,17 +1,21 @@
-# Daily report — 2026-10-16T22:18:54+00:00
+# Daily report — 2026-10-19T18:58:35+00:00
 
 Market: **equities** · judge: deterministic · paper only
 
-## Candidates (1)
-- **ARM** short score 100 R:R 2.0 — skip/low/none
+## Candidates (2)
+- **TSLA** short score 50 R:R 2.0 — TAKE/low/quarter ← opened
+- **USOIL** long score 50 R:R 2.0 — skip/low/none
+
+## Opened this run (1)
+- TSLA short @ 368.0301 (sl 374.50615 tp1 355.078 tp2 348.60195, size quarter)
 
 ## Ledger (running, sized R)
-- 0 open · 66 closed · win rate 16% · total -3.02R
+- 1 open · 66 closed · win rate 16% · total -3.02R
 
 ## Rejections by reason (all-time)
-- no_setup: 928
-- regime_blocked: 257
-- judge_skip: 53
+- no_setup: 933
+- regime_blocked: 260
+- judge_skip: 54
 - levels_rejected_wide_stop: 46
 - conflicting_setups: 4
 
