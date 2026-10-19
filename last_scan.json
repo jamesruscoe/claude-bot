@@ -1,5 +1,5 @@
 {
-  "scan_ts": "2026-10-19T18:57:32.700303+00:00",
+  "scan_ts": "2026-10-19T23:11:12.755656+00:00",
   "skipped": false,
   "llm": false,
   "market": "equities",
@@ -37,9 +37,7 @@
       "size": "quarter",
       "rationale": "score 50 (bos_retest); R:R 2.0; thin sample (3 decided) \u2014 ramping",
       "decided_by": "deterministic",
-      "pattern": "bos_retest",
-      "opened": true,
-      "pattern_confidence": "unproven (n=21 fwd)"
+      "pattern": "bos_retest"
     },
     {
       "symbol": "USOIL",
@@ -50,14 +48,14 @@
         "ob_retest"
       ],
       "regime": "bullish",
-      "price": 98.46,
-      "atr": 4.22344,
+      "price": 98.28,
+      "atr": 4.12915,
       "entry": 99.375,
       "entry_low": 96.85,
       "entry_high": 101.9,
-      "stop_loss": 94.73828,
-      "tp1": 108.64844,
-      "tp2": 113.28516,
+      "stop_loss": 94.78542,
+      "tp1": 108.55416,
+      "tp2": 113.14374,
       "rr": 2.0,
       "take": false,
       "confidence": "low",
@@ -97,35 +95,7 @@
       "reject_reason": "regime_blocked"
     }
   ],
-  "opened": [
-    {
-      "id": "c2cc2f8b-249e-4a9d-ae98-048513aa9243",
-      "signal_id": "700534a7-7be6-4a09-b74c-529a376d5e6f",
-      "symbol": "TSLA",
-      "direction": "short",
-      "setups": "[\"bos_retest\"]",
-      "regime": "bullish",
-      "entry_price": 368.0301,
-      "stop_loss": 374.50615,
-      "original_sl": 374.50615,
-      "tp1": 355.078,
-      "tp2": 348.60195,
-      "tp1_hit": 0,
-      "tp1_hit_at": null,
-      "size": "quarter",
-      "size_mult": 0.25,
-      "lots": null,
-      "source": "forward",
-      "pattern": "bos_retest",
-      "opened_at": "2026-10-19T18:57:32.700303+00:00",
-      "closed_at": null,
-      "close_price": null,
-      "outcome": null,
-      "pnl_r": null,
-      "raw_r": null,
-      "journaled": 0
-    }
-  ],
+  "opened": [],
   "closed": [],
   "system_stats": {
     "total_closed": 66,
