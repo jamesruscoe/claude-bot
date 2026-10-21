@@ -1,34 +1,13 @@
 {
-  "scan_ts": "2026-10-20T22:46:11.556987+00:00",
+  "scan_ts": "2026-10-21T17:51:27.890782+00:00",
   "skipped": false,
   "llm": false,
   "market": "equities",
   "results": [
     {
       "symbol": "ARM",
-      "candidate": true,
-      "score": 100,
-      "direction": "short",
-      "setups": [
-        "ob_retest",
-        "bos_retest"
-      ],
-      "regime": "bearish",
-      "price": 228.05,
-      "atr": 16.90809,
-      "entry": 236.205,
-      "entry_low": 226.54,
-      "entry_high": 245.87,
-      "stop_loss": 254.32405,
-      "tp1": 199.9669,
-      "tp2": 181.84785,
-      "rr": 2.0,
-      "take": false,
-      "confidence": "low",
-      "size": "none",
-      "rationale": "skip \u2014 ARM track record is negative (win rate 0%, avg -0.21R over 6 trades)",
-      "decided_by": "deterministic",
-      "pattern": "ob_retest"
+      "candidate": false,
+      "reject_reason": "levels_rejected_wide_stop"
     },
     {
       "symbol": "NVDA",
@@ -38,7 +17,7 @@
     {
       "symbol": "TSLA",
       "candidate": false,
-      "reject_reason": "regime_blocked"
+      "reject_reason": "no_setup"
     },
     {
       "symbol": "USOIL",
@@ -49,14 +28,14 @@
         "ob_retest"
       ],
       "regime": "bullish",
-      "price": 98.15,
-      "atr": 4.34906,
+      "price": 97.05,
+      "atr": 4.67816,
       "entry": 99.375,
       "entry_low": 96.85,
       "entry_high": 101.9,
-      "stop_loss": 94.67547,
-      "tp1": 108.77406,
-      "tp2": 113.47359,
+      "stop_loss": 94.51092,
+      "tp1": 109.10316,
+      "tp2": 113.96724,
       "rr": 2.0,
       "take": false,
       "confidence": "low",
@@ -78,7 +57,7 @@
     {
       "symbol": "AMZN",
       "candidate": false,
-      "reject_reason": "regime_blocked"
+      "reject_reason": "no_setup"
     },
     {
       "symbol": "NFLX",
@@ -87,28 +66,8 @@
     },
     {
       "symbol": "AMD",
-      "candidate": true,
-      "score": 50,
-      "direction": "short",
-      "setups": [
-        "ob_retest"
-      ],
-      "regime": "bullish",
-      "price": 538.05,
-      "atr": 27.15559,
-      "entry": 549.355,
-      "entry_low": 530.09,
-      "entry_high": 568.62,
-      "stop_loss": 582.19779,
-      "tp1": 483.66942,
-      "tp2": 450.82663,
-      "rr": 2.0,
-      "take": false,
-      "confidence": "low",
-      "size": "none",
-      "rationale": "skip \u2014 AMD track record is negative (win rate 20%, avg +0.02R over 8 trades)",
-      "decided_by": "deterministic",
-      "pattern": "ob_retest"
+      "candidate": false,
+      "reject_reason": "no_setup"
     },
     {
       "symbol": "COIN",
@@ -117,17 +76,44 @@
     }
   ],
   "opened": [],
-  "closed": [],
+  "closed": [
+    {
+      "id": "c2cc2f8b-249e-4a9d-ae98-048513aa9243",
+      "signal_id": "700534a7-7be6-4a09-b74c-529a376d5e6f",
+      "symbol": "TSLA",
+      "direction": "short",
+      "setups": "[\"bos_retest\"]",
+      "regime": "bullish",
+      "entry_price": 368.0301,
+      "stop_loss": 374.50615,
+      "original_sl": 374.50615,
+      "tp1": 355.078,
+      "tp2": 348.60195,
+      "tp1_hit": 0,
+      "tp1_hit_at": null,
+      "opened_at": "2026-10-19T18:57:32.700303+00:00",
+      "closed_at": "2026-10-21T17:52:29.882464+00:00",
+      "close_price": 374.50615,
+      "outcome": "LOSS",
+      "pnl_r": -0.25,
+      "journaled": 0,
+      "size": "quarter",
+      "size_mult": 0.25,
+      "lots": null,
+      "raw_r": -1.0,
+      "source": "forward",
+      "pattern": "bos_retest"
+    }
+  ],
   "system_stats": {
-    "total_closed": 66,
-    "open": 1,
-    "win_rate": 0.15555555555555556,
-    "total_r": -3.021
+    "total_closed": 67,
+    "open": 0,
+    "win_rate": 0.15217391304347827,
+    "total_r": -3.271
   },
   "rejections": {
-    "levels_rejected_wide_stop": 3,
-    "judge_skip": 3,
-    "regime_blocked": 2,
-    "no_setup": 2
+    "no_setup": 5,
+    "levels_rejected_wide_stop": 4,
+    "judge_skip": 1
   }
 }
