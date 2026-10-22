@@ -404,3 +404,6 @@
 2026-10-21 00:00:33,147 [INFO] v2.datasource: data source: FX (yfinance), 9 pairs
 2026-10-21 00:00:38,696 [INFO] v2.report: wrote /home/runner/work/claude-bot/claude-bot/state/daily_report.md
 2026-10-21 00:00:38,967 [INFO] v2.report: wrote /home/runner/work/claude-bot/claude-bot/state/daily_report.md
+2026-10-22 00:05:43,906 [INFO] v2.datasource: data source: FX (yfinance), 9 pairs
+2026-10-22 00:05:50,052 [INFO] v2.report: wrote /home/runner/work/claude-bot/claude-bot/state/daily_report.md
+2026-10-22 00:05:50,304 [INFO] v2.report: wrote /home/runner/work/claude-bot/claude-bot/state/daily_report.md
