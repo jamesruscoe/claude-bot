@@ -1,5 +1,5 @@
 {
-  "scan_ts": "2026-10-22T17:50:09.612553+00:00",
+  "scan_ts": "2026-10-22T22:50:05.925316+00:00",
   "skipped": false,
   "llm": false,
   "market": "equities",
@@ -63,7 +63,7 @@
     {
       "symbol": "USOIL",
       "candidate": false,
-      "reject_reason": "regime_blocked"
+      "reject_reason": "no_setup"
     },
     {
       "symbol": "SMCI",
@@ -88,9 +88,7 @@
       "size": "quarter",
       "rationale": "score 50 (bos_retest); R:R 2.0; thin sample (3 decided) \u2014 ramping",
       "decided_by": "deterministic",
-      "pattern": "bos_retest",
-      "opened": true,
-      "pattern_confidence": "unproven (n=22 fwd)"
+      "pattern": "bos_retest"
     },
     {
       "symbol": "APLD",
@@ -138,35 +136,7 @@
       "reject_reason": "levels_rejected_wide_stop"
     }
   ],
-  "opened": [
-    {
-      "id": "7cee6520-3ef1-4b33-985f-7f291f904c39",
-      "signal_id": "f84d8ef3-bee0-4587-8d9e-c7b26d278002",
-      "symbol": "SMCI",
-      "direction": "short",
-      "setups": "[\"bos_retest\"]",
-      "regime": "bullish",
-      "entry_price": 34.09,
-      "stop_loss": 35.4615,
-      "original_sl": 35.4615,
-      "tp1": 31.347,
-      "tp2": 29.9755,
-      "tp1_hit": 0,
-      "tp1_hit_at": null,
-      "size": "quarter",
-      "size_mult": 0.25,
-      "lots": null,
-      "source": "forward",
-      "pattern": "bos_retest",
-      "opened_at": "2026-10-22T17:50:09.612553+00:00",
-      "closed_at": null,
-      "close_price": null,
-      "outcome": null,
-      "pnl_r": null,
-      "raw_r": null,
-      "journaled": 0
-    }
-  ],
+  "opened": [],
   "closed": [],
   "system_stats": {
     "total_closed": 67,
@@ -175,9 +145,9 @@
     "total_r": -3.271
   },
   "rejections": {
-    "regime_blocked": 4,
+    "regime_blocked": 3,
     "judge_skip": 3,
-    "no_setup": 1,
+    "no_setup": 2,
     "levels_rejected_wide_stop": 1
   }
 }
