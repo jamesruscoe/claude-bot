@@ -1,5 +1,5 @@
 {
-  "scan_ts": "2026-10-23T00:04:02.742988+00:00",
+  "scan_ts": "2026-10-23T23:54:31.358609+00:00",
   "skipped": false,
   "llm": false,
   "market": "fx",
@@ -27,7 +27,7 @@
     {
       "symbol": "AUDUSD=X",
       "candidate": false,
-      "reject_reason": "no_setup"
+      "reject_reason": "regime_blocked"
     },
     {
       "symbol": "USDCAD=X",
@@ -59,6 +59,7 @@
     "total_r": 0.012
   },
   "rejections": {
-    "no_setup": 9
+    "no_setup": 8,
+    "regime_blocked": 1
   }
 }
