@@ -616,3 +616,5 @@
 2026-10-22 17:51:12,320 [INFO] v2.report: wrote /home/runner/work/claude-bot/claude-bot/state/daily_report.md
 2026-10-22 22:51:08,445 [INFO] v2.pipeline: skip open SMCI short — already in an open position
 2026-10-22 22:51:08,468 [INFO] v2.report: wrote /home/runner/work/claude-bot/claude-bot/state/daily_report.md
+2026-10-23 17:41:08,565 [INFO] v2.store: trade opened: TSLA long @ 384.0400 (sl 377.1551 tp1 397.8099 tp2 404.6948) size=quarter x0.25
+2026-10-23 17:41:08,702 [INFO] v2.report: wrote /home/runner/work/claude-bot/claude-bot/state/daily_report.md

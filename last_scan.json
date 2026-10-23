@@ -1,94 +1,55 @@
 {
-  "scan_ts": "2026-10-22T22:50:05.925316+00:00",
+  "scan_ts": "2026-10-23T17:40:06.822759+00:00",
   "skipped": false,
   "llm": false,
   "market": "equities",
   "results": [
     {
       "symbol": "ARM",
-      "candidate": true,
-      "score": 100,
-      "direction": "short",
-      "setups": [
-        "ob_retest",
-        "bos_retest"
-      ],
-      "regime": "ranging",
-      "price": 226.59,
-      "atr": 15.96958,
-      "entry": 236.205,
-      "entry_low": 226.54,
-      "entry_high": 245.87,
-      "stop_loss": 253.85479,
-      "tp1": 200.90542,
-      "tp2": 183.25563,
-      "rr": 2.0,
-      "take": false,
-      "confidence": "low",
-      "size": "none",
-      "rationale": "skip \u2014 ARM track record is negative (win rate 0%, avg -0.21R over 6 trades)",
-      "decided_by": "deterministic",
-      "pattern": "ob_retest"
+      "candidate": false,
+      "reject_reason": "no_setup"
     },
     {
       "symbol": "NVDA",
-      "candidate": true,
-      "score": 50,
-      "direction": "short",
-      "setups": [
-        "bos_retest"
-      ],
-      "regime": "bullish",
-      "price": 221.97,
-      "atr": 5.90226,
-      "entry": 221.09,
-      "entry_low": 220.75837,
-      "entry_high": 221.42164,
-      "stop_loss": 224.37276,
-      "tp1": 214.52448,
-      "tp2": 211.24172,
-      "rr": 2.0,
-      "take": false,
-      "confidence": "low",
-      "size": "none",
-      "rationale": "skip \u2014 NVDA track record is negative (win rate 20%, avg -0.04R over 6 trades)",
-      "decided_by": "deterministic",
-      "pattern": "bos_retest"
+      "candidate": false,
+      "reject_reason": "no_setup"
     },
     {
       "symbol": "TSLA",
-      "candidate": false,
-      "reject_reason": "no_setup"
-    },
-    {
-      "symbol": "USOIL",
-      "candidate": false,
-      "reject_reason": "no_setup"
-    },
-    {
-      "symbol": "SMCI",
       "candidate": true,
       "score": 50,
-      "direction": "short",
+      "direction": "long",
       "setups": [
         "bos_retest"
       ],
       "regime": "bullish",
-      "price": 35.57,
-      "atr": 2.64073,
-      "entry": 34.09,
-      "entry_low": 34.03887,
-      "entry_high": 34.14114,
-      "stop_loss": 35.4615,
-      "tp1": 31.347,
-      "tp2": 29.9755,
+      "price": 374.58,
+      "atr": 12.61777,
+      "entry": 384.04,
+      "entry_low": 383.46394,
+      "entry_high": 384.61606,
+      "stop_loss": 377.15505,
+      "tp1": 397.8099,
+      "tp2": 404.69485,
       "rr": 2.0,
       "take": true,
       "confidence": "low",
       "size": "quarter",
-      "rationale": "score 50 (bos_retest); R:R 2.0; thin sample (3 decided) \u2014 ramping",
+      "rationale": "score 50 (bos_retest); R:R 2.0; thin sample (4 decided) \u2014 ramping",
       "decided_by": "deterministic",
-      "pattern": "bos_retest"
+      "pattern": "bos_retest",
+      "opened": true,
+      "pattern_confidence": "unproven (n=22 fwd)"
+    },
+    {
+      "symbol": "USOIL",
+      "candidate": false,
+      "reject_reason": "regime_blocked"
+    },
+    {
+      "symbol": "SMCI",
+      "candidate": false,
+      "reject_reason": "regime_blocked"
     },
     {
       "symbol": "APLD",
@@ -97,57 +58,84 @@
     },
     {
       "symbol": "AMZN",
+      "candidate": false,
+      "reject_reason": "no_setup"
+    },
+    {
+      "symbol": "NFLX",
       "candidate": true,
       "score": 50,
-      "direction": "long",
+      "direction": "short",
       "setups": [
-        "ob_retest"
+        "bos_retest"
       ],
-      "regime": "bullish",
-      "price": 262.37,
-      "atr": 6.29667,
-      "entry": 256.155,
-      "entry_low": 252.66,
-      "entry_high": 259.65,
-      "stop_loss": 249.51167,
-      "tp1": 269.44166,
-      "tp2": 276.08499,
+      "regime": "bearish",
+      "price": 67.05,
+      "atr": 2.12544,
+      "entry": 65.08,
+      "entry_low": 64.98238,
+      "entry_high": 65.17762,
+      "stop_loss": 66.24034,
+      "tp1": 62.75932,
+      "tp2": 61.59898,
       "rr": 2.0,
       "take": false,
       "confidence": "low",
       "size": "none",
-      "rationale": "skip \u2014 AMZN track record is negative (win rate 20%, avg -0.25R over 5 trades)",
+      "rationale": "skip \u2014 NFLX track record is negative (win rate 20%, avg +0.05R over 6 trades)",
       "decided_by": "deterministic",
-      "pattern": "ob_retest"
-    },
-    {
-      "symbol": "NFLX",
-      "candidate": false,
-      "reject_reason": "regime_blocked"
+      "pattern": "bos_retest"
     },
     {
       "symbol": "AMD",
       "candidate": false,
-      "reject_reason": "regime_blocked"
+      "reject_reason": "no_setup"
     },
     {
       "symbol": "COIN",
       "candidate": false,
-      "reject_reason": "levels_rejected_wide_stop"
+      "reject_reason": "regime_blocked"
     }
   ],
-  "opened": [],
+  "opened": [
+    {
+      "id": "8bf9bc97-7b07-423c-ab5e-2e537f97cf62",
+      "signal_id": "5bff6eb3-106c-43ad-9784-83eac88cdda9",
+      "symbol": "TSLA",
+      "direction": "long",
+      "setups": "[\"bos_retest\"]",
+      "regime": "bullish",
+      "entry_price": 384.04,
+      "stop_loss": 377.15505,
+      "original_sl": 377.15505,
+      "tp1": 397.8099,
+      "tp2": 404.69485,
+      "tp1_hit": 0,
+      "tp1_hit_at": null,
+      "size": "quarter",
+      "size_mult": 0.25,
+      "lots": null,
+      "source": "forward",
+      "pattern": "bos_retest",
+      "opened_at": "2026-10-23T17:40:06.822759+00:00",
+      "closed_at": null,
+      "close_price": null,
+      "outcome": null,
+      "pnl_r": null,
+      "raw_r": null,
+      "journaled": 0
+    }
+  ],
   "closed": [],
   "system_stats": {
     "total_closed": 67,
-    "open": 1,
+    "open": 2,
     "win_rate": 0.15217391304347827,
     "total_r": -3.271
   },
   "rejections": {
-    "regime_blocked": 3,
-    "judge_skip": 3,
-    "no_setup": 2,
-    "levels_rejected_wide_stop": 1
+    "regime_blocked": 4,
+    "no_setup": 4,
+    "judge_skip": 1
   }
 }
