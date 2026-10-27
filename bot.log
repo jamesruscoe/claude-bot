@@ -628,3 +628,5 @@
 2026-10-26 23:26:58,167 [INFO] v2.report: wrote /home/runner/work/claude-bot/claude-bot/state/daily_report.md
 2026-10-27 18:32:39,952 [INFO] v2.pipeline: skip open SMCI short — already in an open position
 2026-10-27 18:32:39,976 [INFO] v2.report: wrote /home/runner/work/claude-bot/claude-bot/state/daily_report.md
+2026-10-27 23:18:58,347 [INFO] v2.pipeline: skip open SMCI short — already in an open position
+2026-10-27 23:18:58,368 [INFO] v2.report: wrote /home/runner/work/claude-bot/claude-bot/state/daily_report.md
