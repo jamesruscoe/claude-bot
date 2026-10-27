@@ -414,3 +414,6 @@
 2026-10-23 23:54:36,241 [INFO] v2.report: wrote /home/runner/work/claude-bot/claude-bot/state/daily_report.md
 2026-10-23 23:54:36,244 [INFO] v2.alerts: FX alert queued: FX ALERT: 8 scans with zero setups detected
 2026-10-23 23:54:36,511 [INFO] v2.report: wrote /home/runner/work/claude-bot/claude-bot/state/daily_report.md
+2026-10-27 00:40:16,814 [INFO] v2.datasource: data source: FX (yfinance), 9 pairs
+2026-10-27 00:40:22,083 [INFO] v2.report: wrote /home/runner/work/claude-bot/claude-bot/state/daily_report.md
+2026-10-27 00:40:22,330 [INFO] v2.report: wrote /home/runner/work/claude-bot/claude-bot/state/daily_report.md
