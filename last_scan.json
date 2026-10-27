@@ -1,16 +1,11 @@
 {
-  "scan_ts": "2026-10-26T23:25:55.189199+00:00",
+  "scan_ts": "2026-10-27T18:31:37.705984+00:00",
   "skipped": false,
   "llm": false,
   "market": "equities",
   "results": [
     {
       "symbol": "ARM",
-      "candidate": false,
-      "reject_reason": "no_setup"
-    },
-    {
-      "symbol": "NVDA",
       "candidate": true,
       "score": 100,
       "direction": "short",
@@ -18,15 +13,40 @@
         "ob_retest",
         "bos_retest"
       ],
+      "regime": "bearish",
+      "price": 223.35,
+      "atr": 15.44275,
+      "entry": 224.225,
+      "entry_low": 219.5,
+      "entry_high": 228.95,
+      "stop_loss": 236.67137,
+      "tp1": 199.33226,
+      "tp2": 186.88589,
+      "rr": 2.0,
+      "take": false,
+      "confidence": "low",
+      "size": "none",
+      "rationale": "skip \u2014 ARM track record is negative (win rate 0%, avg -0.21R over 6 trades)",
+      "decided_by": "deterministic",
+      "pattern": "ob_retest"
+    },
+    {
+      "symbol": "NVDA",
+      "candidate": true,
+      "score": 50,
+      "direction": "short",
+      "setups": [
+        "ob_retest"
+      ],
       "regime": "bullish",
-      "price": 210.96,
-      "atr": 6.06169,
+      "price": 216.0,
+      "atr": 6.11372,
       "entry": 215.615,
       "entry_low": 212.77,
       "entry_high": 218.46,
-      "stop_loss": 221.49085,
-      "tp1": 203.8633,
-      "tp2": 197.98745,
+      "stop_loss": 221.51686,
+      "tp1": 203.81128,
+      "tp2": 197.90942,
       "rr": 2.0,
       "take": false,
       "confidence": "low",
@@ -37,6 +57,11 @@
     },
     {
       "symbol": "TSLA",
+      "candidate": false,
+      "reject_reason": "no_setup"
+    },
+    {
+      "symbol": "USOIL",
       "candidate": true,
       "score": 50,
       "direction": "long",
@@ -44,26 +69,21 @@
         "ob_retest"
       ],
       "regime": "bullish",
-      "price": 372.22,
-      "atr": 12.57722,
-      "entry": 359.915,
-      "entry_low": 349.33,
-      "entry_high": 370.5,
-      "stop_loss": 343.04139,
-      "tp1": 393.66222,
-      "tp2": 410.53583,
+      "price": 100.05,
+      "atr": 4.39506,
+      "entry": 98.33,
+      "entry_low": 96.26,
+      "entry_high": 100.4,
+      "stop_loss": 94.06247,
+      "tp1": 106.86506,
+      "tp2": 111.13259,
       "rr": 2.0,
-      "take": true,
+      "take": false,
       "confidence": "low",
-      "size": "quarter",
-      "rationale": "score 50 (ob_retest); R:R 2.0; thin sample (4 decided) \u2014 ramping",
+      "size": "none",
+      "rationale": "skip \u2014 USOIL track record is negative (win rate 0%, avg -0.11R over 9 trades)",
       "decided_by": "deterministic",
       "pattern": "ob_retest"
-    },
-    {
-      "symbol": "USOIL",
-      "candidate": false,
-      "reject_reason": "no_setup"
     },
     {
       "symbol": "SMCI",
@@ -74,14 +94,14 @@
         "ob_retest"
       ],
       "regime": "bullish",
-      "price": 32.94,
-      "atr": 2.55078,
+      "price": 32.69,
+      "atr": 2.4343,
       "entry": 32.04415,
       "entry_low": 30.92,
       "entry_high": 33.1683,
-      "stop_loss": 34.44369,
-      "tp1": 27.24507,
-      "tp2": 24.84553,
+      "stop_loss": 34.38545,
+      "tp1": 27.36155,
+      "tp2": 25.02025,
       "rr": 2.0,
       "take": true,
       "confidence": "low",
@@ -97,8 +117,28 @@
     },
     {
       "symbol": "AMZN",
-      "candidate": false,
-      "reject_reason": "no_setup"
+      "candidate": true,
+      "score": 50,
+      "direction": "short",
+      "setups": [
+        "bos_retest"
+      ],
+      "regime": "bearish",
+      "price": 249.09,
+      "atr": 6.44134,
+      "entry": 248.6,
+      "entry_low": 248.2271,
+      "entry_high": 248.9729,
+      "stop_loss": 252.19357,
+      "tp1": 241.41286,
+      "tp2": 237.81929,
+      "rr": 2.0,
+      "take": false,
+      "confidence": "low",
+      "size": "none",
+      "rationale": "skip \u2014 AMZN track record is negative (win rate 20%, avg -0.25R over 5 trades)",
+      "decided_by": "deterministic",
+      "pattern": "bos_retest"
     },
     {
       "symbol": "NFLX",
@@ -107,11 +147,6 @@
     },
     {
       "symbol": "AMD",
-      "candidate": false,
-      "reject_reason": "no_setup"
-    },
-    {
-      "symbol": "COIN",
       "candidate": true,
       "score": 50,
       "direction": "short",
@@ -119,21 +154,26 @@
         "ob_retest"
       ],
       "regime": "bullish",
-      "price": 164.45,
-      "atr": 10.49982,
-      "entry": 171.1,
-      "entry_low": 165.9,
-      "entry_high": 176.3,
-      "stop_loss": 181.54991,
-      "tp1": 150.20018,
-      "tp2": 139.75027,
+      "price": 531.28,
+      "atr": 26.79593,
+      "entry": 536.35345,
+      "entry_low": 524.6,
+      "entry_high": 548.1069,
+      "stop_loss": 561.50487,
+      "tp1": 486.05061,
+      "tp2": 460.89919,
       "rr": 2.0,
       "take": false,
       "confidence": "low",
       "size": "none",
-      "rationale": "skip \u2014 COIN track record is negative (win rate 0%, avg -0.21R over 6 trades)",
+      "rationale": "skip \u2014 AMD track record is negative (win rate 20%, avg +0.02R over 8 trades)",
       "decided_by": "deterministic",
       "pattern": "ob_retest"
+    },
+    {
+      "symbol": "COIN",
+      "candidate": false,
+      "reject_reason": "no_setup"
     }
   ],
   "opened": [],
@@ -145,7 +185,7 @@
     "total_r": -3.271
   },
   "rejections": {
-    "no_setup": 6,
-    "judge_skip": 2
+    "judge_skip": 5,
+    "no_setup": 4
   }
 }
