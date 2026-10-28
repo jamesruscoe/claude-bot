@@ -1,5 +1,5 @@
 {
-  "scan_ts": "2026-10-28T18:37:58.360021+00:00",
+  "scan_ts": "2026-10-28T23:41:37.749777+00:00",
   "skipped": false,
   "llm": false,
   "market": "equities",
@@ -76,35 +76,7 @@
     }
   ],
   "opened": [],
-  "closed": [
-    {
-      "id": "8bf9bc97-7b07-423c-ab5e-2e537f97cf62",
-      "signal_id": "5bff6eb3-106c-43ad-9784-83eac88cdda9",
-      "symbol": "TSLA",
-      "direction": "long",
-      "setups": "[\"bos_retest\"]",
-      "regime": "bullish",
-      "entry_price": 384.04,
-      "stop_loss": 377.15505,
-      "original_sl": 377.15505,
-      "tp1": 397.8099,
-      "tp2": 404.69485,
-      "tp1_hit": 0,
-      "tp1_hit_at": null,
-      "opened_at": "2026-10-23T17:40:06.822759+00:00",
-      "closed_at": "2026-10-28T18:39:00.332730+00:00",
-      "close_price": 404.69485,
-      "outcome": "WIN_TP2",
-      "pnl_r": 0.75,
-      "journaled": 0,
-      "size": "quarter",
-      "size_mult": 0.25,
-      "lots": null,
-      "raw_r": 3.0,
-      "source": "forward",
-      "pattern": "bos_retest"
-    }
-  ],
+  "closed": [],
   "system_stats": {
     "total_closed": 68,
     "open": 1,
