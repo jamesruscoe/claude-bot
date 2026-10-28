@@ -1,5 +1,5 @@
 {
-  "scan_ts": "2026-10-27T00:40:16.814754+00:00",
+  "scan_ts": "2026-10-28T00:38:15.174469+00:00",
   "skipped": false,
   "llm": false,
   "market": "fx",
@@ -12,7 +12,7 @@
     {
       "symbol": "GBPUSD=X",
       "candidate": false,
-      "reject_reason": "no_setup"
+      "reject_reason": "regime_blocked"
     },
     {
       "symbol": "USDJPY=X",
@@ -59,6 +59,7 @@
     "total_r": 0.012
   },
   "rejections": {
-    "no_setup": 9
+    "no_setup": 8,
+    "regime_blocked": 1
   }
 }
