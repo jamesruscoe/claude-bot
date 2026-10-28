@@ -630,3 +630,8 @@
 2026-10-27 18:32:39,976 [INFO] v2.report: wrote /home/runner/work/claude-bot/claude-bot/state/daily_report.md
 2026-10-27 23:18:58,347 [INFO] v2.pipeline: skip open SMCI short — already in an open position
 2026-10-27 23:18:58,368 [INFO] v2.report: wrote /home/runner/work/claude-bot/claude-bot/state/daily_report.md
+2026-10-28 18:39:00,333 [INFO] v2.store: trade closed: TSLA long -> WIN_TP2 @ 404.6948 (0.75R sized, 3.00R raw)
+2026-10-28 18:39:00,335 [INFO] v2.journal: journal entry written: 2026-10-28-tsla-long-8bf9bc97.md
+2026-10-28 18:39:00,338 [INFO] v2.journal: lesson written: 20261028-183900-tsla.md
+2026-10-28 18:39:00,338 [INFO] v2.pipeline: reflected on 1 resolved trade(s)
+2026-10-28 18:39:00,346 [INFO] v2.report: wrote /home/runner/work/claude-bot/claude-bot/state/daily_report.md
