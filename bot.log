@@ -636,3 +636,7 @@
 2026-10-28 18:39:00,338 [INFO] v2.pipeline: reflected on 1 resolved trade(s)
 2026-10-28 18:39:00,346 [INFO] v2.report: wrote /home/runner/work/claude-bot/claude-bot/state/daily_report.md
 2026-10-28 23:42:39,999 [INFO] v2.report: wrote /home/runner/work/claude-bot/claude-bot/state/daily_report.md
+2026-10-29 18:47:08,434 [INFO] v2.store: trade closed: SMCI short -> LOSS @ 35.4615 (-0.25R sized, -1.00R raw)
+2026-10-29 18:47:08,435 [INFO] v2.journal: journal entry written: 2026-10-29-smci-short-7cee6520.md
+2026-10-29 18:47:08,436 [INFO] v2.pipeline: reflected on 1 resolved trade(s)
+2026-10-29 18:47:08,442 [INFO] v2.report: wrote /home/runner/work/claude-bot/claude-bot/state/daily_report.md
