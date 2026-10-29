@@ -1,5 +1,5 @@
 {
-  "scan_ts": "2026-10-29T18:46:05.970313+00:00",
+  "scan_ts": "2026-10-29T23:41:17.719327+00:00",
   "skipped": false,
   "llm": false,
   "market": "equities",
@@ -96,35 +96,7 @@
     }
   ],
   "opened": [],
-  "closed": [
-    {
-      "id": "7cee6520-3ef1-4b33-985f-7f291f904c39",
-      "signal_id": "f84d8ef3-bee0-4587-8d9e-c7b26d278002",
-      "symbol": "SMCI",
-      "direction": "short",
-      "setups": "[\"bos_retest\"]",
-      "regime": "bullish",
-      "entry_price": 34.09,
-      "stop_loss": 35.4615,
-      "original_sl": 35.4615,
-      "tp1": 31.347,
-      "tp2": 29.9755,
-      "tp1_hit": 0,
-      "tp1_hit_at": null,
-      "opened_at": "2026-10-22T17:50:09.612553+00:00",
-      "closed_at": "2026-10-29T18:47:08.433592+00:00",
-      "close_price": 35.4615,
-      "outcome": "LOSS",
-      "pnl_r": -0.25,
-      "journaled": 0,
-      "size": "quarter",
-      "size_mult": 0.25,
-      "lots": null,
-      "raw_r": -1.0,
-      "source": "forward",
-      "pattern": "bos_retest"
-    }
-  ],
+  "closed": [],
   "system_stats": {
     "total_closed": 69,
     "open": 0,
