@@ -1,4 +1,4 @@
-# Daily report — 2026-10-30T18:23:43+00:00
+# Daily report — 2026-10-30T23:21:39+00:00
 
 Market: **equities** · judge: deterministic · paper only
 
@@ -9,8 +9,8 @@ Market: **equities** · judge: deterministic · paper only
 - 0 open · 69 closed · win rate 17% · total -2.77R
 
 ## Rejections by reason (all-time)
-- no_setup: 1020
-- regime_blocked: 288
+- no_setup: 1028
+- regime_blocked: 290
 - judge_skip: 92
 - levels_rejected_wide_stop: 62
 - conflicting_setups: 4
