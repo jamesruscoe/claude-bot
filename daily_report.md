@@ -1,18 +1,17 @@
-# Daily report — 2026-10-29T01:08:20+00:00
+# Daily report — 2026-10-30T01:13:19+00:00
 
 Market: **fx** · judge: deterministic · paper only
 
-## Candidates (2)
-- **EURUSD=X** short score 50 R:R 2.0 — TAKE/low/quarter · blocked: below calibrated FX_MIN_SCORE (50<85)
-- **EURGBP=X** short score 50 R:R 2.0 — TAKE/low/quarter · blocked: below calibrated FX_MIN_SCORE (50<85)
+## Candidates (0)
+- none today
 
 ## Ledger (running, sized R)
 - 0 open · 1 closed · win rate n/a · total +0.01R
 
 ## Rejections by reason (all-time)
-- no_setup: 618
+- no_setup: 626
 - stale_feed: 99
 - below calibrated FX_MIN_SCORE (50<85): 48
-- regime_blocked: 17
+- regime_blocked: 18
 
 > Paper only. Live bid/ask via an OANDA practice account is a documented TODO (see ARCHITECTURE.md / PROGRESS.md) — fills here use yfinance mid + assumed spread.

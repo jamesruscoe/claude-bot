@@ -425,3 +425,6 @@
 2026-10-29 01:08:20,121 [INFO] v2.pipeline: skip open EURGBP=X — below calibrated FX_MIN_SCORE (50<85)
 2026-10-29 01:08:20,131 [INFO] v2.report: wrote /home/runner/work/claude-bot/claude-bot/state/daily_report.md
 2026-10-29 01:08:20,467 [INFO] v2.report: wrote /home/runner/work/claude-bot/claude-bot/state/daily_report.md
+2026-10-30 01:13:14,326 [INFO] v2.datasource: data source: FX (yfinance), 9 pairs
+2026-10-30 01:13:19,625 [INFO] v2.report: wrote /home/runner/work/claude-bot/claude-bot/state/daily_report.md
+2026-10-30 01:13:19,882 [INFO] v2.report: wrote /home/runner/work/claude-bot/claude-bot/state/daily_report.md
