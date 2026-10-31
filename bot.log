@@ -428,3 +428,6 @@
 2026-10-30 01:13:14,326 [INFO] v2.datasource: data source: FX (yfinance), 9 pairs
 2026-10-30 01:13:19,625 [INFO] v2.report: wrote /home/runner/work/claude-bot/claude-bot/state/daily_report.md
 2026-10-30 01:13:19,882 [INFO] v2.report: wrote /home/runner/work/claude-bot/claude-bot/state/daily_report.md
+2026-10-31 00:56:11,101 [INFO] v2.datasource: data source: FX (yfinance), 9 pairs
+2026-10-31 00:56:11,101 [INFO] v2.pipeline: market closed — 2026-10-31 is a weekend. Skipping scan.
+2026-10-31 00:56:11,280 [INFO] v2.report: wrote /home/runner/work/claude-bot/claude-bot/state/daily_report.md
