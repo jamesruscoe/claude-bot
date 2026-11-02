@@ -1,5 +1,5 @@
 {
-  "scan_ts": "2026-10-30T23:20:37.528246+00:00",
+  "scan_ts": "2026-11-02T22:04:43.126993+00:00",
   "skipped": false,
   "llm": false,
   "market": "equities",
@@ -7,7 +7,7 @@
     {
       "symbol": "ARM",
       "candidate": false,
-      "reject_reason": "no_setup"
+      "reject_reason": "regime_blocked"
     },
     {
       "symbol": "NVDA",
@@ -21,8 +21,29 @@
     },
     {
       "symbol": "USOIL",
-      "candidate": false,
-      "reject_reason": "no_setup"
+      "candidate": true,
+      "score": 100,
+      "direction": "long",
+      "setups": [
+        "ob_retest",
+        "bos_retest"
+      ],
+      "regime": "bullish",
+      "price": 96.29,
+      "atr": 4.52464,
+      "entry": 101.13,
+      "entry_low": 99.44,
+      "entry_high": 102.82,
+      "stop_loss": 97.17768,
+      "tp1": 109.03464,
+      "tp2": 112.98696,
+      "rr": 2.0,
+      "take": false,
+      "confidence": "low",
+      "size": "none",
+      "rationale": "skip \u2014 USOIL track record is negative (win rate 0%, avg -0.11R over 9 trades)",
+      "decided_by": "deterministic",
+      "pattern": "ob_retest"
     },
     {
       "symbol": "SMCI",
@@ -32,7 +53,7 @@
     {
       "symbol": "APLD",
       "candidate": false,
-      "reject_reason": "regime_blocked"
+      "reject_reason": "levels_rejected_wide_stop"
     },
     {
       "symbol": "AMZN",
@@ -47,12 +68,12 @@
     {
       "symbol": "AMD",
       "candidate": false,
-      "reject_reason": "no_setup"
+      "reject_reason": "regime_blocked"
     },
     {
       "symbol": "COIN",
       "candidate": false,
-      "reject_reason": "regime_blocked"
+      "reject_reason": "no_setup"
     }
   ],
   "opened": [],
@@ -64,7 +85,9 @@
     "total_r": -2.771
   },
   "rejections": {
-    "no_setup": 8,
-    "regime_blocked": 2
+    "no_setup": 6,
+    "regime_blocked": 2,
+    "levels_rejected_wide_stop": 1,
+    "judge_skip": 1
   }
 }
