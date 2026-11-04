@@ -1,5 +1,5 @@
 {
-  "scan_ts": "2026-11-03T02:59:44.652233+00:00",
+  "scan_ts": "2026-11-04T01:33:24.051362+00:00",
   "skipped": false,
   "llm": false,
   "market": "fx",
@@ -21,8 +21,29 @@
     },
     {
       "symbol": "USDCHF=X",
-      "candidate": false,
-      "reject_reason": "no_setup"
+      "candidate": true,
+      "score": 50,
+      "direction": "short",
+      "setups": [
+        "bos_retest"
+      ],
+      "regime": "ranging",
+      "price": 0.81509,
+      "atr": 0.00599,
+      "entry": 0.81905,
+      "entry_low": 0.81794,
+      "entry_high": 0.8204,
+      "stop_loss": 0.82339,
+      "tp1": 0.81037,
+      "tp2": 0.80603,
+      "rr": 2.0,
+      "take": true,
+      "confidence": "low",
+      "size": "quarter",
+      "rationale": "score 50 (bos_retest); R:R 2.0; probation (0 decided) \u2014 tiny stake to learn",
+      "decided_by": "deterministic",
+      "pattern": "bos_retest",
+      "fx_blocked": "below calibrated FX_MIN_SCORE (50<85)"
     },
     {
       "symbol": "AUDUSD=X",
@@ -41,29 +62,8 @@
     },
     {
       "symbol": "EURGBP=X",
-      "candidate": true,
-      "score": 50,
-      "direction": "short",
-      "setups": [
-        "bos_retest"
-      ],
-      "regime": "bearish",
-      "price": 0.83454,
-      "atr": 0.00299,
-      "entry": 0.83348,
-      "entry_low": 0.83235,
-      "entry_high": 0.83485,
-      "stop_loss": 0.83634,
-      "tp1": 0.82776,
-      "tp2": 0.8249,
-      "rr": 2.0,
-      "take": true,
-      "confidence": "low",
-      "size": "quarter",
-      "rationale": "score 50 (bos_retest); R:R 2.0; probation (0 decided) \u2014 tiny stake to learn",
-      "decided_by": "deterministic",
-      "pattern": "bos_retest",
-      "fx_blocked": "below calibrated FX_MIN_SCORE (50<85)"
+      "candidate": false,
+      "reject_reason": "no_setup"
     },
     {
       "symbol": "EURJPY=X",
