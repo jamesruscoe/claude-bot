@@ -1,5 +1,5 @@
 {
-  "scan_ts": "2026-11-05T01:36:12.099588+00:00",
+  "scan_ts": "2026-11-06T01:42:07.219308+00:00",
   "skipped": false,
   "llm": false,
   "market": "fx",
@@ -16,29 +16,8 @@
     },
     {
       "symbol": "USDJPY=X",
-      "candidate": true,
-      "score": 50,
-      "direction": "long",
-      "setups": [
-        "bos_retest"
-      ],
-      "regime": "ranging",
-      "price": 158.088,
-      "atr": 0.9571,
-      "entry": 158.254,
-      "entry_low": 158.00663,
-      "entry_high": 158.48137,
-      "stop_loss": 157.52809,
-      "tp1": 159.70582,
-      "tp2": 160.43173,
-      "rr": 2.0,
-      "take": true,
-      "confidence": "low",
-      "size": "quarter",
-      "rationale": "score 50 (bos_retest); R:R 2.0; probation (0 decided) \u2014 tiny stake to learn",
-      "decided_by": "deterministic",
-      "pattern": "bos_retest",
-      "fx_blocked": "below calibrated FX_MIN_SCORE (50<85)"
+      "candidate": false,
+      "reject_reason": "no_setup"
     },
     {
       "symbol": "USDCHF=X",
@@ -47,29 +26,8 @@
     },
     {
       "symbol": "AUDUSD=X",
-      "candidate": true,
-      "score": 50,
-      "direction": "short",
-      "setups": [
-        "ob_retest"
-      ],
-      "regime": "ranging",
-      "price": 0.70175,
-      "atr": 0.00487,
-      "entry": 0.70409,
-      "entry_low": 0.70161,
-      "entry_high": 0.70678,
-      "stop_loss": 0.70921,
-      "tp1": 0.69385,
-      "tp2": 0.68873,
-      "rr": 2.0,
-      "take": true,
-      "confidence": "low",
-      "size": "quarter",
-      "rationale": "score 50 (ob_retest); R:R 2.0; probation (0 decided) \u2014 tiny stake to learn",
-      "decided_by": "deterministic",
-      "pattern": "ob_retest",
-      "fx_blocked": "below calibrated FX_MIN_SCORE (50<85)"
+      "candidate": false,
+      "reject_reason": "no_setup"
     },
     {
       "symbol": "USDCAD=X",
@@ -89,7 +47,7 @@
     {
       "symbol": "EURJPY=X",
       "candidate": false,
-      "reject_reason": "no_setup"
+      "reject_reason": "regime_blocked"
     }
   ],
   "opened": [],
@@ -101,7 +59,7 @@
     "total_r": 0.012
   },
   "rejections": {
-    "no_setup": 7,
-    "below calibrated FX_MIN_SCORE (50<85)": 2
+    "no_setup": 8,
+    "regime_blocked": 1
   }
 }
