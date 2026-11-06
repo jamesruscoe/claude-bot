@@ -1,19 +1,21 @@
-# Daily report — 2026-11-06T00:37:18+00:00
+# Daily report — 2026-11-06T19:50:25+00:00
 
 Market: **equities** · judge: deterministic · paper only
 
-## Candidates (3)
-- **SMCI** short score 50 R:R 2.0 — TAKE/low/quarter
-- **NFLX** short score 100 R:R 2.0 — skip/low/none
-- **TSLA** long score 50 R:R 2.0 — skip/low/none
+## Candidates (1)
+- **AMZN** long score 50 R:R 2.0 — skip/low/none
+
+## Resolved this run (2)
+- SMCI WIN_TP2 — 1.5R (sized)
+- APLD WIN_TP2 — 0.75R (sized)
 
 ## Ledger (running, sized R)
-- 2 open · 69 closed · win rate 17% · total -2.77R
+- 0 open · 71 closed · win rate 20% · total -0.52R
 
 ## Rejections by reason (all-time)
-- no_setup: 1073
-- regime_blocked: 300
-- judge_skip: 107
+- no_setup: 1081
+- regime_blocked: 301
+- judge_skip: 108
 - levels_rejected_wide_stop: 64
 - conflicting_setups: 6
 

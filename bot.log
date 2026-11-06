@@ -657,3 +657,10 @@
 2026-11-05 20:28:13,881 [INFO] v2.report: wrote /home/runner/work/claude-bot/claude-bot/state/daily_report.md
 2026-11-06 00:37:18,822 [INFO] v2.pipeline: skip open SMCI short — already in an open position
 2026-11-06 00:37:18,842 [INFO] v2.report: wrote /home/runner/work/claude-bot/claude-bot/state/daily_report.md
+2026-11-06 19:50:25,425 [INFO] v2.store: trade closed: SMCI short -> WIN_TP2 @ 25.8685 (1.50R sized, 3.00R raw)
+2026-11-06 19:50:25,425 [INFO] v2.store: trade closed: APLD short -> WIN_TP2 @ 14.9378 (0.75R sized, 3.00R raw)
+2026-11-06 19:50:25,426 [INFO] v2.journal: journal entry written: 2026-11-06-smci-short-d1a30227.md
+2026-11-06 19:50:25,428 [INFO] v2.journal: journal entry written: 2026-11-06-apld-short-87e7a3c5.md
+2026-11-06 19:50:25,431 [INFO] v2.journal: lesson written: 20261106-195025-apld.md
+2026-11-06 19:50:25,431 [INFO] v2.pipeline: reflected on 2 resolved trade(s)
+2026-11-06 19:50:25,438 [INFO] v2.report: wrote /home/runner/work/claude-bot/claude-bot/state/daily_report.md
