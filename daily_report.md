@@ -1,17 +1,19 @@
-# Daily report — 2026-11-06T23:52:40+00:00
+# Daily report — 2026-11-09T22:51:53+00:00
 
 Market: **equities** · judge: deterministic · paper only
 
-## Candidates (1)
-- **AMZN** long score 50 R:R 2.0 — skip/low/none
+## Candidates (3)
+- **NVDA** short score 100 R:R 2.0 — skip/low/none
+- **TSLA** short score 50 R:R 2.0 — skip/low/none
+- **AMD** short score 50 R:R 2.0 — skip/low/none
 
 ## Ledger (running, sized R)
 - 0 open · 71 closed · win rate 20% · total -0.52R
 
 ## Rejections by reason (all-time)
-- no_setup: 1089
-- regime_blocked: 302
-- judge_skip: 109
+- no_setup: 1094
+- regime_blocked: 304
+- judge_skip: 112
 - levels_rejected_wide_stop: 64
 - conflicting_setups: 6
 
