@@ -450,3 +450,11 @@
 2026-11-07 01:01:33,056 [INFO] v2.datasource: data source: FX (yfinance), 9 pairs
 2026-11-07 01:01:33,056 [INFO] v2.pipeline: market closed — 2026-11-07 is a weekend. Skipping scan.
 2026-11-07 01:01:33,204 [INFO] v2.report: wrote /home/runner/work/claude-bot/claude-bot/state/daily_report.md
+2026-11-10 03:42:13,015 [INFO] v2.datasource: data source: FX (yfinance), 9 pairs
+2026-11-10 03:42:17,970 [INFO] v2.pipeline: skip open EURUSD=X — below calibrated FX_MIN_SCORE (50<85)
+2026-11-10 03:42:17,989 [INFO] v2.pipeline: skip open AUDUSD=X — below calibrated FX_MIN_SCORE (50<85)
+2026-11-10 03:42:18,003 [INFO] v2.store: trade opened: NZDUSD=X short @ 0.5614 (sl 0.5673 tp1 0.5496 tp2 0.5437) size=quarter x0.25
+2026-11-10 03:42:18,015 [INFO] v2.pipeline: skip open EURJPY=X — below calibrated FX_MIN_SCORE (50<85)
+2026-11-10 03:42:18,602 [INFO] v2.report: wrote /home/runner/work/claude-bot/claude-bot/state/daily_report.md
+2026-11-10 03:42:18,605 [INFO] v2.alerts: FX alert queued: FX SIGNAL: NZDUSD SHORT @ 0.56139 [ob_retest · unproven]
+2026-11-10 03:42:18,853 [INFO] v2.report: wrote /home/runner/work/claude-bot/claude-bot/state/daily_report.md

@@ -1,18 +1,39 @@
 {
-  "scan_ts": "2026-11-06T01:42:07.219308+00:00",
+  "scan_ts": "2026-11-10T03:42:13.015544+00:00",
   "skipped": false,
   "llm": false,
   "market": "fx",
   "results": [
     {
       "symbol": "EURUSD=X",
-      "candidate": false,
-      "reject_reason": "no_setup"
+      "candidate": true,
+      "score": 50,
+      "direction": "short",
+      "setups": [
+        "ob_retest"
+      ],
+      "regime": "bearish",
+      "price": 1.12246,
+      "atr": 0.00693,
+      "entry": 1.12372,
+      "entry_low": 1.12003,
+      "entry_high": 1.12752,
+      "stop_loss": 1.13098,
+      "tp1": 1.1092,
+      "tp2": 1.10194,
+      "rr": 2.0,
+      "take": true,
+      "confidence": "low",
+      "size": "quarter",
+      "rationale": "score 50 (ob_retest); R:R 2.0; probation (0 decided) \u2014 tiny stake to learn",
+      "decided_by": "deterministic",
+      "pattern": "ob_retest",
+      "fx_blocked": "below calibrated FX_MIN_SCORE (50<85)"
     },
     {
       "symbol": "GBPUSD=X",
       "candidate": false,
-      "reject_reason": "no_setup"
+      "reject_reason": "regime_blocked"
     },
     {
       "symbol": "USDJPY=X",
@@ -26,8 +47,29 @@
     },
     {
       "symbol": "AUDUSD=X",
-      "candidate": false,
-      "reject_reason": "no_setup"
+      "candidate": true,
+      "score": 50,
+      "direction": "short",
+      "setups": [
+        "bos_retest"
+      ],
+      "regime": "bearish",
+      "price": 0.69209,
+      "atr": 0.00579,
+      "entry": 0.69063,
+      "entry_low": 0.68969,
+      "entry_high": 0.69177,
+      "stop_loss": 0.69466,
+      "tp1": 0.68257,
+      "tp2": 0.67854,
+      "rr": 2.0,
+      "take": true,
+      "confidence": "low",
+      "size": "quarter",
+      "rationale": "score 50 (bos_retest); R:R 2.0; probation (0 decided) \u2014 tiny stake to learn",
+      "decided_by": "deterministic",
+      "pattern": "bos_retest",
+      "fx_blocked": "below calibrated FX_MIN_SCORE (50<85)"
     },
     {
       "symbol": "USDCAD=X",
@@ -36,8 +78,31 @@
     },
     {
       "symbol": "NZDUSD=X",
-      "candidate": false,
-      "reject_reason": "no_setup"
+      "candidate": true,
+      "score": 100,
+      "direction": "short",
+      "setups": [
+        "ob_retest",
+        "bos_retest"
+      ],
+      "regime": "bearish",
+      "price": 0.56351,
+      "atr": 0.00531,
+      "entry": 0.56139,
+      "entry_low": 0.55842,
+      "entry_high": 0.56464,
+      "stop_loss": 0.5673,
+      "tp1": 0.54957,
+      "tp2": 0.54366,
+      "rr": 2.0,
+      "take": true,
+      "confidence": "low",
+      "size": "quarter",
+      "rationale": "score 100 (ob_retest+bos_retest); R:R 2.0; dual-confluence (OB + BOS agree); probation (0 decided) \u2014 tiny stake to learn",
+      "decided_by": "deterministic",
+      "pattern": "ob_retest",
+      "opened": true,
+      "pattern_confidence": "unproven (n=1 fwd)"
     },
     {
       "symbol": "EURGBP=X",
@@ -46,20 +111,70 @@
     },
     {
       "symbol": "EURJPY=X",
-      "candidate": false,
-      "reject_reason": "regime_blocked"
+      "candidate": true,
+      "score": 50,
+      "direction": "short",
+      "setups": [
+        "ob_retest"
+      ],
+      "regime": "bearish",
+      "price": 177.246,
+      "atr": 1.23415,
+      "entry": 177.527,
+      "entry_low": 177.088,
+      "entry_high": 178.002,
+      "stop_loss": 178.61908,
+      "tp1": 175.34284,
+      "tp2": 174.25076,
+      "rr": 2.0,
+      "take": true,
+      "confidence": "low",
+      "size": "quarter",
+      "rationale": "score 50 (ob_retest); R:R 2.0; probation (0 decided) \u2014 tiny stake to learn",
+      "decided_by": "deterministic",
+      "pattern": "ob_retest",
+      "fx_blocked": "below calibrated FX_MIN_SCORE (50<85)"
     }
   ],
-  "opened": [],
+  "opened": [
+    {
+      "id": "34e99913-074e-4d51-8461-72062f85401e",
+      "signal_id": "32de8201-278c-4b3d-a0f6-7dd211e701c1",
+      "symbol": "NZDUSD=X",
+      "direction": "short",
+      "setups": "[\"ob_retest\", \"bos_retest\"]",
+      "regime": "bearish",
+      "entry_price": 0.56139,
+      "stop_loss": 0.5673,
+      "original_sl": 0.5673,
+      "tp1": 0.54957,
+      "tp2": 0.54366,
+      "tp1_hit": 0,
+      "tp1_hit_at": null,
+      "size": "quarter",
+      "size_mult": 0.25,
+      "lots": 0.085,
+      "source": "forward",
+      "pattern": "ob_retest",
+      "opened_at": "2026-11-10T03:42:13.015544+00:00",
+      "closed_at": null,
+      "close_price": null,
+      "outcome": null,
+      "pnl_r": null,
+      "raw_r": null,
+      "journaled": 0
+    }
+  ],
   "closed": [],
   "system_stats": {
     "total_closed": 1,
-    "open": 0,
+    "open": 1,
     "win_rate": null,
     "total_r": 0.012
   },
   "rejections": {
-    "no_setup": 8,
+    "no_setup": 4,
+    "below calibrated FX_MIN_SCORE (50<85)": 3,
     "regime_blocked": 1
   }
 }
