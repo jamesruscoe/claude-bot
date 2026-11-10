@@ -1,20 +1,21 @@
-# Daily report — 2026-11-10T02:27:40+00:00
+# Daily report — 2026-11-10T20:11:35+00:00
 
 Market: **equities** · judge: deterministic · paper only
 
-## Candidates (3)
-- **NVDA** short score 100 R:R 2.0 — skip/low/none
-- **TSLA** short score 50 R:R 2.0 — skip/low/none
+## Candidates (4)
+- **USOIL** short score 100 R:R 2.0 — skip/low/none
+- **NFLX** short score 50 R:R 2.0 — skip/low/none
 - **AMD** short score 50 R:R 2.0 — skip/low/none
+- **COIN** short score 50 R:R 2.0 — skip/low/none
 
 ## Ledger (running, sized R)
 - 0 open · 71 closed · win rate 20% · total -0.52R
 
 ## Rejections by reason (all-time)
-- no_setup: 1100
-- regime_blocked: 305
-- judge_skip: 115
-- levels_rejected_wide_stop: 64
+- no_setup: 1103
+- regime_blocked: 307
+- judge_skip: 119
+- levels_rejected_wide_stop: 65
 - conflicting_setups: 6
 
 > Paper only. Live bid/ask via an OANDA practice account is a documented TODO (see ARCHITECTURE.md / PROGRESS.md) — fills here use yfinance mid + assumed spread.
