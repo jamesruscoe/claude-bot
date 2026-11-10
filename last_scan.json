@@ -1,5 +1,5 @@
 {
-  "scan_ts": "2026-11-09T22:50:51.305851+00:00",
+  "scan_ts": "2026-11-10T02:26:38.452735+00:00",
   "skipped": false,
   "llm": false,
   "market": "equities",
@@ -63,7 +63,7 @@
     {
       "symbol": "USOIL",
       "candidate": false,
-      "reject_reason": "regime_blocked"
+      "reject_reason": "no_setup"
     },
     {
       "symbol": "SMCI",
@@ -125,8 +125,8 @@
     "total_r": -0.521
   },
   "rejections": {
-    "no_setup": 5,
+    "no_setup": 6,
     "judge_skip": 3,
-    "regime_blocked": 2
+    "regime_blocked": 1
   }
 }
