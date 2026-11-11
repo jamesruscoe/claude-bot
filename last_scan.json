@@ -1,5 +1,5 @@
 {
-  "scan_ts": "2026-11-11T00:17:12.940934+00:00",
+  "scan_ts": "2026-11-11T19:58:35.220393+00:00",
   "skipped": false,
   "llm": false,
   "market": "equities",
@@ -7,7 +7,7 @@
     {
       "symbol": "ARM",
       "candidate": false,
-      "reject_reason": "no_setup"
+      "reject_reason": "regime_blocked"
     },
     {
       "symbol": "NVDA",
@@ -16,13 +16,53 @@
     },
     {
       "symbol": "TSLA",
-      "candidate": false,
-      "reject_reason": "regime_blocked"
+      "candidate": true,
+      "score": 50,
+      "direction": "long",
+      "setups": [
+        "ob_retest"
+      ],
+      "regime": "bullish",
+      "price": 379.78,
+      "atr": 16.6819,
+      "entry": 356.225,
+      "entry_low": 338.15,
+      "entry_high": 374.3,
+      "stop_loss": 329.80905,
+      "tp1": 409.0569,
+      "tp2": 435.47285,
+      "rr": 2.0,
+      "take": false,
+      "confidence": "low",
+      "size": "none",
+      "rationale": "skip \u2014 TSLA track record is negative (win rate 20%, avg +0.01R over 7 trades)",
+      "decided_by": "deterministic",
+      "pattern": "ob_retest"
     },
     {
       "symbol": "USOIL",
-      "candidate": false,
-      "reject_reason": "no_setup"
+      "candidate": true,
+      "score": 50,
+      "direction": "short",
+      "setups": [
+        "ob_retest"
+      ],
+      "regime": "ranging",
+      "price": 86.17,
+      "atr": 4.67826,
+      "entry": 88.985,
+      "entry_low": 86.65,
+      "entry_high": 91.32,
+      "stop_loss": 93.65913,
+      "tp1": 79.63674,
+      "tp2": 74.96261,
+      "rr": 2.0,
+      "take": false,
+      "confidence": "low",
+      "size": "none",
+      "rationale": "skip \u2014 USOIL track record is negative (win rate 0%, avg -0.11R over 9 trades)",
+      "decided_by": "deterministic",
+      "pattern": "ob_retest"
     },
     {
       "symbol": "SMCI",
@@ -32,87 +72,27 @@
     {
       "symbol": "APLD",
       "candidate": false,
-      "reject_reason": "levels_rejected_wide_stop"
+      "reject_reason": "no_setup"
     },
     {
       "symbol": "AMZN",
       "candidate": false,
-      "reject_reason": "regime_blocked"
+      "reject_reason": "no_setup"
     },
     {
       "symbol": "NFLX",
-      "candidate": true,
-      "score": 50,
-      "direction": "short",
-      "setups": [
-        "ob_retest"
-      ],
-      "regime": "bearish",
-      "price": 63.95,
-      "atr": 1.99337,
-      "entry": 65.4,
-      "entry_low": 64.02,
-      "entry_high": 66.78,
-      "stop_loss": 67.77668,
-      "tp1": 60.64664,
-      "tp2": 58.26996,
-      "rr": 2.0,
-      "take": false,
-      "confidence": "low",
-      "size": "none",
-      "rationale": "skip \u2014 NFLX track record is negative (win rate 20%, avg +0.05R over 6 trades)",
-      "decided_by": "deterministic",
-      "pattern": "ob_retest"
+      "candidate": false,
+      "reject_reason": "no_setup"
     },
     {
       "symbol": "AMD",
-      "candidate": true,
-      "score": 50,
-      "direction": "short",
-      "setups": [
-        "ob_retest"
-      ],
-      "regime": "ranging",
-      "price": 508.58,
-      "atr": 38.71709,
-      "entry": 485.47005,
-      "entry_low": 473.5401,
-      "entry_high": 497.4,
-      "stop_loss": 516.75855,
-      "tp1": 422.89305,
-      "tp2": 391.60455,
-      "rr": 2.0,
-      "take": false,
-      "confidence": "low",
-      "size": "none",
-      "rationale": "skip \u2014 AMD track record is negative (win rate 20%, avg +0.02R over 8 trades)",
-      "decided_by": "deterministic",
-      "pattern": "ob_retest"
+      "candidate": false,
+      "reject_reason": "no_setup"
     },
     {
       "symbol": "COIN",
-      "candidate": true,
-      "score": 50,
-      "direction": "short",
-      "setups": [
-        "bos_retest"
-      ],
-      "regime": "bearish",
-      "price": 136.1,
-      "atr": 10.66359,
-      "entry": 135.46,
-      "entry_low": 135.25681,
-      "entry_high": 135.66319,
-      "stop_loss": 140.99499,
-      "tp1": 124.39002,
-      "tp2": 118.85503,
-      "rr": 2.0,
-      "take": false,
-      "confidence": "low",
-      "size": "none",
-      "rationale": "skip \u2014 COIN track record is negative (win rate 0%, avg -0.21R over 6 trades)",
-      "decided_by": "deterministic",
-      "pattern": "bos_retest"
+      "candidate": false,
+      "reject_reason": "regime_blocked"
     }
   ],
   "opened": [],
@@ -124,9 +104,8 @@
     "total_r": -0.521
   },
   "rejections": {
-    "no_setup": 4,
-    "judge_skip": 3,
+    "no_setup": 6,
     "regime_blocked": 2,
-    "levels_rejected_wide_stop": 1
+    "judge_skip": 2
   }
 }
