@@ -1,5 +1,5 @@
 {
-  "scan_ts": "2026-11-10T20:10:33.103722+00:00",
+  "scan_ts": "2026-11-11T00:17:12.940934+00:00",
   "skipped": false,
   "llm": false,
   "market": "equities",
@@ -21,29 +21,8 @@
     },
     {
       "symbol": "USOIL",
-      "candidate": true,
-      "score": 100,
-      "direction": "short",
-      "setups": [
-        "ob_retest",
-        "bos_retest"
-      ],
-      "regime": "ranging",
-      "price": 86.38,
-      "atr": 4.81351,
-      "entry": 88.985,
-      "entry_low": 86.65,
-      "entry_high": 91.32,
-      "stop_loss": 93.72675,
-      "tp1": 79.5015,
-      "tp2": 74.75975,
-      "rr": 2.0,
-      "take": false,
-      "confidence": "low",
-      "size": "none",
-      "rationale": "skip \u2014 USOIL track record is negative (win rate 0%, avg -0.11R over 9 trades)",
-      "decided_by": "deterministic",
-      "pattern": "ob_retest"
+      "candidate": false,
+      "reject_reason": "no_setup"
     },
     {
       "symbol": "SMCI",
@@ -145,8 +124,8 @@
     "total_r": -0.521
   },
   "rejections": {
-    "judge_skip": 4,
-    "no_setup": 3,
+    "no_setup": 4,
+    "judge_skip": 3,
     "regime_blocked": 2,
     "levels_rejected_wide_stop": 1
   }
