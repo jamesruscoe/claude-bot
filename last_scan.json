@@ -1,33 +1,13 @@
 {
-  "scan_ts": "2026-11-13T00:46:13.462441+00:00",
+  "scan_ts": "2026-11-13T20:16:04.219319+00:00",
   "skipped": false,
   "llm": false,
   "market": "equities",
   "results": [
     {
       "symbol": "ARM",
-      "candidate": true,
-      "score": 50,
-      "direction": "short",
-      "setups": [
-        "bos_retest"
-      ],
-      "regime": "bearish",
-      "price": 203.36,
-      "atr": 16.0816,
-      "entry": 193.91,
-      "entry_low": 193.61913,
-      "entry_high": 194.20087,
-      "stop_loss": 202.24167,
-      "tp1": 177.24666,
-      "tp2": 168.91499,
-      "rr": 2.0,
-      "take": false,
-      "confidence": "low",
-      "size": "none",
-      "rationale": "skip \u2014 ARM track record is negative (win rate 0%, avg -0.21R over 6 trades)",
-      "decided_by": "deterministic",
-      "pattern": "bos_retest"
+      "candidate": false,
+      "reject_reason": "no_setup"
     },
     {
       "symbol": "NVDA",
@@ -41,53 +21,13 @@
     },
     {
       "symbol": "USOIL",
-      "candidate": true,
-      "score": 50,
-      "direction": "short",
-      "setups": [
-        "ob_retest"
-      ],
-      "regime": "ranging",
-      "price": 88.44,
-      "atr": 4.51547,
-      "entry": 88.985,
-      "entry_low": 86.65,
-      "entry_high": 91.32,
-      "stop_loss": 93.57774,
-      "tp1": 79.79952,
-      "tp2": 75.20678,
-      "rr": 2.0,
-      "take": false,
-      "confidence": "low",
-      "size": "none",
-      "rationale": "skip \u2014 USOIL track record is negative (win rate 0%, avg -0.11R over 9 trades)",
-      "decided_by": "deterministic",
-      "pattern": "ob_retest"
+      "candidate": false,
+      "reject_reason": "no_setup"
     },
     {
       "symbol": "SMCI",
-      "candidate": true,
-      "score": 50,
-      "direction": "short",
-      "setups": [
-        "ob_retest"
-      ],
-      "regime": "bearish",
-      "price": 30.43,
-      "atr": 2.56654,
-      "entry": 31.605,
-      "entry_low": 30.93,
-      "entry_high": 32.28,
-      "stop_loss": 33.56327,
-      "tp1": 27.68846,
-      "tp2": 25.73019,
-      "rr": 2.0,
-      "take": true,
-      "confidence": "low",
-      "size": "quarter",
-      "rationale": "score 50 (ob_retest); R:R 2.0; weak-ish record (40%) \u2014 trim",
-      "decided_by": "deterministic",
-      "pattern": "ob_retest"
+      "candidate": false,
+      "reject_reason": "regime_blocked"
     },
     {
       "symbol": "APLD",
@@ -96,54 +36,13 @@
     },
     {
       "symbol": "AMZN",
-      "candidate": true,
-      "score": 100,
-      "direction": "long",
-      "setups": [
-        "ob_retest",
-        "bos_retest"
-      ],
-      "regime": "ranging",
-      "price": 266.17,
-      "atr": 9.45241,
-      "entry": 262.75,
-      "entry_low": 252.27,
-      "entry_high": 273.23,
-      "stop_loss": 247.5438,
-      "tp1": 293.1624,
-      "tp2": 308.3686,
-      "rr": 2.0,
-      "take": false,
-      "confidence": "low",
-      "size": "none",
-      "rationale": "skip \u2014 AMZN track record is negative (win rate 20%, avg -0.25R over 5 trades)",
-      "decided_by": "deterministic",
-      "pattern": "ob_retest"
+      "candidate": false,
+      "reject_reason": "no_setup"
     },
     {
       "symbol": "NFLX",
-      "candidate": true,
-      "score": 50,
-      "direction": "short",
-      "setups": [
-        "ob_retest"
-      ],
-      "regime": "bearish",
-      "price": 64.54,
-      "atr": 1.9376,
-      "entry": 65.4,
-      "entry_low": 64.02,
-      "entry_high": 66.78,
-      "stop_loss": 67.7488,
-      "tp1": 60.7024,
-      "tp2": 58.3536,
-      "rr": 2.0,
-      "take": false,
-      "confidence": "low",
-      "size": "none",
-      "rationale": "skip \u2014 NFLX track record is negative (win rate 20%, avg +0.05R over 6 trades)",
-      "decided_by": "deterministic",
-      "pattern": "ob_retest"
+      "candidate": false,
+      "reject_reason": "no_setup"
     },
     {
       "symbol": "AMD",
@@ -153,7 +52,7 @@
     {
       "symbol": "COIN",
       "candidate": false,
-      "reject_reason": "no_setup"
+      "reject_reason": "regime_blocked"
     }
   ],
   "opened": [],
@@ -165,7 +64,7 @@
     "total_r": -0.521
   },
   "rejections": {
-    "no_setup": 5,
-    "judge_skip": 4
+    "no_setup": 8,
+    "regime_blocked": 2
   }
 }
