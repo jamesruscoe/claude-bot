@@ -1,5 +1,5 @@
 {
-  "scan_ts": "2026-11-12T20:37:29.221947+00:00",
+  "scan_ts": "2026-11-13T00:46:13.462441+00:00",
   "skipped": false,
   "llm": false,
   "market": "equities",
@@ -48,14 +48,14 @@
         "ob_retest"
       ],
       "regime": "ranging",
-      "price": 89.08,
-      "atr": 4.6319,
+      "price": 88.44,
+      "atr": 4.51547,
       "entry": 88.985,
       "entry_low": 86.65,
       "entry_high": 91.32,
-      "stop_loss": 93.63595,
-      "tp1": 79.6831,
-      "tp2": 75.03215,
+      "stop_loss": 93.57774,
+      "tp1": 79.79952,
+      "tp2": 75.20678,
       "rr": 2.0,
       "take": false,
       "confidence": "low",
@@ -87,9 +87,7 @@
       "size": "quarter",
       "rationale": "score 50 (ob_retest); R:R 2.0; weak-ish record (40%) \u2014 trim",
       "decided_by": "deterministic",
-      "pattern": "ob_retest",
-      "opened": true,
-      "pattern_confidence": "provisional (n=46, not yet validated)"
+      "pattern": "ob_retest"
     },
     {
       "symbol": "APLD",
@@ -158,35 +156,7 @@
       "reject_reason": "no_setup"
     }
   ],
-  "opened": [
-    {
-      "id": "63137f0b-730f-470b-bc03-3a40fb7b8758",
-      "signal_id": "26ea4a28-f938-4686-8654-91b775eb7cb5",
-      "symbol": "SMCI",
-      "direction": "short",
-      "setups": "[\"ob_retest\"]",
-      "regime": "bearish",
-      "entry_price": 31.605,
-      "stop_loss": 33.56327,
-      "original_sl": 33.56327,
-      "tp1": 27.68846,
-      "tp2": 25.73019,
-      "tp1_hit": 0,
-      "tp1_hit_at": null,
-      "size": "quarter",
-      "size_mult": 0.25,
-      "lots": null,
-      "source": "forward",
-      "pattern": "ob_retest",
-      "opened_at": "2026-11-12T20:37:29.221947+00:00",
-      "closed_at": null,
-      "close_price": null,
-      "outcome": null,
-      "pnl_r": null,
-      "raw_r": null,
-      "journaled": 0
-    }
-  ],
+  "opened": [],
   "closed": [],
   "system_stats": {
     "total_closed": 71,
