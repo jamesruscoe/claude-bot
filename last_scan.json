@@ -1,5 +1,5 @@
 {
-  "scan_ts": "2026-11-13T20:16:04.219319+00:00",
+  "scan_ts": "2026-11-16T22:42:43.809088+00:00",
   "skipped": false,
   "llm": false,
   "market": "equities",
@@ -7,12 +7,12 @@
     {
       "symbol": "ARM",
       "candidate": false,
-      "reject_reason": "no_setup"
+      "reject_reason": "regime_blocked"
     },
     {
       "symbol": "NVDA",
       "candidate": false,
-      "reject_reason": "no_setup"
+      "reject_reason": "regime_blocked"
     },
     {
       "symbol": "TSLA",
@@ -27,12 +27,12 @@
     {
       "symbol": "SMCI",
       "candidate": false,
-      "reject_reason": "regime_blocked"
+      "reject_reason": "levels_rejected_wide_stop"
     },
     {
       "symbol": "APLD",
       "candidate": false,
-      "reject_reason": "no_setup"
+      "reject_reason": "levels_rejected_wide_stop"
     },
     {
       "symbol": "AMZN",
@@ -47,12 +47,12 @@
     {
       "symbol": "AMD",
       "candidate": false,
-      "reject_reason": "no_setup"
+      "reject_reason": "regime_blocked"
     },
     {
       "symbol": "COIN",
       "candidate": false,
-      "reject_reason": "regime_blocked"
+      "reject_reason": "no_setup"
     }
   ],
   "opened": [],
@@ -64,7 +64,8 @@
     "total_r": -0.521
   },
   "rejections": {
-    "no_setup": 8,
-    "regime_blocked": 2
+    "no_setup": 5,
+    "regime_blocked": 3,
+    "levels_rejected_wide_stop": 2
   }
 }
