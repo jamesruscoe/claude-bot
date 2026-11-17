@@ -1,5 +1,5 @@
 {
-  "scan_ts": "2026-11-16T22:42:43.809088+00:00",
+  "scan_ts": "2026-11-17T02:40:30.620677+00:00",
   "skipped": false,
   "llm": false,
   "market": "equities",
@@ -7,12 +7,12 @@
     {
       "symbol": "ARM",
       "candidate": false,
-      "reject_reason": "regime_blocked"
+      "reject_reason": "no_setup"
     },
     {
       "symbol": "NVDA",
       "candidate": false,
-      "reject_reason": "regime_blocked"
+      "reject_reason": "levels_rejected_wide_stop"
     },
     {
       "symbol": "TSLA",
@@ -27,12 +27,12 @@
     {
       "symbol": "SMCI",
       "candidate": false,
-      "reject_reason": "levels_rejected_wide_stop"
+      "reject_reason": "no_setup"
     },
     {
       "symbol": "APLD",
       "candidate": false,
-      "reject_reason": "levels_rejected_wide_stop"
+      "reject_reason": "no_setup"
     },
     {
       "symbol": "AMZN",
@@ -41,13 +41,33 @@
     },
     {
       "symbol": "NFLX",
-      "candidate": false,
-      "reject_reason": "no_setup"
+      "candidate": true,
+      "score": 50,
+      "direction": "short",
+      "setups": [
+        "ob_retest"
+      ],
+      "regime": "bearish",
+      "price": 60.75,
+      "atr": 1.97386,
+      "entry": 63.655,
+      "entry_low": 62.75,
+      "entry_high": 64.56,
+      "stop_loss": 65.54693,
+      "tp1": 59.87114,
+      "tp2": 57.97921,
+      "rr": 2.0,
+      "take": false,
+      "confidence": "low",
+      "size": "none",
+      "rationale": "skip \u2014 NFLX track record is negative (win rate 20%, avg +0.05R over 6 trades)",
+      "decided_by": "deterministic",
+      "pattern": "ob_retest"
     },
     {
       "symbol": "AMD",
       "candidate": false,
-      "reject_reason": "regime_blocked"
+      "reject_reason": "no_setup"
     },
     {
       "symbol": "COIN",
@@ -56,16 +76,44 @@
     }
   ],
   "opened": [],
-  "closed": [],
+  "closed": [
+    {
+      "id": "63137f0b-730f-470b-bc03-3a40fb7b8758",
+      "signal_id": "26ea4a28-f938-4686-8654-91b775eb7cb5",
+      "symbol": "SMCI",
+      "direction": "short",
+      "setups": "[\"ob_retest\"]",
+      "regime": "bearish",
+      "entry_price": 31.605,
+      "stop_loss": 31.605,
+      "original_sl": 33.56327,
+      "tp1": 27.68846,
+      "tp2": 25.73019,
+      "tp1_hit": 1,
+      "tp1_hit_at": "2026-11-13T05:00:00+00:00",
+      "opened_at": "2026-11-12T20:37:29.221947+00:00",
+      "closed_at": "2026-11-17T02:41:32.975273+00:00",
+      "close_price": 25.73019,
+      "outcome": "WIN_TP2",
+      "pnl_r": 0.75,
+      "journaled": 0,
+      "size": "quarter",
+      "size_mult": 0.25,
+      "lots": null,
+      "raw_r": 3.0,
+      "source": "forward",
+      "pattern": "ob_retest"
+    }
+  ],
   "system_stats": {
-    "total_closed": 71,
-    "open": 1,
-    "win_rate": 0.2,
-    "total_r": -0.521
+    "total_closed": 72,
+    "open": 0,
+    "win_rate": 0.21568627450980393,
+    "total_r": 0.229
   },
   "rejections": {
-    "no_setup": 5,
-    "regime_blocked": 3,
-    "levels_rejected_wide_stop": 2
+    "no_setup": 8,
+    "levels_rejected_wide_stop": 1,
+    "judge_skip": 1
   }
 }
