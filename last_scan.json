@@ -1,5 +1,5 @@
 {
-  "scan_ts": "2026-11-17T02:40:30.620677+00:00",
+  "scan_ts": "2026-11-17T21:28:54.235739+00:00",
   "skipped": false,
   "llm": false,
   "market": "equities",
@@ -21,8 +21,28 @@
     },
     {
       "symbol": "USOIL",
-      "candidate": false,
-      "reject_reason": "no_setup"
+      "candidate": true,
+      "score": 50,
+      "direction": "short",
+      "setups": [
+        "ob_retest"
+      ],
+      "regime": "bullish",
+      "price": 85.64,
+      "atr": 4.31122,
+      "entry": 87.14,
+      "entry_low": 85.13,
+      "entry_high": 89.15,
+      "stop_loss": 91.30561,
+      "tp1": 78.80878,
+      "tp2": 74.64317,
+      "rr": 2.0,
+      "take": false,
+      "confidence": "low",
+      "size": "none",
+      "rationale": "skip \u2014 USOIL track record is negative (win rate 0%, avg -0.11R over 9 trades)",
+      "decided_by": "deterministic",
+      "pattern": "ob_retest"
     },
     {
       "symbol": "SMCI",
@@ -76,35 +96,7 @@
     }
   ],
   "opened": [],
-  "closed": [
-    {
-      "id": "63137f0b-730f-470b-bc03-3a40fb7b8758",
-      "signal_id": "26ea4a28-f938-4686-8654-91b775eb7cb5",
-      "symbol": "SMCI",
-      "direction": "short",
-      "setups": "[\"ob_retest\"]",
-      "regime": "bearish",
-      "entry_price": 31.605,
-      "stop_loss": 31.605,
-      "original_sl": 33.56327,
-      "tp1": 27.68846,
-      "tp2": 25.73019,
-      "tp1_hit": 1,
-      "tp1_hit_at": "2026-11-13T05:00:00+00:00",
-      "opened_at": "2026-11-12T20:37:29.221947+00:00",
-      "closed_at": "2026-11-17T02:41:32.975273+00:00",
-      "close_price": 25.73019,
-      "outcome": "WIN_TP2",
-      "pnl_r": 0.75,
-      "journaled": 0,
-      "size": "quarter",
-      "size_mult": 0.25,
-      "lots": null,
-      "raw_r": 3.0,
-      "source": "forward",
-      "pattern": "ob_retest"
-    }
-  ],
+  "closed": [],
   "system_stats": {
     "total_closed": 72,
     "open": 0,
@@ -112,8 +104,8 @@
     "total_r": 0.229
   },
   "rejections": {
-    "no_setup": 8,
-    "levels_rejected_wide_stop": 1,
-    "judge_skip": 1
+    "no_setup": 7,
+    "judge_skip": 2,
+    "levels_rejected_wide_stop": 1
   }
 }
