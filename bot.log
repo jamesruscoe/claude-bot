@@ -473,3 +473,11 @@
 2026-11-17 04:04:06,309 [INFO] v2.datasource: data source: FX (yfinance), 9 pairs
 2026-11-17 04:04:11,975 [INFO] v2.report: wrote /home/runner/work/claude-bot/claude-bot/state/daily_report.md
 2026-11-17 04:04:12,225 [INFO] v2.report: wrote /home/runner/work/claude-bot/claude-bot/state/daily_report.md
+2026-11-18 03:01:33,736 [INFO] v2.datasource: data source: FX (yfinance), 9 pairs
+2026-11-18 03:01:39,098 [INFO] v2.pipeline: skip open GBPUSD=X — below calibrated FX_MIN_SCORE (50<85)
+2026-11-18 03:01:39,116 [INFO] v2.pipeline: skip open USDCAD=X — below calibrated FX_MIN_SCORE (50<85)
+2026-11-18 03:01:39,507 [INFO] v2.store: trade closed: NZDUSD=X short -> BREAKEVEN @ 0.5614 (0.00R sized, 0.00R raw)
+2026-11-18 03:01:39,509 [INFO] v2.journal: journal entry written: 2026-11-18-nzdusd-x-short-34e99913.md
+2026-11-18 03:01:39,510 [INFO] v2.pipeline: reflected on 1 resolved trade(s)
+2026-11-18 03:01:39,515 [INFO] v2.report: wrote /home/runner/work/claude-bot/claude-bot/state/daily_report.md
+2026-11-18 03:01:39,763 [INFO] v2.report: wrote /home/runner/work/claude-bot/claude-bot/state/daily_report.md

@@ -1,5 +1,5 @@
 {
-  "scan_ts": "2026-11-17T04:04:06.309562+00:00",
+  "scan_ts": "2026-11-18T03:01:33.736931+00:00",
   "skipped": false,
   "llm": false,
   "market": "fx",
@@ -11,8 +11,29 @@
     },
     {
       "symbol": "GBPUSD=X",
-      "candidate": false,
-      "reject_reason": "no_setup"
+      "candidate": true,
+      "score": 50,
+      "direction": "short",
+      "setups": [
+        "bos_retest"
+      ],
+      "regime": "bearish",
+      "price": 1.31987,
+      "atr": 0.00822,
+      "entry": 1.31853,
+      "entry_low": 1.31665,
+      "entry_high": 1.32061,
+      "stop_loss": 1.32472,
+      "tp1": 1.30615,
+      "tp2": 1.29996,
+      "rr": 2.0,
+      "take": true,
+      "confidence": "low",
+      "size": "quarter",
+      "rationale": "score 50 (bos_retest); R:R 2.0; probation (0 decided) \u2014 tiny stake to learn",
+      "decided_by": "deterministic",
+      "pattern": "bos_retest",
+      "fx_blocked": "below calibrated FX_MIN_SCORE (50<85)"
     },
     {
       "symbol": "USDJPY=X",
@@ -31,8 +52,29 @@
     },
     {
       "symbol": "USDCAD=X",
-      "candidate": false,
-      "reject_reason": "no_setup"
+      "candidate": true,
+      "score": 50,
+      "direction": "long",
+      "setups": [
+        "bos_retest"
+      ],
+      "regime": "bullish",
+      "price": 1.43094,
+      "atr": 0.00696,
+      "entry": 1.42956,
+      "entry_low": 1.4273,
+      "entry_high": 1.43158,
+      "stop_loss": 1.42382,
+      "tp1": 1.44104,
+      "tp2": 1.44678,
+      "rr": 2.0,
+      "take": true,
+      "confidence": "low",
+      "size": "quarter",
+      "rationale": "score 50 (bos_retest); R:R 2.0; probation (0 decided) \u2014 tiny stake to learn",
+      "decided_by": "deterministic",
+      "pattern": "bos_retest",
+      "fx_blocked": "below calibrated FX_MIN_SCORE (50<85)"
     },
     {
       "symbol": "NZDUSD=X",
@@ -51,14 +93,43 @@
     }
   ],
   "opened": [],
-  "closed": [],
+  "closed": [
+    {
+      "id": "34e99913-074e-4d51-8461-72062f85401e",
+      "signal_id": "32de8201-278c-4b3d-a0f6-7dd211e701c1",
+      "symbol": "NZDUSD=X",
+      "direction": "short",
+      "setups": "[\"ob_retest\", \"bos_retest\"]",
+      "regime": "bearish",
+      "entry_price": 0.56139,
+      "stop_loss": 0.56139,
+      "original_sl": 0.5673,
+      "tp1": 0.54957,
+      "tp2": 0.54366,
+      "tp1_hit": 1,
+      "tp1_hit_at": "2026-11-17T01:00:00+00:00",
+      "size": "quarter",
+      "size_mult": 0.25,
+      "lots": 0.085,
+      "opened_at": "2026-11-10T03:42:13.015544+00:00",
+      "closed_at": "2026-11-18T03:01:39.507029+00:00",
+      "close_price": 0.56139,
+      "outcome": "BREAKEVEN",
+      "pnl_r": 0.0,
+      "raw_r": 0.0,
+      "journaled": 0,
+      "source": "forward",
+      "pattern": "ob_retest"
+    }
+  ],
   "system_stats": {
-    "total_closed": 1,
-    "open": 1,
+    "total_closed": 2,
+    "open": 0,
     "win_rate": null,
     "total_r": 0.012
   },
   "rejections": {
-    "no_setup": 9
+    "no_setup": 7,
+    "below calibrated FX_MIN_SCORE (50<85)": 2
   }
 }
