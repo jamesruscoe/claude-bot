@@ -1,5 +1,5 @@
 {
-  "scan_ts": "2026-11-17T21:28:54.235739+00:00",
+  "scan_ts": "2026-11-18T01:55:35.816326+00:00",
   "skipped": false,
   "llm": false,
   "market": "equities",
@@ -28,14 +28,14 @@
         "ob_retest"
       ],
       "regime": "bullish",
-      "price": 85.64,
-      "atr": 4.31122,
+      "price": 85.38,
+      "atr": 4.16193,
       "entry": 87.14,
       "entry_low": 85.13,
       "entry_high": 89.15,
-      "stop_loss": 91.30561,
-      "tp1": 78.80878,
-      "tp2": 74.64317,
+      "stop_loss": 91.23097,
+      "tp1": 78.95806,
+      "tp2": 74.86709,
       "rr": 2.0,
       "take": false,
       "confidence": "low",
@@ -61,28 +61,8 @@
     },
     {
       "symbol": "NFLX",
-      "candidate": true,
-      "score": 50,
-      "direction": "short",
-      "setups": [
-        "ob_retest"
-      ],
-      "regime": "bearish",
-      "price": 60.75,
-      "atr": 1.97386,
-      "entry": 63.655,
-      "entry_low": 62.75,
-      "entry_high": 64.56,
-      "stop_loss": 65.54693,
-      "tp1": 59.87114,
-      "tp2": 57.97921,
-      "rr": 2.0,
-      "take": false,
-      "confidence": "low",
-      "size": "none",
-      "rationale": "skip \u2014 NFLX track record is negative (win rate 20%, avg +0.05R over 6 trades)",
-      "decided_by": "deterministic",
-      "pattern": "ob_retest"
+      "candidate": false,
+      "reject_reason": "no_setup"
     },
     {
       "symbol": "AMD",
@@ -104,8 +84,8 @@
     "total_r": 0.229
   },
   "rejections": {
-    "no_setup": 7,
-    "judge_skip": 2,
-    "levels_rejected_wide_stop": 1
+    "no_setup": 8,
+    "levels_rejected_wide_stop": 1,
+    "judge_skip": 1
   }
 }
