@@ -1,5 +1,5 @@
 {
-  "scan_ts": "2026-11-18T21:03:30.976529+00:00",
+  "scan_ts": "2026-11-19T01:33:32.089093+00:00",
   "skipped": false,
   "llm": false,
   "market": "equities",
@@ -7,7 +7,7 @@
     {
       "symbol": "ARM",
       "candidate": false,
-      "reject_reason": "no_setup"
+      "reject_reason": "levels_rejected_wide_stop"
     },
     {
       "symbol": "NVDA",
@@ -17,7 +17,7 @@
     {
       "symbol": "TSLA",
       "candidate": false,
-      "reject_reason": "no_setup"
+      "reject_reason": "regime_blocked"
     },
     {
       "symbol": "USOIL",
@@ -37,7 +37,7 @@
     {
       "symbol": "AMZN",
       "candidate": false,
-      "reject_reason": "no_setup"
+      "reject_reason": "regime_blocked"
     },
     {
       "symbol": "NFLX",
@@ -64,7 +64,8 @@
     "total_r": 0.229
   },
   "rejections": {
-    "no_setup": 9,
-    "levels_rejected_wide_stop": 1
+    "no_setup": 6,
+    "regime_blocked": 2,
+    "levels_rejected_wide_stop": 2
   }
 }
