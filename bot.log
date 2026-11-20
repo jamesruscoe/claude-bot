@@ -687,3 +687,5 @@
 2026-11-18 21:04:33,023 [INFO] v2.report: wrote /home/runner/work/claude-bot/claude-bot/state/daily_report.md
 2026-11-19 01:34:33,555 [INFO] v2.report: wrote /home/runner/work/claude-bot/claude-bot/state/daily_report.md
 2026-11-19 21:09:54,687 [INFO] v2.report: wrote /home/runner/work/claude-bot/claude-bot/state/daily_report.md
+2026-11-20 01:30:09,422 [INFO] v2.store: trade opened: SMCI short @ 25.6800 (sl 26.9298 tp1 23.1804 tp2 21.9306) size=half x0.50
+2026-11-20 01:30:09,577 [INFO] v2.report: wrote /home/runner/work/claude-bot/claude-bot/state/daily_report.md
