@@ -1,5 +1,5 @@
 {
-  "scan_ts": "2026-11-20T01:29:07.711032+00:00",
+  "scan_ts": "2026-11-20T20:53:51.291407+00:00",
   "skipped": false,
   "llm": false,
   "market": "equities",
@@ -67,9 +67,7 @@
       "size": "half",
       "rationale": "score 50 (bos_retest); R:R 2.0; decent record (50%)",
       "decided_by": "deterministic",
-      "pattern": "bos_retest",
-      "opened": true,
-      "pattern_confidence": "unproven (n=25 fwd)"
+      "pattern": "bos_retest"
     },
     {
       "symbol": "APLD",
@@ -117,35 +115,7 @@
       "reject_reason": "no_setup"
     }
   ],
-  "opened": [
-    {
-      "id": "b9b18812-610d-45ba-ab5b-f860e7c1285c",
-      "signal_id": "8601079e-2b36-4afb-83b5-c318c617c6fc",
-      "symbol": "SMCI",
-      "direction": "short",
-      "setups": "[\"bos_retest\"]",
-      "regime": "bearish",
-      "entry_price": 25.68,
-      "stop_loss": 26.9298,
-      "original_sl": 26.9298,
-      "tp1": 23.1804,
-      "tp2": 21.9306,
-      "tp1_hit": 0,
-      "tp1_hit_at": null,
-      "size": "half",
-      "size_mult": 0.5,
-      "lots": null,
-      "source": "forward",
-      "pattern": "bos_retest",
-      "opened_at": "2026-11-20T01:29:07.711032+00:00",
-      "closed_at": null,
-      "close_price": null,
-      "outcome": null,
-      "pnl_r": null,
-      "raw_r": null,
-      "journaled": 0
-    }
-  ],
+  "opened": [],
   "closed": [],
   "system_stats": {
     "total_closed": 72,
