@@ -699,3 +699,6 @@
 2026-11-24 04:30:10,602 [INFO] v2.store: trade opened: SMCI short @ 21.7900 (sl 23.1144 tp1 19.1411 tp2 17.8167) size=half x0.50
 2026-11-24 04:30:10,680 [INFO] v2.store: trade opened: APLD short @ 13.6100 (sl 14.6100 tp1 11.6099 tp2 10.6099) size=full x1.00
 2026-11-24 04:30:10,767 [INFO] v2.report: wrote /home/runner/work/claude-bot/claude-bot/state/daily_report.md
+2026-11-24 22:54:18,399 [INFO] v2.pipeline: skip open SMCI short — already in an open position
+2026-11-24 22:54:18,406 [INFO] v2.pipeline: skip open APLD short — already in an open position
+2026-11-24 22:54:18,423 [INFO] v2.report: wrote /home/runner/work/claude-bot/claude-bot/state/daily_report.md
