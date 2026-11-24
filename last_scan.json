@@ -1,38 +1,18 @@
 {
-  "scan_ts": "2026-11-20T20:53:51.291407+00:00",
+  "scan_ts": "2026-11-24T00:33:00.455117+00:00",
   "skipped": false,
   "llm": false,
   "market": "equities",
   "results": [
     {
       "symbol": "ARM",
-      "candidate": true,
-      "score": 50,
-      "direction": "short",
-      "setups": [
-        "ob_retest"
-      ],
-      "regime": "bearish",
-      "price": 177.17,
-      "atr": 15.41156,
-      "entry": 179.065,
-      "entry_low": 173.2,
-      "entry_high": 184.93,
-      "stop_loss": 192.63578,
-      "tp1": 151.92344,
-      "tp2": 138.35266,
-      "rr": 2.0,
-      "take": false,
-      "confidence": "low",
-      "size": "none",
-      "rationale": "skip \u2014 ARM track record is negative (win rate 0%, avg -0.21R over 6 trades)",
-      "decided_by": "deterministic",
-      "pattern": "ob_retest"
+      "candidate": false,
+      "reject_reason": "no_setup"
     },
     {
       "symbol": "NVDA",
       "candidate": false,
-      "reject_reason": "levels_rejected_wide_stop"
+      "reject_reason": "no_setup"
     },
     {
       "symbol": "TSLA",
@@ -46,28 +26,8 @@
     },
     {
       "symbol": "SMCI",
-      "candidate": true,
-      "score": 50,
-      "direction": "short",
-      "setups": [
-        "bos_retest"
-      ],
-      "regime": "bearish",
-      "price": 23.84,
-      "atr": 2.42257,
-      "entry": 25.68,
-      "entry_low": 25.64148,
-      "entry_high": 25.71852,
-      "stop_loss": 26.9298,
-      "tp1": 23.1804,
-      "tp2": 21.9306,
-      "rr": 2.0,
-      "take": true,
-      "confidence": "medium",
-      "size": "half",
-      "rationale": "score 50 (bos_retest); R:R 2.0; decent record (50%)",
-      "decided_by": "deterministic",
-      "pattern": "bos_retest"
+      "candidate": false,
+      "reject_reason": "no_setup"
     },
     {
       "symbol": "APLD",
@@ -78,19 +38,19 @@
       "symbol": "AMZN",
       "candidate": true,
       "score": 50,
-      "direction": "long",
+      "direction": "short",
       "setups": [
         "ob_retest"
       ],
-      "regime": "ranging",
-      "price": 257.37,
-      "atr": 9.60797,
-      "entry": 259.8,
-      "entry_low": 256.68,
-      "entry_high": 262.92,
-      "stop_loss": 251.87601,
-      "tp1": 275.64798,
-      "tp2": 283.57197,
+      "regime": "bearish",
+      "price": 246.82,
+      "atr": 9.96883,
+      "entry": 263.9,
+      "entry_low": 259.51,
+      "entry_high": 268.29,
+      "stop_loss": 273.27442,
+      "tp1": 245.15116,
+      "tp2": 235.77674,
       "rr": 2.0,
       "take": false,
       "confidence": "low",
@@ -107,7 +67,7 @@
     {
       "symbol": "AMD",
       "candidate": false,
-      "reject_reason": "regime_blocked"
+      "reject_reason": "no_setup"
     },
     {
       "symbol": "COIN",
@@ -116,17 +76,43 @@
     }
   ],
   "opened": [],
-  "closed": [],
+  "closed": [
+    {
+      "id": "b9b18812-610d-45ba-ab5b-f860e7c1285c",
+      "signal_id": "8601079e-2b36-4afb-83b5-c318c617c6fc",
+      "symbol": "SMCI",
+      "direction": "short",
+      "setups": "[\"bos_retest\"]",
+      "regime": "bearish",
+      "entry_price": 25.68,
+      "stop_loss": 26.9298,
+      "original_sl": 26.9298,
+      "tp1": 23.1804,
+      "tp2": 21.9306,
+      "tp1_hit": 0,
+      "tp1_hit_at": null,
+      "opened_at": "2026-11-20T01:29:07.711032+00:00",
+      "closed_at": "2026-11-24T00:34:02.528347+00:00",
+      "close_price": 21.9306,
+      "outcome": "WIN_TP2",
+      "pnl_r": 1.5,
+      "journaled": 0,
+      "size": "half",
+      "size_mult": 0.5,
+      "lots": null,
+      "raw_r": 3.0,
+      "source": "forward",
+      "pattern": "bos_retest"
+    }
+  ],
   "system_stats": {
-    "total_closed": 72,
-    "open": 1,
-    "win_rate": 0.21568627450980393,
-    "total_r": 0.229
+    "total_closed": 73,
+    "open": 0,
+    "win_rate": 0.23076923076923078,
+    "total_r": 1.729
   },
   "rejections": {
-    "no_setup": 5,
-    "judge_skip": 2,
-    "regime_blocked": 1,
-    "levels_rejected_wide_stop": 1
+    "no_setup": 9,
+    "judge_skip": 1
   }
 }
