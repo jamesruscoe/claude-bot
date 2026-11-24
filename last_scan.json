@@ -1,5 +1,5 @@
 {
-  "scan_ts": "2026-11-20T02:28:48.637521+00:00",
+  "scan_ts": "2026-11-24T05:25:05.393719+00:00",
   "skipped": false,
   "llm": false,
   "market": "fx",
@@ -36,29 +36,8 @@
     },
     {
       "symbol": "NZDUSD=X",
-      "candidate": true,
-      "score": 50,
-      "direction": "short",
-      "setups": [
-        "bos_retest"
-      ],
-      "regime": "bearish",
-      "price": 0.54876,
-      "atr": 0.00481,
-      "entry": 0.54893,
-      "entry_low": 0.54825,
-      "entry_high": 0.54989,
-      "stop_loss": 0.5523,
-      "tp1": 0.54219,
-      "tp2": 0.53882,
-      "rr": 2.0,
-      "take": true,
-      "confidence": "low",
-      "size": "quarter",
-      "rationale": "score 50 (bos_retest); R:R 2.0; probation (0 decided) \u2014 tiny stake to learn",
-      "decided_by": "deterministic",
-      "pattern": "bos_retest",
-      "fx_blocked": "below calibrated FX_MIN_SCORE (50<85)"
+      "candidate": false,
+      "reject_reason": "no_setup"
     },
     {
       "symbol": "EURGBP=X",
@@ -67,29 +46,8 @@
     },
     {
       "symbol": "EURJPY=X",
-      "candidate": true,
-      "score": 50,
-      "direction": "short",
-      "setups": [
-        "bos_retest"
-      ],
-      "regime": "bearish",
-      "price": 174.66901,
-      "atr": 1.15018,
-      "entry": 175.09299,
-      "entry_low": 174.84832,
-      "entry_high": 175.37366,
-      "stop_loss": 175.94875,
-      "tp1": 173.38147,
-      "tp2": 172.52571,
-      "rr": 2.0,
-      "take": true,
-      "confidence": "low",
-      "size": "quarter",
-      "rationale": "score 50 (bos_retest); R:R 2.0; probation (0 decided) \u2014 tiny stake to learn",
-      "decided_by": "deterministic",
-      "pattern": "bos_retest",
-      "fx_blocked": "below calibrated FX_MIN_SCORE (50<85)"
+      "candidate": false,
+      "reject_reason": "no_setup"
     }
   ],
   "opened": [],
@@ -101,7 +59,6 @@
     "total_r": 0.012
   },
   "rejections": {
-    "no_setup": 7,
-    "below calibrated FX_MIN_SCORE (50<85)": 2
+    "no_setup": 9
   }
 }
