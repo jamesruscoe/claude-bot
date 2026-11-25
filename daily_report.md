@@ -1,22 +1,18 @@
-# Daily report — 2026-11-25T03:14:26+00:00
+# Daily report — 2026-11-25T22:07:33+00:00
 
 Market: **equities** · judge: deterministic · paper only
 
-## Candidates (3)
+## Candidates (2)
 - **TSLA** long score 50 R:R 2.0 — skip/low/none
-- **USOIL** short score 50 R:R 2.0 — skip/low/none
 - **NFLX** short score 50 R:R 2.0 — skip/low/none
-
-## Resolved this run (1)
-- SMCI LOSS — -0.5R (sized)
 
 ## Ledger (running, sized R)
 - 1 open · 74 closed · win rate 23% · total +1.23R
 
 ## Rejections by reason (all-time)
-- no_setup: 1218
-- regime_blocked: 329
-- judge_skip: 149
+- no_setup: 1225
+- regime_blocked: 330
+- judge_skip: 151
 - levels_rejected_wide_stop: 80
 - conflicting_setups: 6
 
