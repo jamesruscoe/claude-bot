@@ -501,3 +501,6 @@
 2026-11-25 04:26:31,207 [INFO] v2.pipeline: skip open AUDUSD=X — below calibrated FX_MIN_SCORE (50<85)
 2026-11-25 04:26:31,221 [INFO] v2.report: wrote /home/runner/work/claude-bot/claude-bot/state/daily_report.md
 2026-11-25 04:26:31,419 [INFO] v2.report: wrote /home/runner/work/claude-bot/claude-bot/state/daily_report.md
+2026-11-26 03:41:37,683 [INFO] v2.datasource: data source: FX (yfinance), 9 pairs
+2026-11-26 03:41:42,638 [INFO] v2.report: wrote /home/runner/work/claude-bot/claude-bot/state/daily_report.md
+2026-11-26 03:41:42,893 [INFO] v2.report: wrote /home/runner/work/claude-bot/claude-bot/state/daily_report.md
