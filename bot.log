@@ -710,3 +710,4 @@
 2026-11-26 02:31:33,237 [INFO] v2.pipeline: market closed — 2026-11-26 is a market holiday (exchange calendar). Skipping scan.
 2026-11-26 22:05:02,937 [INFO] v2.pipeline: market closed — 2026-11-26 is a market holiday (exchange calendar). Skipping scan.
 2026-11-27 02:32:10,710 [INFO] v2.report: wrote /home/runner/work/claude-bot/claude-bot/state/daily_report.md
+2026-11-27 21:48:19,861 [INFO] v2.report: wrote /home/runner/work/claude-bot/claude-bot/state/daily_report.md

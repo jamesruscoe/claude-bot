@@ -1,4 +1,4 @@
-# Daily report — 2026-11-27T02:32:10+00:00
+# Daily report — 2026-11-27T21:48:19+00:00
 
 Market: **equities** · judge: deterministic · paper only
 
@@ -10,10 +10,10 @@ Market: **equities** · judge: deterministic · paper only
 - 1 open · 74 closed · win rate 23% · total +1.23R
 
 ## Rejections by reason (all-time)
-- no_setup: 1230
-- regime_blocked: 331
-- judge_skip: 153
-- levels_rejected_wide_stop: 82
+- no_setup: 1235
+- regime_blocked: 332
+- judge_skip: 155
+- levels_rejected_wide_stop: 84
 - conflicting_setups: 6
 
 > Paper only. Live bid/ask via an OANDA practice account is a documented TODO (see ARCHITECTURE.md / PROGRESS.md) — fills here use yfinance mid + assumed spread.
